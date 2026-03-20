@@ -407,119 +407,32 @@ LANDING_HTML_5 = """
 </div>
 """
 
-# ── Credenciales de prueba por perfil ─────────────────────────────────────────
-PROFILE_CREDENTIALS = {
-    "admin":   ("admin@convivir.ar",  "admin123"),
-    "teacher": ("docente@colegio.ar", "docente123"),
-    "student": ("alumno@colegio.ar",  "alumno123"),
-    "family":  ("familia@colegio.ar", "familia123"),
-}
+# ── Login directo por perfil ──────────────────────────────────────────────────
+def login_as(role, name, email):
+    st.session_state.logged_in = True
+    st.session_state.show_login_panel = False
+    st.session_state.show_colegio = False
+    st.session_state.user = {"email": email, "role": role, "name": name}
+    st.rerun()
 
-# Agregar usuario familia
-USERS["familia@colegio.ar"] = {"password": "familia123", "role": "student", "name": "Carlos Martínez (Padre)"}
-
-# ── Estilos del selector de perfiles ─────────────────────────────────────────
-PROFILE_CSS = """
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
-.psel-overlay {
-    position:fixed; inset:0; z-index:999;
-    background:rgba(3,9,26,0.88); backdrop-filter:blur(14px);
-    display:flex; align-items:center; justify-content:center;
-}
-.psel-box {
-    background:#0d1b38;
-    border:1px solid rgba(74,158,255,0.15);
-    border-radius:20px;
-    padding:40px 44px 36px;
-    width:100%; max-width:560px;
-    box-shadow:0 32px 80px rgba(0,0,0,0.5);
-}
-.psel-logo { display:flex; align-items:center; gap:9px; margin-bottom:6px; }
-.psel-logo-txt { font-family:'Sora',sans-serif; font-size:18px; font-weight:800; color:#fff; letter-spacing:-0.4px; }
-.psel-logo-txt em { font-style:normal; color:#4a9eff; }
-.psel-title { font-family:'Sora',sans-serif; font-size:22px; font-weight:800; color:#fff; letter-spacing:-0.5px; margin-bottom:6px; margin-top:20px; }
-.psel-sub { font-size:13px; color:rgba(221,232,248,0.45); margin-bottom:28px; }
-
-/* Fila principal: Admin + Colegio */
-.psel-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:0; }
-
-/* Card primer nivel */
-.psel-card {
-    border-radius:14px; padding:22px 18px 20px;
-    border:1px solid rgba(74,158,255,0.12);
-    background:rgba(255,255,255,0.03);
-    cursor:pointer; transition:all .18s; text-align:center;
-    user-select:none;
-}
-.psel-card:hover {
-    border-color:rgba(74,158,255,0.4);
-    background:rgba(26,111,255,0.08);
-    transform:translateY(-2px);
-    box-shadow:0 8px 24px rgba(26,111,255,0.15);
-}
-.psel-card.selected {
-    border-color:#1a6fff;
-    background:rgba(26,111,255,0.12);
-    box-shadow:0 0 0 3px rgba(26,111,255,0.2);
-}
-.psel-card-icon { font-size:32px; margin-bottom:10px; }
-.psel-card-name { font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:#fff; margin-bottom:4px; }
-.psel-card-desc { font-size:11px; color:rgba(221,232,248,0.38); line-height:1.5; }
-
-/* Sub-cards dentro de Colegio */
-.psel-sub-label {
-    font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
-    color:#4a9eff; margin:20px 0 10px;
-}
-.psel-sub-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-.psel-sub-card {
-    border-radius:12px; padding:16px 10px 14px;
-    border:1px solid rgba(74,158,255,0.1);
-    background:rgba(255,255,255,0.025);
-    cursor:pointer; transition:all .18s; text-align:center;
-    user-select:none;
-}
-.psel-sub-card:hover {
-    border-color:rgba(74,158,255,0.35);
-    background:rgba(26,111,255,0.07);
-    transform:translateY(-2px);
-}
-.psel-sub-card.selected {
-    border-color:#1a6fff;
-    background:rgba(26,111,255,0.12);
-    box-shadow:0 0 0 2px rgba(26,111,255,0.25);
-}
-.psel-sub-icon { font-size:24px; margin-bottom:7px; }
-.psel-sub-name { font-family:'Sora',sans-serif; font-size:12px; font-weight:700; color:#fff; }
-</style>
-"""
-
-# ── Landing + Login ───────────────────────────────────────────────────────────
 def show_login():
     if "show_login_panel" not in st.session_state:
         st.session_state.show_login_panel = False
-    if "selected_profile" not in st.session_state:
-        st.session_state.selected_profile = None   # "admin" | "colegio"
-    if "selected_role" not in st.session_state:
-        st.session_state.selected_role = None      # "teacher" | "student" | "family"
+    if "show_colegio" not in st.session_state:
+        st.session_state.show_colegio = False
 
-    # ── Landing HTML ──────────────────────────────────────────────────────────
+    # Landing
     full_html = (
         LANDING_CSS
-        + LANDING_HTML_1
-        + LOGO_NAV
-        + LANDING_HTML_2
-        + LOGO_HERO
-        + LANDING_HTML_3
-        + LOGO_MOD
-        + LANDING_HTML_4
-        + LOGO_NAV
+        + LANDING_HTML_1 + LOGO_NAV
+        + LANDING_HTML_2 + LOGO_HERO
+        + LANDING_HTML_3 + LOGO_MOD
+        + LANDING_HTML_4 + LOGO_NAV
         + LANDING_HTML_5
     )
     st.markdown(full_html, unsafe_allow_html=True)
 
-    # Botón "Ingresar →" fijo arriba a la derecha
+    # Botón fijo arriba a la derecha
     st.markdown("""
     <style>
     div[data-testid="stVerticalBlock"] > div:first-child {
@@ -528,162 +441,140 @@ def show_login():
     </style>
     """, unsafe_allow_html=True)
 
-    col_spacer, col_btn = st.columns([12, 1])
+    _, col_btn = st.columns([12, 1])
     with col_btn:
         if st.button("Ingresar →", type="primary", key="open_login"):
             st.session_state.show_login_panel = True
-            st.session_state.selected_profile = None
-            st.session_state.selected_role = None
+            st.session_state.show_colegio = False
             st.rerun()
 
-    # ── Panel superpuesto ─────────────────────────────────────────────────────
     if not st.session_state.show_login_panel:
         return
 
-    # Overlay oscuro
-    st.markdown(
-        PROFILE_CSS
-        + '<div class="psel-overlay"></div>',
-        unsafe_allow_html=True
-    )
+    # Overlay
+    st.markdown("""
+    <style>
+    .ov { position:fixed; inset:0; z-index:998;
+          background:rgba(3,9,26,0.9); backdrop-filter:blur(16px); }
+    .pcard-wrap { border-radius:16px; padding:24px 14px 20px;
+        border:1px solid rgba(74,158,255,0.13);
+        background:rgba(255,255,255,0.035);
+        text-align:center; margin-bottom:4px; }
+    .pcard-ico { font-size:38px; margin-bottom:10px; }
+    .pcard-nm  { font-family:'Sora',sans-serif; font-size:14px;
+        font-weight:700; color:#0a1f5c; margin-bottom:4px; }
+    .pcard-ds  { font-size:11px; color:#5c6e8a; line-height:1.5; }
+    .panel-hd  { font-family:'Sora',sans-serif; font-size:19px;
+        font-weight:800; color:#0a1f5c; letter-spacing:-0.4px;
+        margin-bottom:4px; margin-top:12px; }
+    .panel-sb  { font-size:12.5px; color:#5c6e8a; margin-bottom:20px; }
+    </style>
+    <div class="ov"></div>
+    """, unsafe_allow_html=True)
 
-    # Centrar el panel con columnas
     _, col_mid, _ = st.columns([1, 1.6, 1])
     with col_mid:
         with st.container(border=True):
-
-            # Logo + título
+            # Logo
             st.markdown(
-                '<div class="psel-logo">'
+                "<div style='display:flex;align-items:center;gap:8px;'>"
                 + LOGO_NAV
-                + '<span class="psel-logo-txt">Con<em>Vivir</em></span>'
-                + '</div>'
-                + '<div class="psel-title">¿Cómo querés ingresar?</div>'
-                + '<div class="psel-sub">Seleccioná tu perfil para continuar</div>',
+                + "<span style='font-family:Sora,sans-serif;font-size:17px;"
+                  "font-weight:800;color:#0a1f5c;'>Con<span style='color:#1a6fff;'>"
+                  "Vivir</span></span></div>",
                 unsafe_allow_html=True
             )
 
-            # ── Paso 1: elegir Admin o Colegio ────────────────────────────────
-            sel = st.session_state.selected_profile
-
-            col_adm, col_col = st.columns(2)
-
-            with col_adm:
-                adm_sel = "selected" if sel == "admin" else ""
+            # ── Vista 1: Admin + Colegio ──────────────────────────────────────
+            if not st.session_state.show_colegio:
                 st.markdown(
-                    '<div class="psel-card ' + adm_sel + '">',
+                    "<div class='panel-hd'>¿Cómo querés ingresar?</div>"
+                    "<div class='panel-sb'>Seleccioná tu perfil para entrar directo</div>",
                     unsafe_allow_html=True
                 )
-                if st.button("🏛️\n\n**Administrador**\n\nGestión institucional y KYC",
-                             key="pick_admin", use_container_width=True):
-                    st.session_state.selected_profile = "admin"
-                    st.session_state.selected_role = None
-                    st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
-
-            with col_col:
-                col_sel = "selected" if sel == "colegio" else ""
-                st.markdown(
-                    '<div class="psel-card ' + col_sel + '">',
-                    unsafe_allow_html=True
-                )
-                if st.button("🏫\n\n**Colegio**\n\nDocentes, familias y alumnos",
-                             key="pick_colegio", use_container_width=True):
-                    st.session_state.selected_profile = "colegio"
-                    st.session_state.selected_role = None
-                    st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
-
-            # ── Paso 2: si eligió Colegio, mostrar sub-roles ──────────────────
-            if st.session_state.selected_profile == "colegio":
-                st.markdown("---")
-                st.markdown("**¿Cuál es tu rol en el colegio?**")
-
-                r = st.session_state.selected_role
-                c1, c2, c3 = st.columns(3)
-
-                with c1:
-                    t_sel = "✅ " if r == "teacher" else ""
-                    if st.button(t_sel + "👨‍🏫\nDocente", key="pick_teacher",
-                                 use_container_width=True,
-                                 type="primary" if r == "teacher" else "secondary"):
-                        st.session_state.selected_role = "teacher"
-                        st.rerun()
-
-                with c2:
-                    f_sel = "✅ " if r == "family" else ""
-                    if st.button(f_sel + "👨‍👩‍👧\nFamilia", key="pick_family",
-                                 use_container_width=True,
-                                 type="primary" if r == "family" else "secondary"):
-                        st.session_state.selected_role = "family"
-                        st.rerun()
-
-                with c3:
-                    s_sel = "✅ " if r == "student" else ""
-                    if st.button(s_sel + "🎒\nAlumno", key="pick_student",
-                                 use_container_width=True,
-                                 type="primary" if r == "student" else "secondary"):
-                        st.session_state.selected_role = "student"
-                        st.rerun()
-
-            # ── Paso 3: formulario de login según perfil seleccionado ─────────
-            profile = st.session_state.selected_profile
-            role    = st.session_state.selected_role
-
-            show_form = (profile == "admin") or (profile == "colegio" and role is not None)
-
-            if show_form:
-                st.markdown("---")
-
-                if profile == "admin":
-                    default_email = "admin@convivir.ar"
-                    hint = "admin@convivir.ar / admin123"
-                elif role == "teacher":
-                    default_email = "docente@colegio.ar"
-                    hint = "docente@colegio.ar / docente123"
-                elif role == "family":
-                    default_email = "familia@colegio.ar"
-                    hint = "familia@colegio.ar / familia123"
-                else:
-                    default_email = "alumno@colegio.ar"
-                    hint = "alumno@colegio.ar / alumno123"
-
-                email    = st.text_input("Email", value=default_email, key="login_email")
-                password = st.text_input("Contraseña", type="password", key="login_pass")
-
                 col_a, col_b = st.columns(2)
                 with col_a:
-                    if st.button("Ingresar", type="primary",
-                                 use_container_width=True, key="do_login"):
-                        user = USERS.get(email)
-                        if user and user["password"] == password:
-                            st.session_state.logged_in = True
-                            st.session_state.show_login_panel = False
-                            st.session_state.user = {
-                                "email": email,
-                                "role": user["role"],
-                                "name": user["name"],
-                            }
-                            st.rerun()
-                        else:
-                            st.error("Email o contraseña incorrectos.")
+                    st.markdown(
+                        "<div class='pcard-wrap'>"
+                        "<div class='pcard-ico'>🏛️</div>"
+                        "<div class='pcard-nm'>Administrador</div>"
+                        "<div class='pcard-ds'>Gestión de colegios,<br>docentes y KYC</div>"
+                        "</div>",
+                        unsafe_allow_html=True
+                    )
+                    if st.button("Entrar como Admin", key="go_admin",
+                                 use_container_width=True, type="primary"):
+                        login_as("admin", "Administrador", "admin@convivir.ar")
+
                 with col_b:
-                    if st.button("Cancelar", use_container_width=True, key="cancel_login"):
-                        st.session_state.show_login_panel = False
+                    st.markdown(
+                        "<div class='pcard-wrap'>"
+                        "<div class='pcard-ico'>🏫</div>"
+                        "<div class='pcard-nm'>Colegio</div>"
+                        "<div class='pcard-ds'>Docentes, familias<br>y alumnos</div>"
+                        "</div>",
+                        unsafe_allow_html=True
+                    )
+                    if st.button("Entrar a Colegio →", key="go_colegio",
+                                 use_container_width=True):
+                        st.session_state.show_colegio = True
                         st.rerun()
 
-                st.caption("Demo: " + hint)
-
-            elif profile is None:
-                # Aún no eligió nada: solo mostrar botón cancelar
-                if st.button("← Volver", use_container_width=True, key="cancel_login"):
+                st.markdown("---")
+                if st.button("← Cerrar", key="cancel_login", use_container_width=True):
                     st.session_state.show_login_panel = False
                     st.rerun()
+
+            # ── Vista 2: Docente / Familia / Alumno ───────────────────────────
             else:
-                # Eligió Colegio pero aún no el sub-rol
-                if st.button("← Volver", use_container_width=True, key="cancel_login"):
-                    st.session_state.show_login_panel = False
-                    st.session_state.selected_profile = None
+                st.markdown(
+                    "<div class='panel-hd'>Colegio</div>"
+                    "<div class='panel-sb'>¿Con qué perfil ingresás?</div>",
+                    unsafe_allow_html=True
+                )
+                c1, c2, c3 = st.columns(3)
+                with c1:
+                    st.markdown(
+                        "<div class='pcard-wrap'>"
+                        "<div class='pcard-ico'>👨‍🏫</div>"
+                        "<div class='pcard-nm'>Docente</div>"
+                        "<div class='pcard-ds'>Sociograma, alertas<br>y reportes</div>"
+                        "</div>",
+                        unsafe_allow_html=True
+                    )
+                    if st.button("Soy Docente", key="go_teacher",
+                                 use_container_width=True, type="primary"):
+                        login_as("teacher", "Prof. María García", "docente@colegio.ar")
+
+                with c2:
+                    st.markdown(
+                        "<div class='pcard-wrap'>"
+                        "<div class='pcard-ico'>👨‍👩‍👧</div>"
+                        "<div class='pcard-nm'>Familia</div>"
+                        "<div class='pcard-ds'>Contenido y<br>seguimiento</div>"
+                        "</div>",
+                        unsafe_allow_html=True
+                    )
+                    if st.button("Soy Familia", key="go_family",
+                                 use_container_width=True, type="primary"):
+                        login_as("student", "Carlos Martínez (Padre)", "familia@colegio.ar")
+
+                with c3:
+                    st.markdown(
+                        "<div class='pcard-wrap'>"
+                        "<div class='pcard-ico'>🎒</div>"
+                        "<div class='pcard-nm'>Alumno</div>"
+                        "<div class='pcard-ds'>Encuesta y<br>contenido</div>"
+                        "</div>",
+                        unsafe_allow_html=True
+                    )
+                    if st.button("Soy Alumno", key="go_student",
+                                 use_container_width=True, type="primary"):
+                        login_as("student", "Lucas Martínez", "alumno@colegio.ar")
+
+                st.markdown("---")
+                if st.button("← Volver", key="back_colegio", use_container_width=True):
+                    st.session_state.show_colegio = False
                     st.rerun()
 
 # ── Sidebar post-login ────────────────────────────────────────────────────────
