@@ -383,15 +383,13 @@ def show_login_page():
 
     st.markdown("""
     <style>
-    .ov { position:fixed; inset:0; z-index:998; background:rgba(3,9,26,0.9); backdrop-filter:blur(16px); }
-    .pcard-wrap { border-radius:16px; padding:24px 14px 20px; border:1px solid rgba(74,158,255,0.13); background:rgba(255,255,255,0.035); text-align:center; margin-bottom:4px; }
+    .pcard-wrap { border-radius:16px; padding:24px 14px 20px; border:1px solid rgba(74,158,255,0.13); background:#f0f4ff; text-align:center; margin-bottom:4px; }
     .pcard-ico { font-size:38px; margin-bottom:10px; }
     .pcard-nm  { font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:#0a1f5c; margin-bottom:4px; }
     .pcard-ds  { font-size:11px; color:#5c6e8a; line-height:1.5; }
     .panel-hd  { font-family:'Sora',sans-serif; font-size:19px; font-weight:800; color:#0a1f5c; letter-spacing:-0.4px; margin-bottom:4px; margin-top:12px; }
     .panel-sb  { font-size:12.5px; color:#5c6e8a; margin-bottom:20px; }
-    </style>
-    <div class="ov"></div>""", unsafe_allow_html=True)
+    </style>""", unsafe_allow_html=True)
 
     _, col_mid, _ = st.columns([1, 1.6, 1])
     with col_mid:
