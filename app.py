@@ -1,230 +1,153 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="ConVivir — Animar Infancias & Educación",
+    page_title="ConVivir — Plataforma de Convivencia Escolar",
     page_icon="🕸️",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# ══════════════════════════════════════════════════════════════════════════════
-# PALETA ANIMAR
-# teal:   #4db8a0  (color principal)
-# teal2:  #2a9a82  (hover)
-# orange: #e8621a  (acento)
-# dark:   #1a2e2a  (textos oscuros / sidebar)
-# cream:  #f5f0eb  (fondo interior)
-# cream2: #ede8e0  (fondo alterno)
-# ══════════════════════════════════════════════════════════════════════════════
-
 # ── Estilos globales (pantallas internas post-login) ──────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
-
-/* Sidebar */
-[data-testid="stSidebar"] { background-color: #1a2e2a !important; }
-[data-testid="stSidebar"] * { color: white !important; font-family:'DM Sans',sans-serif !important; }
-[data-testid="stSidebar"] hr { border-color: rgba(77,184,160,0.3) !important; }
-[data-testid="stSidebar"] .stButton > button {
-    background: rgba(77,184,160,0.15) !important;
-    border: 1px solid rgba(77,184,160,0.25) !important;
-    color: white !important;
-    border-radius: 8px !important;
-    font-family:'DM Sans',sans-serif !important;
-    font-weight: 500 !important;
-    transition: all .15s !important;
-}
-[data-testid="stSidebar"] .stButton > button:hover {
-    background: rgba(77,184,160,0.35) !important;
-    border-color: #4db8a0 !important;
-}
-
-/* Fondo interior */
-.main, .block-container { background: #f5f0eb !important; }
-.main .block-container { padding-top: 2rem; }
-
-/* Tipografía */
-h1 { font-family:'Sora',sans-serif !important; color:#1a2e2a !important; font-weight:800 !important; letter-spacing:-0.5px !important; }
-h2 { font-family:'Sora',sans-serif !important; color:#1a2e2a !important; font-weight:700 !important; letter-spacing:-0.3px !important; }
-h3 { font-family:'Sora',sans-serif !important; color:#2a9a82 !important; font-weight:700 !important; }
-p, li, label { font-family:'DM Sans',sans-serif !important; }
-
-/* Botones primarios */
-.stButton > button[kind="primary"] {
-    background: #4db8a0 !important;
-    border: none !important;
-    font-family:'Sora',sans-serif !important;
-    font-weight:700 !important;
-    border-radius: 8px !important;
-    letter-spacing: 0.2px !important;
-}
-.stButton > button[kind="primary"]:hover { background: #2a9a82 !important; }
-
-/* Badges */
-.badge-admin   { background:#d4ede8; color:#1a6b5a; padding:3px 12px; border-radius:20px; font-size:12px; font-weight:700; }
-.badge-teacher { background:#d4ede8; color:#1a6b5a; padding:3px 12px; border-radius:20px; font-size:12px; font-weight:700; }
-.badge-student { background:#fde8d0; color:#c0511a; padding:3px 12px; border-radius:20px; font-size:12px; font-weight:700; }
-
-/* Alertas */
-.alert-high   { background:#fdeaea; border-left:4px solid #c0392b; border-radius:8px; padding:12px 16px; margin:8px 0; }
-.alert-medium { background:#fef0e6; border-left:4px solid #e8621a; border-radius:8px; padding:12px 16px; margin:8px 0; }
-.alert-low    { background:#d4ede8; border-left:4px solid #4db8a0; border-radius:8px; padding:12px 16px; margin:8px 0; }
-
-/* Métricas */
-[data-testid="stMetric"] { background:white; border-radius:12px; padding:14px 18px; border:1px solid #e0d8d0; }
-[data-testid="stMetricLabel"] { color:#6b5e52 !important; font-family:'DM Sans',sans-serif !important; }
-[data-testid="stMetricValue"] { color:#1a2e2a !important; font-family:'Sora',sans-serif !important; font-weight:800 !important; }
+  [data-testid="stSidebar"] { background-color: #1a2e2a; }
+  [data-testid="stSidebar"] * { color: white !important; }
+  [data-testid="stSidebar"] hr { border-color: rgba(77,184,160,0.25); }
+  .main .block-container { padding-top: 2rem; }
+  h1 { color: #0a1f5c; }
+  h2 { color: #0a1f5c; }
+  h3 { color: #1a56a0; }
+  .badge-admin   { background:#e8effe; color:#1a56a0; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; }
+  .badge-teacher { background:#e6f4ee; color:#1d7a55; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; }
+  .badge-student { background:#fde8d0; color:#d4580a; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; }
+  .alert-high   { background:#fdeaea; border-left:4px solid #c0392b; border-radius:8px; padding:12px 16px; margin:8px 0; }
+  .alert-medium { background:#fef3e2; border-left:4px solid #d4580a; border-radius:8px; padding:12px 16px; margin:8px 0; }
+  .alert-low    { background:#e6f4ee; border-left:4px solid #1d7a55; border-radius:8px; padding:12px 16px; margin:8px 0; }
 </style>
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# LOGOS EN SVG — Paleta Animar (teal + orange)
+# LOGOS SVG — Marca Animar fiel
+# A grande en teal con figura humana, texto ANIMAR bold, subtítulo spaced,
+# cuadradito naranja sobre la A (como en la identidad visual original)
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Logo navbar (fondo teal, figura blanca)
+# Logo horizontal navbar (ícono A + texto ANIMAR + subtítulo)
 LOGO_NAV = (
-    '<svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
-    '<rect width="100" height="100" rx="14" fill="#4db8a0"/>'
-    '<path d="M10,94 L36,18 L50,18 L50,94 Z" fill="#1a2e2a" opacity="0.9"/>'
-    '<path d="M90,94 L64,18 L50,18 L50,94 Z" fill="#1a2e2a" opacity="0.9"/>'
-    '<circle cx="50" cy="42" r="10" fill="white"/>'
-    '<path d="M50,52 Q34,44 26,30" stroke="white" stroke-width="8" stroke-linecap="round" fill="none"/>'
-    '<path d="M50,52 Q66,44 74,30" stroke="white" stroke-width="8" stroke-linecap="round" fill="none"/>'
-    '<line x1="50" y1="52" x2="50" y2="72" stroke="white" stroke-width="8" stroke-linecap="round"/>'
-    '<line x1="50" y1="72" x2="41" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/>'
-    '<line x1="50" y1="72" x2="59" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/>'
-    '<rect x="44" y="14" width="12" height="8" rx="2" fill="#e8621a"/>'
+    '<svg width="148" height="40" viewBox="0 0 296 80" xmlns="http://www.w3.org/2000/svg">' 
+    '<path d="M4,76 L24,8 L32,8 L32,76 Z" fill="#4db8a0"/>' 
+    '<path d="M60,76 L40,8 L32,8 L32,76 Z" fill="#4db8a0"/>' 
+    '<circle cx="32" cy="23" r="7.5" fill="#0e1c19"/>' 
+    '<path d="M32,30.5 Q21,25 17,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>' 
+    '<path d="M32,30.5 Q43,25 47,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>' 
+    '<line x1="32" y1="30.5" x2="32" y2="48" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>' 
+    '<line x1="32" y1="48" x2="26" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>' 
+    '<line x1="32" y1="48" x2="38" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>' 
+    '<rect x="27" y="3" width="10" height="7" rx="1.5" fill="#e8621a"/>' 
+    '<text x="74" y="50" font-family="Arial Black,Impact,sans-serif" font-size="36" font-weight="900" fill="#1a2e2a" letter-spacing="1">ANIMAR</text>' 
+    '<text x="74" y="66" font-family="Arial,sans-serif" font-size="9.5" font-weight="400" fill="#4db8a0" letter-spacing="2.5">INFANCIAS &amp; EDUCACI&#xD3;N</text>' 
     '</svg>'
 )
 
-# Logo hero grande con gradiente teal
+# Logo vertical para el hero (solo ícono grande + texto debajo, sin anillos)
 LOGO_HERO = (
-    '<svg width="140" height="140" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">'
-    '<defs>'
-    '<linearGradient id="hg2" x1="0%" y1="0%" x2="100%" y2="100%">'
-    '<stop offset="0%" stop-color="#4db8a0"/>'
-    '<stop offset="100%" stop-color="#1a6b5a"/>'
-    '</linearGradient>'
-    '<filter id="gl2"><feGaussianBlur stdDeviation="4" result="b"/>'
-    '<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
-    '</defs>'
-    '<rect width="200" height="200" rx="32" fill="url(#hg2)"/>'
-    '<path d="M14,190 L58,24 L100,24 L100,190 Z" fill="#1a2e2a" opacity="0.75"/>'
-    '<path d="M186,190 L142,24 L100,24 L100,190 Z" fill="#1a2e2a" opacity="0.75"/>'
-    '<circle cx="100" cy="82" r="20" fill="white" filter="url(#gl2)"/>'
-    '<path d="M100,102 Q75,90 56,64" stroke="white" stroke-width="15" stroke-linecap="round" fill="none" filter="url(#gl2)"/>'
-    '<path d="M100,102 Q125,90 144,64" stroke="white" stroke-width="15" stroke-linecap="round" fill="none" filter="url(#gl2)"/>'
-    '<line x1="100" y1="102" x2="100" y2="146" stroke="white" stroke-width="15" stroke-linecap="round" filter="url(#gl2)"/>'
-    '<line x1="100" y1="146" x2="82" y2="178" stroke="white" stroke-width="13" stroke-linecap="round" filter="url(#gl2)"/>'
-    '<line x1="100" y1="146" x2="118" y2="178" stroke="white" stroke-width="13" stroke-linecap="round" filter="url(#gl2)"/>'
-    '<rect x="88" y="18" width="24" height="14" rx="4" fill="#e8621a"/>'
+    '<svg width="200" height="228" viewBox="0 0 200 228" xmlns="http://www.w3.org/2000/svg">' 
+    '<path d="M8,182 L70,10 L100,10 L100,182 Z" fill="#4db8a0"/>' 
+    '<path d="M192,182 L130,10 L100,10 L100,182 Z" fill="#4db8a0"/>' 
+    '<circle cx="100" cy="48" r="17" fill="#0e1c19"/>' 
+    '<path d="M100,65 Q74,53 58,32" stroke="#0e1c19" stroke-width="13" stroke-linecap="round" fill="none"/>' 
+    '<path d="M100,65 Q126,53 142,32" stroke="#0e1c19" stroke-width="13" stroke-linecap="round" fill="none"/>' 
+    '<line x1="100" y1="65" x2="100" y2="108" stroke="#0e1c19" stroke-width="13" stroke-linecap="round"/>' 
+    '<line x1="100" y1="108" x2="83" y2="140" stroke="#0e1c19" stroke-width="11" stroke-linecap="round"/>' 
+    '<line x1="100" y1="108" x2="117" y2="140" stroke="#0e1c19" stroke-width="11" stroke-linecap="round"/>' 
+    '<rect x="88" y="2" width="24" height="15" rx="3" fill="#e8621a"/>' 
+    '<text x="100" y="207" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-size="38" font-weight="900" fill="white" letter-spacing="2">ANIMAR</text>' 
+    '<text x="100" y="224" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="400" fill="rgba(221,232,228,0.55)" letter-spacing="2.5">INFANCIAS &amp; EDUCACI&#xD3;N</text>' 
     '</svg>'
 )
 
-# Logo módulo M3 (sociograma)
+# Logo ícono solo para M3 / módulo sociograma
 LOGO_MOD = (
-    '<svg width="42" height="42" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
-    '<rect width="100" height="100" rx="18" fill="rgba(77,184,160,0.15)"/>'
-    '<path d="M12,92 L36,20 L50,20 L50,92 Z" fill="#4db8a0" opacity="0.8"/>'
-    '<path d="M88,92 L64,20 L50,20 L50,92 Z" fill="#4db8a0" opacity="0.8"/>'
-    '<circle cx="50" cy="44" r="9" fill="#1a2e2a"/>'
-    '<path d="M50,53 Q39,47 32,36" stroke="#1a2e2a" stroke-width="6" stroke-linecap="round" fill="none"/>'
-    '<path d="M50,53 Q61,47 68,36" stroke="#1a2e2a" stroke-width="6" stroke-linecap="round" fill="none"/>'
-    '<line x1="50" y1="53" x2="50" y2="70" stroke="#1a2e2a" stroke-width="6" stroke-linecap="round"/>'
-    '<line x1="50" y1="70" x2="43" y2="83" stroke="#1a2e2a" stroke-width="5" stroke-linecap="round"/>'
-    '<line x1="50" y1="70" x2="57" y2="83" stroke="#1a2e2a" stroke-width="5" stroke-linecap="round"/>'
-    '<rect x="44" y="14" width="12" height="8" rx="2" fill="#e8621a"/>'
+    '<svg width="42" height="42" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' 
+    '<rect width="100" height="100" rx="14" fill="rgba(77,184,160,0.15)"/>' 
+    '<path d="M8,94 L33,12 L50,12 L50,94 Z" fill="#4db8a0"/>' 
+    '<path d="M92,94 L67,12 L50,12 L50,94 Z" fill="#4db8a0"/>' 
+    '<circle cx="50" cy="30" r="9" fill="#0e1c19"/>' 
+    '<path d="M50,39 Q38,33 31,21" stroke="#0e1c19" stroke-width="6.5" stroke-linecap="round" fill="none"/>' 
+    '<path d="M50,39 Q62,33 69,21" stroke="#0e1c19" stroke-width="6.5" stroke-linecap="round" fill="none"/>' 
+    '<line x1="50" y1="39" x2="50" y2="58" stroke="#0e1c19" stroke-width="6.5" stroke-linecap="round"/>' 
+    '<line x1="50" y1="58" x2="43" y2="72" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>' 
+    '<line x1="50" y1="58" x2="57" y2="72" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>' 
+    '<rect x="44" y="6" width="12" height="8" rx="2" fill="#e8621a"/>' 
     '</svg>'
 )
 
-# Logo sidebar (sobre fondo oscuro — figura en teal)
+# Logo horizontal para sidebar (sobre fondo oscuro)
 LOGO_SIDEBAR = (
-    '<svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
-    '<rect width="100" height="100" rx="14" fill="#4db8a0"/>'
-    '<path d="M10,94 L36,18 L50,18 L50,94 Z" fill="#1a2e2a" opacity="0.85"/>'
-    '<path d="M90,94 L64,18 L50,18 L50,94 Z" fill="#1a2e2a" opacity="0.85"/>'
-    '<circle cx="50" cy="42" r="10" fill="white"/>'
-    '<path d="M50,52 Q34,44 26,30" stroke="white" stroke-width="8" stroke-linecap="round" fill="none"/>'
-    '<path d="M50,52 Q66,44 74,30" stroke="white" stroke-width="8" stroke-linecap="round" fill="none"/>'
-    '<line x1="50" y1="52" x2="50" y2="72" stroke="white" stroke-width="8" stroke-linecap="round"/>'
-    '<line x1="50" y1="72" x2="41" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/>'
-    '<line x1="50" y1="72" x2="59" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/>'
-    '<rect x="44" y="14" width="12" height="8" rx="2" fill="#e8621a"/>'
+    '<svg width="148" height="40" viewBox="0 0 296 80" xmlns="http://www.w3.org/2000/svg">' 
+    '<path d="M4,76 L24,8 L32,8 L32,76 Z" fill="#4db8a0"/>' 
+    '<path d="M60,76 L40,8 L32,8 L32,76 Z" fill="#4db8a0"/>' 
+    '<circle cx="32" cy="23" r="7.5" fill="#0e1c19"/>' 
+    '<path d="M32,30.5 Q21,25 17,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>' 
+    '<path d="M32,30.5 Q43,25 47,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>' 
+    '<line x1="32" y1="30.5" x2="32" y2="48" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>' 
+    '<line x1="32" y1="48" x2="26" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>' 
+    '<line x1="32" y1="48" x2="38" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>' 
+    '<rect x="27" y="3" width="10" height="7" rx="1.5" fill="#e8621a"/>' 
+    '<text x="74" y="50" font-family="Arial Black,Impact,sans-serif" font-size="36" font-weight="900" fill="white" letter-spacing="1">ANIMAR</text>' 
+    '<text x="74" y="66" font-family="Arial,sans-serif" font-size="9.5" font-weight="400" fill="rgba(77,184,160,0.65)" letter-spacing="2.5">INFANCIAS &amp; EDUCACI&#xD3;N</text>' 
     '</svg>'
 )
 
-# ── Datos de usuarios ─────────────────────────────────────────────────────────
+# ── Datos de usuarios de prueba ───────────────────────────────────────────────
 USERS = {
-    "admin@convivir.ar":  {"password": "admin123",   "role": "admin",   "name": "Administrador"},
-    "docente@colegio.ar": {"password": "docente123", "role": "teacher", "name": "Prof. María García"},
-    "alumno@colegio.ar":  {"password": "alumno123",  "role": "student", "name": "Lucas Martínez"},
+    "admin@convivir.ar":   {"password": "admin123",   "role": "admin",   "name": "Administrador"},
+    "docente@colegio.ar":  {"password": "docente123", "role": "teacher", "name": "Prof. María García"},
+    "alumno@colegio.ar":   {"password": "alumno123",  "role": "student", "name": "Lucas Martínez"},
 }
 
 # ── Estado de sesión ──────────────────────────────────────────────────────────
-if "logged_in" not in st.session_state: st.session_state.logged_in = False
-if "user"      not in st.session_state: st.session_state.user      = None
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "user" not in st.session_state:
+    st.session_state.user = None
 
-# ══════════════════════════════════════════════════════════════════════════════
-# CSS LANDING — Identidad Animar
-# Fondo oscuro con acento teal y naranja, tipografía Sora bold
-# ══════════════════════════════════════════════════════════════════════════════
+# ── CSS de la landing (sin variables Python, sin f-string) ────────────────────
 LANDING_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 .block-container { padding:0!important; max-width:100%!important; }
 header[data-testid="stHeader"] { display:none; }
-[data-testid="stSidebar"]      { display:none; }
+[data-testid="stSidebar"] { display:none; }
 
-/* ── BASE ── */
-.cv {
-    font-family:'DM Sans',sans-serif;
-    background:#0e1c19;
-    color:#dde8e4;
-    min-height:100vh;
-}
+.cv { font-family:'DM Sans',sans-serif; background:#03091a; color:#dde8f8; min-height:100vh; }
 
-/* ── NAV ── */
 .cv-nav {
     position:fixed; top:0; left:0; right:0; z-index:100;
     display:flex; align-items:center; justify-content:space-between;
     padding:0 52px; height:66px;
-    background:rgba(14,28,25,0.92);
-    backdrop-filter:blur(20px);
-    border-bottom:1px solid rgba(77,184,160,0.15);
+    background:rgba(3,9,26,0.9); backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(74,158,255,0.1);
 }
-.cv-logo { display:flex; align-items:center; gap:11px; }
-.cv-logo-txt {
-    font-family:'Sora',sans-serif; font-size:20px; font-weight:800;
-    color:#fff; letter-spacing:-0.4px;
-}
-.cv-logo-txt em { font-style:normal; color:#4db8a0; }
-.cv-logo-sub {
-    font-size:9px; font-weight:600; letter-spacing:2.5px;
-    text-transform:uppercase; color:rgba(221,232,228,0.35);
-    display:block; margin-top:1px;
-}
-.cv-nav-links {
-    display:flex; gap:34px; font-size:13px; font-weight:500;
-    color:rgba(221,232,228,0.4);
-}
+.cv-logo { display:flex; align-items:center; gap:10px; }
+.cv-logo-txt { font-family:'Sora',sans-serif; font-size:20px; font-weight:800; color:#fff; letter-spacing:-0.4px; }
+.cv-logo-txt em { font-style:normal; color:#4a9eff; }
+.cv-nav-links { display:flex; gap:34px; font-size:13px; font-weight:500; color:rgba(221,232,248,0.4); }
 
-/* ── HERO ── */
 .cv-hero {
     min-height:100vh; display:flex; flex-direction:column; justify-content:center;
     padding:120px 52px 80px; position:relative; overflow:hidden;
     background:
-        radial-gradient(ellipse 90% 65% at 50% -5%, rgba(77,184,160,0.18) 0%, transparent 65%),
-        radial-gradient(ellipse 45% 45% at 87% 38%, rgba(232,98,26,0.07) 0%, transparent 55%),
-        #0e1c19;
+        radial-gradient(ellipse 90% 65% at 50% -5%, rgba(26,111,255,0.2) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 45% at 87% 38%, rgba(59,130,246,0.08) 0%, transparent 55%),
+        #03091a;
 }
 .cv-hero::before {
     content:''; position:absolute; inset:0;
     background-image:
-        linear-gradient(rgba(77,184,160,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(77,184,160,0.04) 1px, transparent 1px);
-    background-size:60px 60px;
+        linear-gradient(rgba(74,158,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,158,255,0.035) 1px, transparent 1px);
+    background-size:64px 64px;
     mask-image:radial-gradient(ellipse 80% 55% at 50% 0%, black, transparent 72%);
 }
 .cv-hero-inner {
@@ -233,186 +156,119 @@ header[data-testid="stHeader"] { display:none; }
 }
 .cv-tag {
     display:inline-flex; align-items:center; gap:7px;
-    background:rgba(77,184,160,0.12); border:1px solid rgba(77,184,160,0.3);
-    border-radius:100px; padding:5px 16px;
-    font-size:10px; font-weight:700; letter-spacing:2.5px;
-    text-transform:uppercase; color:#4db8a0; margin-bottom:22px;
+    background:rgba(26,111,255,0.1); border:1px solid rgba(74,158,255,0.22);
+    border-radius:100px; padding:5px 14px;
+    font-size:10.5px; font-weight:700; letter-spacing:2px;
+    text-transform:uppercase; color:#60a5fa; margin-bottom:22px;
 }
 .cv-hero h1 {
     font-family:'Sora',sans-serif;
-    font-size:clamp(38px,5vw,68px); font-weight:800;
-    line-height:1.06; letter-spacing:-2.5px; color:#fff; margin-bottom:20px;
+    font-size:clamp(36px,5vw,66px); font-weight:800;
+    line-height:1.07; letter-spacing:-2.5px; color:#fff; margin-bottom:20px;
 }
-.cv-hero h1 em { font-style:normal; color:#4db8a0; }
-.cv-hero h1 strong { color:#e8621a; font-style:normal; }
+.cv-hero h1 em { font-style:normal; color:#4a9eff; }
 .cv-hero-sub {
     font-size:16.5px; font-weight:300; line-height:1.75;
-    color:rgba(221,232,228,0.55); max-width:510px;
+    color:rgba(221,232,248,0.52); max-width:510px;
 }
-
-/* Logo hero — anillos animados */
 .cv-logo-hero {
-    position:relative; width:220px; height:220px;
+    position:relative; width:210px; height:210px;
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
 }
-.cv-logo-ring1 {
-    position:absolute; inset:0; border-radius:50%;
-    border:1px solid rgba(77,184,160,0.18);
-    animation:spin1 22s linear infinite;
-}
-.cv-logo-ring1::after {
-    content:''; position:absolute; top:-6px; left:50%; transform:translateX(-50%);
-    width:12px; height:12px; border-radius:50%; background:#4db8a0;
-    box-shadow:0 0 16px 4px rgba(77,184,160,0.6);
-}
-.cv-logo-ring2 {
-    position:absolute; inset:24px; border-radius:50%;
-    border:1px dashed rgba(232,98,26,0.12);
-    animation:spin1 35s linear infinite reverse;
-}
-.cv-logo-ring2::after {
-    content:''; position:absolute; bottom:-5px; left:50%; transform:translateX(-50%);
-    width:8px; height:8px; border-radius:50%; background:#e8621a;
-    box-shadow:0 0 10px 3px rgba(232,98,26,0.5);
-}
-@keyframes spin1 { to { transform:rotate(360deg); } }
-.cv-logo-glow {
-    position:absolute; inset:-30px; border-radius:50%;
-    background:radial-gradient(circle, rgba(77,184,160,0.14) 0%, transparent 68%);
-    animation:pulse1 4s ease-in-out infinite;
-}
-@keyframes pulse1 { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.1)} }
 
-/* Stats */
 .cv-stats {
     display:flex; gap:0; margin-top:56px; padding-top:40px;
-    border-top:1px solid rgba(77,184,160,0.12); position:relative; z-index:1;
+    border-top:1px solid rgba(74,158,255,0.09); position:relative; z-index:1;
 }
-.cv-stat { flex:1; padding-right:36px; margin-right:36px; border-right:1px solid rgba(77,184,160,0.08); }
+.cv-stat { flex:1; padding-right:36px; margin-right:36px; border-right:1px solid rgba(74,158,255,0.07); }
 .cv-stat:last-child { border-right:none; padding-right:0; margin-right:0; }
 .cv-stat-n { font-family:'Sora',sans-serif; font-size:36px; font-weight:800; letter-spacing:-2px; line-height:1; color:#fff; margin-bottom:5px; }
-.cv-stat-n b { color:#4db8a0; }
-.cv-stat-l { font-size:12px; color:rgba(221,232,228,0.36); line-height:1.55; }
+.cv-stat-n b { color:#4a9eff; }
+.cv-stat-l { font-size:12px; color:rgba(221,232,248,0.36); line-height:1.55; }
 
-/* ── SECCIONES ── */
 .cv-s  { padding:84px 52px; }
-.cv-sa { padding:84px 52px; background:rgba(77,184,160,0.04); border-top:1px solid rgba(77,184,160,0.08); border-bottom:1px solid rgba(77,184,160,0.08); }
-.cv-eyebrow { font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#4db8a0; margin-bottom:14px; }
-.cv-s h2, .cv-sa h2 { font-family:'Sora',sans-serif; font-size:clamp(24px,2.7vw,40px); font-weight:800; letter-spacing:-1px; color:#fff; line-height:1.1; margin-bottom:12px; }
-.cv-intro { font-size:16px; color:rgba(221,232,228,0.48); max-width:560px; line-height:1.72; margin-bottom:48px; }
+.cv-sa { padding:84px 52px; background:rgba(26,111,255,0.022); border-top:1px solid rgba(74,158,255,0.065); border-bottom:1px solid rgba(74,158,255,0.065); }
+.cv-eyebrow { font-size:10px; font-weight:700; letter-spacing:2.8px; text-transform:uppercase; color:#4a9eff; margin-bottom:13px; }
+.cv-s h2, .cv-sa h2 { font-family:'Sora',sans-serif; font-size:clamp(24px,2.7vw,38px); font-weight:800; letter-spacing:-1px; color:#fff; line-height:1.12; margin-bottom:12px; }
+.cv-intro { font-size:16px; color:rgba(221,232,248,0.48); max-width:560px; line-height:1.72; margin-bottom:48px; }
 
-/* Problema cards */
 .pg { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-.pc { background:rgba(255,255,255,0.03); border:1px solid rgba(77,184,160,0.1); border-radius:18px; padding:28px; transition:all .2s; }
-.pc:hover { border-color:rgba(77,184,160,0.35); background:rgba(77,184,160,0.06); transform:translateY(-3px); }
-.pc-icon { font-size:26px; margin-bottom:14px; }
-.pc h3 { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:#fff; margin-bottom:10px; }
-.pc p  { font-size:13px; color:rgba(221,232,228,0.46); line-height:1.65; }
-.pc-stat { font-family:'Sora',sans-serif; font-size:30px; font-weight:800; color:#e8621a; margin-top:18px; letter-spacing:-1px; }
-.pc-sub  { font-size:10.5px; color:rgba(221,232,228,0.28); margin-top:3px; }
+.pc { background:rgba(255,255,255,0.023); border:1px solid rgba(74,158,255,0.09); border-radius:18px; padding:26px; transition:all .2s; }
+.pc:hover { border-color:rgba(74,158,255,0.28); background:rgba(26,111,255,0.055); transform:translateY(-3px); }
+.pc-icon { font-size:24px; margin-bottom:12px; }
+.pc h3 { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:#fff; margin-bottom:9px; }
+.pc p  { font-size:13px; color:rgba(221,232,248,0.46); line-height:1.65; }
+.pc-stat { font-family:'Sora',sans-serif; font-size:28px; font-weight:800; color:#4a9eff; margin-top:16px; letter-spacing:-1px; }
+.pc-sub  { font-size:10.5px; color:rgba(221,232,248,0.28); margin-top:2px; }
 
-/* Módulos */
-.mg { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
-.mc { background:rgba(255,255,255,0.025); border:1px solid rgba(77,184,160,0.09); border-radius:16px; padding:22px 14px 18px; text-align:center; transition:all .2s; }
-.mc:hover { background:rgba(77,184,160,0.08); border-color:rgba(77,184,160,0.35); transform:translateY(-5px); box-shadow:0 12px 30px rgba(77,184,160,0.12); }
+.mg { display:grid; grid-template-columns:repeat(5,1fr); gap:11px; }
+.mc { background:rgba(255,255,255,0.02); border:1px solid rgba(74,158,255,0.08); border-radius:16px; padding:22px 14px 18px; text-align:center; transition:all .2s; }
+.mc:hover { background:rgba(26,111,255,0.07); border-color:rgba(74,158,255,0.28); transform:translateY(-5px); box-shadow:0 12px 30px rgba(26,111,255,0.14); }
 .mc-icon { font-size:26px; margin-bottom:8px; }
-.mc-logo { width:42px; height:42px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; }
-.mc-id   { font-family:'Sora',monospace; font-size:9px; color:#4db8a0; font-weight:700; letter-spacing:1.5px; margin-bottom:5px; }
+.mc-logo { width:40px; height:40px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; }
+.mc-id   { font-family:'Sora',monospace; font-size:9px; color:#4a9eff; font-weight:700; letter-spacing:1.5px; margin-bottom:5px; }
 .mc-name { font-family:'Sora',sans-serif; font-size:12px; font-weight:700; color:#fff; line-height:1.3; margin-bottom:6px; }
-.mc-desc { font-size:10.5px; color:rgba(221,232,228,0.36); line-height:1.55; }
+.mc-desc { font-size:10.5px; color:rgba(221,232,248,0.36); line-height:1.55; }
 
-/* Actores */
-.ag { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
-.ac { border-radius:18px; padding:26px 20px; border:1px solid transparent; transition:transform .2s; }
+.ag { display:grid; grid-template-columns:repeat(4,1fr); gap:13px; }
+.ac { border-radius:18px; padding:24px 20px; border:1px solid transparent; transition:transform .2s; }
 .ac:hover { transform:translateY(-4px); }
-.ac-adm { background:linear-gradient(145deg,rgba(77,184,160,.18),rgba(77,184,160,.04)); border-color:rgba(77,184,160,.3); }
-.ac-tch { background:linear-gradient(145deg,rgba(77,184,160,.18),rgba(77,184,160,.04)); border-color:rgba(77,184,160,.3); }
-.ac-stu { background:linear-gradient(145deg,rgba(232,98,26,.18),rgba(232,98,26,.04)); border-color:rgba(232,98,26,.3); }
-.ac-fam { background:linear-gradient(145deg,rgba(232,98,26,.12),rgba(232,98,26,.03)); border-color:rgba(232,98,26,.25); }
-.ac-emoji { font-size:30px; margin-bottom:12px; display:block; }
-.ac-badge { display:inline-block; padding:3px 12px; border-radius:100px; font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:9px; }
-.ab-a { background:rgba(77,184,160,.25); color:#7ad4c0; }
-.ab-t { background:rgba(77,184,160,.25); color:#7ad4c0; }
-.ab-s { background:rgba(232,98,26,.25); color:#f4a070; }
-.ab-f { background:rgba(232,98,26,.18); color:#f4a070; }
-.ac-name { font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:#fff; margin-bottom:8px; }
-.ac-desc { font-size:12.5px; color:rgba(221,232,228,0.46); line-height:1.65; }
+.ac-adm { background:linear-gradient(145deg,rgba(26,86,160,.2),rgba(26,86,160,.05)); border-color:rgba(26,86,160,.3); }
+.ac-tch { background:linear-gradient(145deg,rgba(29,122,85,.2),rgba(29,122,85,.05)); border-color:rgba(29,122,85,.3); }
+.ac-stu { background:linear-gradient(145deg,rgba(212,88,10,.2),rgba(212,88,10,.05)); border-color:rgba(212,88,10,.3); }
+.ac-fam { background:linear-gradient(145deg,rgba(91,63,160,.2),rgba(91,63,160,.05)); border-color:rgba(91,63,160,.3); }
+.ac-emoji { font-size:28px; margin-bottom:11px; display:block; }
+.ac-badge { display:inline-block; padding:2px 10px; border-radius:100px; font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:8px; }
+.ab-a { background:rgba(26,86,160,.28); color:#93b4e8; }
+.ab-t { background:rgba(29,122,85,.28); color:#6dd9a8; }
+.ab-s { background:rgba(212,88,10,.28); color:#f4a461; }
+.ab-f { background:rgba(91,63,160,.28); color:#b39ddb; }
+.ac-name { font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:#fff; margin-bottom:7px; }
+.ac-desc { font-size:12.5px; color:rgba(221,232,248,0.46); line-height:1.65; }
 
-/* Flujo */
 .fg { display:flex; gap:0; position:relative; margin-top:44px; }
-.fg::before { content:''; position:absolute; top:26px; left:26px; right:26px; height:2px; background:linear-gradient(90deg,#4db8a0,rgba(77,184,160,.1)); }
+.fg::before { content:''; position:absolute; top:26px; left:26px; right:26px; height:2px; background:linear-gradient(90deg,#1a6fff,rgba(26,111,255,.12)); }
 .fs { flex:1; text-align:center; padding:0 10px; }
-.fs-n { width:52px; height:52px; border-radius:50%; margin:0 auto 12px; background:#0e1c19; border:2px solid #4db8a0; display:flex; align-items:center; justify-content:center; font-family:'Sora',sans-serif; font-size:16px; font-weight:800; color:#4db8a0; position:relative; z-index:1; }
+.fs-n { width:52px; height:52px; border-radius:50%; margin:0 auto 12px; background:#03091a; border:2px solid #1a6fff; display:flex; align-items:center; justify-content:center; font-family:'Sora',sans-serif; font-size:16px; font-weight:800; color:#4a9eff; position:relative; z-index:1; }
 .fs-t { font-family:'Sora',sans-serif; font-size:12px; font-weight:700; color:#fff; margin-bottom:5px; }
-.fs-d { font-size:11px; color:rgba(221,232,228,0.36); line-height:1.6; }
+.fs-d { font-size:11px; color:rgba(221,232,248,0.36); line-height:1.6; }
 
-/* Privacidad */
 .priv-g { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
-.priv-i { display:flex; gap:14px; align-items:flex-start; background:rgba(255,255,255,0.025); border:1px solid rgba(77,184,160,0.09); border-radius:14px; padding:20px; }
-.priv-ico { font-size:20px; flex-shrink:0; margin-top:1px; }
-.priv-t { font-family:'Sora',sans-serif; font-size:13.5px; font-weight:700; color:#fff; margin-bottom:4px; }
-.priv-d { font-size:12px; color:rgba(221,232,228,0.42); line-height:1.6; }
+.priv-i { display:flex; gap:14px; align-items:flex-start; background:rgba(255,255,255,0.02); border:1px solid rgba(74,158,255,0.08); border-radius:14px; padding:18px; }
+.priv-ico { font-size:18px; flex-shrink:0; margin-top:1px; }
+.priv-t { font-family:'Sora',sans-serif; font-size:13px; font-weight:700; color:#fff; margin-bottom:3px; }
+.priv-d { font-size:12px; color:rgba(221,232,248,0.42); line-height:1.6; }
 
-/* Roadmap */
-.rm-g { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
-.rm-p { border-radius:16px; padding:26px 22px; background:rgba(255,255,255,0.025); border:1px solid rgba(77,184,160,0.09); position:relative; overflow:hidden; }
-.rm-p::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; }
-.r1::before { background:#4db8a0; }
-.r2::before { background:#3aaa90; }
-.r3::before { background:#e8621a; }
-.r4::before { background:#c04e10; }
-.rm-tag { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:9px; }
-.r1 .rm-tag, .r2 .rm-tag { color:#4db8a0; }
-.r3 .rm-tag, .r4 .rm-tag { color:#e8621a; }
-.rm-title { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:#fff; margin-bottom:13px; }
+.rm-g { display:grid; grid-template-columns:repeat(4,1fr); gap:13px; }
+.rm-p { border-radius:16px; padding:24px 20px; background:rgba(255,255,255,0.02); border:1px solid rgba(74,158,255,0.08); position:relative; overflow:hidden; }
+.rm-p::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+.r1::before { background:#1a6fff; } .r2::before { background:#0ea5e9; }
+.r3::before { background:#06b6d4; } .r4::before { background:#6366f1; }
+.rm-tag { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+.r1 .rm-tag { color:#4a9eff; } .r2 .rm-tag { color:#38bdf8; }
+.r3 .rm-tag { color:#22d3ee; } .r4 .rm-tag { color:#818cf8; }
+.rm-title { font-family:'Sora',sans-serif; font-size:14.5px; font-weight:700; color:#fff; margin-bottom:12px; }
 .rm-p ul { list-style:none; }
-.rm-p ul li { font-size:12px; color:rgba(221,232,228,0.48); padding:5px 0; border-bottom:1px solid rgba(77,184,160,0.07); line-height:1.5; }
-.rm-p ul li::before { content:'→ '; color:rgba(77,184,160,0.5); }
+.rm-p ul li { font-size:11.5px; color:rgba(221,232,248,0.46); padding:4px 0; border-bottom:1px solid rgba(74,158,255,0.055); line-height:1.5; }
+.rm-p ul li::before { content:'→ '; color:rgba(74,158,255,0.35); }
 
-/* CTA */
-.cv-cta {
-    padding:88px 52px; text-align:center;
-    background:radial-gradient(ellipse 55% 70% at 50% 50%, rgba(77,184,160,0.1) 0%, transparent 65%);
-}
-.cv-cta h2 { font-family:'Sora',sans-serif; font-size:44px; font-weight:800; letter-spacing:-2px; color:#fff; margin-bottom:14px; }
-.cv-cta p { font-size:17px; color:rgba(221,232,228,0.42); }
+.cv-cta { padding:84px 52px; text-align:center; background:radial-gradient(ellipse 50% 65% at 50% 50%, rgba(26,111,255,0.09) 0%, transparent 65%); }
+.cv-cta h2 { font-family:'Sora',sans-serif; font-size:42px; font-weight:800; letter-spacing:-2px; color:#fff; margin-bottom:14px; }
+.cv-cta p { font-size:16px; color:rgba(221,232,248,0.42); }
 
-/* Footer */
-.cv-ft {
-    padding:24px 52px;
-    border-top:1px solid rgba(77,184,160,0.1);
-    display:flex; justify-content:space-between; align-items:center;
-    font-size:11.5px; color:rgba(221,232,228,0.22);
-}
-.cv-ft-logo { display:flex; align-items:center; gap:8px; }
-
-/* Login panel cards */
-.pcard-wrap {
-    border-radius:16px; padding:24px 14px 20px;
-    border:1px solid rgba(77,184,160,0.2);
-    background:rgba(77,184,160,0.05);
-    text-align:center; margin-bottom:4px;
-    transition: all .2s;
-}
-.pcard-ico  { font-size:38px; margin-bottom:10px; }
-.pcard-nm   { font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:#1a2e2a; margin-bottom:4px; }
-.pcard-ds   { font-size:11px; color:#5c7a72; line-height:1.5; }
-.panel-hd   { font-family:'Sora',sans-serif; font-size:19px; font-weight:800; color:#1a2e2a; letter-spacing:-0.4px; margin-bottom:4px; margin-top:12px; }
-.panel-sb   { font-size:12.5px; color:#6b8a82; margin-bottom:20px; }
+.cv-ft { padding:22px 52px; border-top:1px solid rgba(74,158,255,0.07); display:flex; justify-content:space-between; align-items:center; font-size:11px; color:rgba(221,232,248,0.2); }
+.cv-ft-logo { display:flex; align-items:center; gap:7px; }
 </style>
 """
 
-# ── HTML Landing ──────────────────────────────────────────────────────────────
+# ── HTML de la landing (sin variables Python) ─────────────────────────────────
 LANDING_HTML_1 = """
 <div class="cv">
   <nav class="cv-nav">
     <div class="cv-logo">
 """
 LANDING_HTML_2 = """
-      <div>
-        <span class="cv-logo-txt">Con<em>Vivir</em></span>
-        <span class="cv-logo-sub">Animar · Infancias &amp; Educación</span>
-      </div>
+      <span class="cv-logo-txt">Con<em>Vivir</em></span>
     </div>
     <div class="cv-nav-links">
       <span>El problema</span><span>Solución</span><span>Actores</span><span>Roadmap</span>
@@ -427,9 +283,6 @@ LANDING_HTML_2 = """
         <p class="cv-hero-sub">ConVivir combina sociogramas de aula, contenido educativo y gestión institucional para que docentes detecten situaciones de acoso antes de que escalen.</p>
       </div>
       <div class="cv-logo-hero">
-        <div class="cv-logo-glow"></div>
-        <div class="cv-logo-ring1"></div>
-        <div class="cv-logo-ring2"></div>
 """
 LANDING_HTML_3 = """
       </div>
@@ -528,25 +381,28 @@ LANDING_HTML_4 = """
     <div class="cv-ft-logo">
 """
 LANDING_HTML_5 = """
-      <span>© 2025 ConVivir — <strong>Animar</strong> Infancias &amp; Educación</span>
+      <span>© 2025 ConVivir — Plataforma de Convivencia Escolar</span>
     </div>
-    <span>animar.escolar@gmail.com · @animar.escolar</span>
+    <span>Confidencial · v1.0 · Borrador Inicial</span>
   </footer>
 </div>
 """
 
-# ── Login ─────────────────────────────────────────────────────────────────────
+# ── Login directo por perfil ──────────────────────────────────────────────────
 def login_as(role, name, email):
-    st.session_state.logged_in    = True
-    st.session_state.show_login   = False
+    st.session_state.logged_in = True
+    st.session_state.show_login_panel = False
     st.session_state.show_colegio = False
     st.session_state.user = {"email": email, "role": role, "name": name}
     st.rerun()
 
 def show_login():
-    if "show_login"   not in st.session_state: st.session_state.show_login   = False
-    if "show_colegio" not in st.session_state: st.session_state.show_colegio = False
+    if "show_login_panel" not in st.session_state:
+        st.session_state.show_login_panel = False
+    if "show_colegio" not in st.session_state:
+        st.session_state.show_colegio = False
 
+    # Landing
     full_html = (
         LANDING_CSS
         + LANDING_HTML_1 + LOGO_NAV
@@ -557,24 +413,11 @@ def show_login():
     )
     st.markdown(full_html, unsafe_allow_html=True)
 
-    # Botón "Ingresar →" fijo arriba a la derecha
+    # Botón fijo arriba a la derecha
     st.markdown("""
     <style>
     div[data-testid="stVerticalBlock"] > div:first-child {
         position:fixed; top:13px; right:52px; z-index:200;
-    }
-    /* Botón Ingresar con color Animar */
-    div[data-testid="stVerticalBlock"] > div:first-child .stButton > button {
-        background: #4db8a0 !important;
-        border: none !important;
-        font-family: 'Sora', sans-serif !important;
-        font-weight: 700 !important;
-        border-radius: 8px !important;
-        padding: 8px 22px !important;
-        font-size: 14px !important;
-    }
-    div[data-testid="stVerticalBlock"] > div:first-child .stButton > button:hover {
-        background: #2a9a82 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -582,29 +425,48 @@ def show_login():
     _, col_btn = st.columns([12, 1])
     with col_btn:
         if st.button("Ingresar →", type="primary", key="open_login"):
-            st.session_state.show_login   = True
+            st.session_state.show_login_panel = True
             st.session_state.show_colegio = False
             st.rerun()
 
-    if not st.session_state.show_login:
+    if not st.session_state.show_login_panel:
         return
 
-    # Panel de login centrado (sin overlay oscuro)
+    # Overlay
+    st.markdown("""
+    <style>
+    .ov { position:fixed; inset:0; z-index:998;
+          background:rgba(3,9,26,0.9); backdrop-filter:blur(16px); }
+    .pcard-wrap { border-radius:16px; padding:24px 14px 20px;
+        border:1px solid rgba(74,158,255,0.13);
+        background:rgba(255,255,255,0.035);
+        text-align:center; margin-bottom:4px; }
+    .pcard-ico { font-size:38px; margin-bottom:10px; }
+    .pcard-nm  { font-family:'Sora',sans-serif; font-size:14px;
+        font-weight:700; color:#0a1f5c; margin-bottom:4px; }
+    .pcard-ds  { font-size:11px; color:#5c6e8a; line-height:1.5; }
+    .panel-hd  { font-family:'Sora',sans-serif; font-size:19px;
+        font-weight:800; color:#0a1f5c; letter-spacing:-0.4px;
+        margin-bottom:4px; margin-top:12px; }
+    .panel-sb  { font-size:12.5px; color:#5c6e8a; margin-bottom:20px; }
+    </style>
+    <div class="ov"></div>
+    """, unsafe_allow_html=True)
+
     _, col_mid, _ = st.columns([1, 1.6, 1])
     with col_mid:
         with st.container(border=True):
-            # Logo + nombre
+            # Logo
             st.markdown(
-                "<div style='display:flex;align-items:center;gap:10px;margin-bottom:4px;'>"
+                "<div style='display:flex;align-items:center;gap:8px;'>"
                 + LOGO_NAV
-                + "<div><span style='font-family:Sora,sans-serif;font-size:17px;font-weight:800;"
-                  "color:#1a2e2a;'>Con<span style='color:#4db8a0;'>Vivir</span></span>"
-                  "<span style='display:block;font-size:9px;font-weight:600;letter-spacing:2px;"
-                  "text-transform:uppercase;color:#8aaa9a;'>Animar · Infancias &amp; Educación</span></div>"
-                  "</div>",
+                + "<span style='font-family:Sora,sans-serif;font-size:17px;"
+                  "font-weight:800;color:#0a1f5c;'>Con<span style='color:#1a6fff;'>"
+                  "Vivir</span></span></div>",
                 unsafe_allow_html=True
             )
 
+            # ── Vista 1: Admin + Colegio ──────────────────────────────────────
             if not st.session_state.show_colegio:
                 st.markdown(
                     "<div class='panel-hd'>¿Cómo querés ingresar?</div>"
@@ -614,28 +476,37 @@ def show_login():
                 col_a, col_b = st.columns(2)
                 with col_a:
                     st.markdown(
-                        "<div class='pcard-wrap'><div class='pcard-ico'>🏛️</div>"
+                        "<div class='pcard-wrap'>"
+                        "<div class='pcard-ico'>🏛️</div>"
                         "<div class='pcard-nm'>Administrador</div>"
-                        "<div class='pcard-ds'>Gestión de colegios,<br>docentes y KYC</div></div>",
+                        "<div class='pcard-ds'>Gestión de colegios,<br>docentes y KYC</div>"
+                        "</div>",
                         unsafe_allow_html=True
                     )
-                    if st.button("Entrar como Admin", key="go_admin", use_container_width=True, type="primary"):
+                    if st.button("Entrar como Admin", key="go_admin",
+                                 use_container_width=True, type="primary"):
                         login_as("admin", "Administrador", "admin@convivir.ar")
+
                 with col_b:
                     st.markdown(
-                        "<div class='pcard-wrap'><div class='pcard-ico'>🏫</div>"
+                        "<div class='pcard-wrap'>"
+                        "<div class='pcard-ico'>🏫</div>"
                         "<div class='pcard-nm'>Colegio</div>"
-                        "<div class='pcard-ds'>Docentes, familias<br>y alumnos</div></div>",
+                        "<div class='pcard-ds'>Docentes, familias<br>y alumnos</div>"
+                        "</div>",
                         unsafe_allow_html=True
                     )
-                    if st.button("Entrar a Colegio →", key="go_colegio", use_container_width=True):
+                    if st.button("Entrar a Colegio →", key="go_colegio",
+                                 use_container_width=True):
                         st.session_state.show_colegio = True
                         st.rerun()
+
                 st.markdown("---")
                 if st.button("← Cerrar", key="cancel_login", use_container_width=True):
-                    st.session_state.show_login = False
+                    st.session_state.show_login_panel = False
                     st.rerun()
 
+            # ── Vista 2: Docente / Familia / Alumno ───────────────────────────
             else:
                 st.markdown(
                     "<div class='panel-hd'>Colegio</div>"
@@ -645,54 +516,63 @@ def show_login():
                 c1, c2, c3 = st.columns(3)
                 with c1:
                     st.markdown(
-                        "<div class='pcard-wrap'><div class='pcard-ico'>👨‍🏫</div>"
+                        "<div class='pcard-wrap'>"
+                        "<div class='pcard-ico'>👨‍🏫</div>"
                         "<div class='pcard-nm'>Docente</div>"
-                        "<div class='pcard-ds'>Sociograma, alertas<br>y reportes</div></div>",
+                        "<div class='pcard-ds'>Sociograma, alertas<br>y reportes</div>"
+                        "</div>",
                         unsafe_allow_html=True
                     )
-                    if st.button("Soy Docente", key="go_teacher", use_container_width=True, type="primary"):
+                    if st.button("Soy Docente", key="go_teacher",
+                                 use_container_width=True, type="primary"):
                         login_as("teacher", "Prof. María García", "docente@colegio.ar")
+
                 with c2:
                     st.markdown(
-                        "<div class='pcard-wrap'><div class='pcard-ico'>👨‍👩‍👧</div>"
+                        "<div class='pcard-wrap'>"
+                        "<div class='pcard-ico'>👨‍👩‍👧</div>"
                         "<div class='pcard-nm'>Familia</div>"
-                        "<div class='pcard-ds'>Contenido y<br>seguimiento</div></div>",
+                        "<div class='pcard-ds'>Contenido y<br>seguimiento</div>"
+                        "</div>",
                         unsafe_allow_html=True
                     )
-                    if st.button("Soy Familia", key="go_family", use_container_width=True, type="primary"):
+                    if st.button("Soy Familia", key="go_family",
+                                 use_container_width=True, type="primary"):
                         login_as("student", "Carlos Martínez (Padre)", "familia@colegio.ar")
+
                 with c3:
                     st.markdown(
-                        "<div class='pcard-wrap'><div class='pcard-ico'>🎒</div>"
+                        "<div class='pcard-wrap'>"
+                        "<div class='pcard-ico'>🎒</div>"
                         "<div class='pcard-nm'>Alumno</div>"
-                        "<div class='pcard-ds'>Encuesta y<br>contenido</div></div>",
+                        "<div class='pcard-ds'>Encuesta y<br>contenido</div>"
+                        "</div>",
                         unsafe_allow_html=True
                     )
-                    if st.button("Soy Alumno", key="go_student", use_container_width=True, type="primary"):
+                    if st.button("Soy Alumno", key="go_student",
+                                 use_container_width=True, type="primary"):
                         login_as("student", "Lucas Martínez", "alumno@colegio.ar")
+
                 st.markdown("---")
                 if st.button("← Volver", key="back_colegio", use_container_width=True):
                     st.session_state.show_colegio = False
                     st.rerun()
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+# ── Sidebar post-login ────────────────────────────────────────────────────────
 def show_sidebar():
     user = st.session_state.user
     role = user["role"]
 
     with st.sidebar:
         st.markdown(
-            "<div style='display:flex;align-items:center;gap:10px;padding:8px 0 6px;'>"
+            "<div style='display:flex;align-items:center;gap:9px;padding:6px 0 14px;'>"
             + LOGO_SIDEBAR
-            + "<div><span style='font-size:17px;font-weight:800;color:white;letter-spacing:-0.4px;"
-              "font-family:Sora,sans-serif;'>ConVivir</span>"
-              "<span style='display:block;font-size:8px;font-weight:600;letter-spacing:2px;"
-              "text-transform:uppercase;color:rgba(77,184,160,0.6);margin-top:1px;'>Animar · Infancias &amp; Educación</span>"
-              "</div></div>",
+            + ""
+            + "</div>",
             unsafe_allow_html=True
         )
         st.markdown("---")
-        st.markdown("👤 **" + user["name"] + "**")
+        st.markdown("👤 **" + user['name'] + "**")
         badge  = {"admin":"badge-admin","teacher":"badge-teacher","student":"badge-student"}[role]
         labels = {"admin":"Administrador","teacher":"Docente","student":"Alumno"}
         st.markdown("<span class='" + badge + "'>" + labels[role] + "</span>", unsafe_allow_html=True)
@@ -701,22 +581,22 @@ def show_sidebar():
         if role == "admin":
             pages = {
                 "🏛️ Dashboard Admin": "admin_dashboard",
-                "🏫 Colegios":         "admin_colegios",
-                "👨‍🏫 Docentes":        "admin_docentes",
-                "✅ KYC / Validaciones":"admin_kyc",
+                "🏫 Colegios": "admin_colegios",
+                "👨‍🏫 Docentes": "admin_docentes",
+                "✅ KYC / Validaciones": "admin_kyc",
             }
         elif role == "teacher":
             pages = {
-                "📊 Mi Dashboard":       "teacher_dashboard",
-                "🚪 Gestión de Aulas":   "teacher_aulas",
-                "🕸️ Sociograma":         "teacher_sociograma",
-                "🚨 Alertas":            "teacher_alertas",
-                "📋 Reportes":           "teacher_reportes",
+                "📊 Mi Dashboard": "teacher_dashboard",
+                "🚪 Gestión de Aulas": "teacher_aulas",
+                "🕸️ Sociograma": "teacher_sociograma",
+                "🚨 Alertas": "teacher_alertas",
+                "📋 Reportes": "teacher_reportes",
             }
         else:
             pages = {
-                "🏠 Inicio":              "student_home",
-                "📝 Encuesta Sociométrica":"student_encuesta",
+                "🏠 Inicio": "student_home",
+                "📝 Encuesta Sociométrica": "student_encuesta",
                 "📚 Contenido Educativo": "student_contenido",
             }
 
@@ -730,8 +610,8 @@ def show_sidebar():
 
         st.markdown("---")
         if st.button("🚪 Cerrar sesión", use_container_width=True):
-            st.session_state.logged_in    = False
-            st.session_state.user         = None
+            st.session_state.logged_in = False
+            st.session_state.user = None
             st.session_state.current_page = None
             st.rerun()
 
