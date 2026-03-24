@@ -389,20 +389,38 @@ LANDING_HTML_5 = """
 """
 
 # ── Login directo por perfil ──────────────────────────────────────────────────
-def login_as(role, name, email):
-    st.session_state.logged_in = True
-    st.session_state.show_login_panel = False
-    st.session_state.show_colegio = False
-    st.session_state.user = {"email": email, "role": role, "name": name}
-    st.rerun()
+# ══════════════════════════════════════════════════════════════════════════════
+# LOGIN — 4 widgets: Colegio / Admin / Familia / Alumno
+# Al hacer click en un widget aparece el formulario de esa cuenta
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Credenciales demo por perfil
+CREDS = {
+    "colegio":  {"email": "docente@colegio.ar",  "password": "docente123", "role": "teacher", "name": "Prof. María García"},
+    "admin":    {"email": "admin@convivir.ar",    "password": "admin123",   "role": "admin",   "name": "Administrador"},
+    "familia":  {"email": "familia@colegio.ar",   "password": "familia123", "role": "family",  "name": "Carlos Martínez"},
+    "alumno":   {"email": "alumno@colegio.ar",    "password": "alumno123",  "role": "student", "name": "Lucas Martínez"},
+}
+
+def do_login(profile, email_input, pass_input):
+    cred = CREDS[profile]
+    if email_input == cred["email"] and pass_input == cred["password"]:
+        st.session_state.logged_in   = True
+        st.session_state.login_panel = None
+        st.session_state.user = {
+            "email": cred["email"],
+            "role":  cred["role"],
+            "name":  cred["name"],
+        }
+        st.rerun()
+    else:
+        st.error("Email o contraseña incorrectos.")
 
 def show_login():
-    if "show_login_panel" not in st.session_state:
-        st.session_state.show_login_panel = False
-    if "show_colegio" not in st.session_state:
-        st.session_state.show_colegio = False
+    if "login_panel" not in st.session_state:
+        st.session_state.login_panel = None  # None | "colegio" | "admin" | "familia" | "alumno"
 
-    # Landing
+    # ── Renderizar landing completa ───────────────────────────────────────────
     full_html = (
         LANDING_CSS
         + LANDING_HTML_1 + LOGO_NAV
@@ -413,150 +431,199 @@ def show_login():
     )
     st.markdown(full_html, unsafe_allow_html=True)
 
-    # Botón fijo arriba a la derecha
+    # ── CSS pantalla de selección de perfil ───────────────────────────────────
     st.markdown("""
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap');
+
+    /* Oculta la landing y muestra solo el selector cuando está activo */
+    .login-screen {
+        position:fixed; inset:0; z-index:999;
+        background:#f5f0eb;
+        display:flex; flex-direction:column;
+        align-items:center; justify-content:center;
+        padding:32px 16px;
+    }
+    .login-header {
+        text-align:center; margin-bottom:40px;
+    }
+    .login-title {
+        font-family:'Sora',sans-serif; font-size:26px; font-weight:800;
+        color:#1a2e2a; letter-spacing:-0.5px; margin:16px 0 6px;
+    }
+    .login-sub {
+        font-size:14px; color:#7a8a82; margin:0;
+    }
+
+    /* Los 4 widgets */
+    .profile-grid {
+        display:grid; grid-template-columns:1fr 1fr 1fr 1fr;
+        gap:16px; width:100%; max-width:860px; margin-bottom:0;
+    }
+    .pwidget {
+        background:white; border-radius:20px;
+        border:2px solid #e0d8d0;
+        padding:32px 16px 26px;
+        text-align:center; cursor:pointer;
+        box-shadow:0 4px 20px rgba(26,46,42,0.06);
+        transition:all .18s;
+    }
+    .pwidget:hover {
+        border-color:#4db8a0;
+        transform:translateY(-4px);
+        box-shadow:0 12px 32px rgba(77,184,160,0.18);
+    }
+    .pwidget-ico  { font-size:48px; margin-bottom:14px; display:block; }
+    .pwidget-name {
+        font-family:'Sora',sans-serif; font-size:16px; font-weight:800;
+        color:#1a2e2a; margin-bottom:6px;
+    }
+    .pwidget-desc { font-size:12px; color:#8a9a92; line-height:1.5; }
+
+    /* Widget activo (seleccionado) */
+    .pwidget-active {
+        border-color:#4db8a0 !important;
+        background:linear-gradient(160deg,#f0faf7,white) !important;
+        box-shadow:0 8px 28px rgba(77,184,160,0.2) !important;
+    }
+
+    /* Formulario de login */
+    .login-form-wrap {
+        background:white; border-radius:20px;
+        border:2px solid #4db8a0;
+        padding:28px 32px; width:100%; max-width:400px;
+        margin-top:24px;
+        box-shadow:0 8px 32px rgba(77,184,160,0.15);
+    }
+    .login-form-title {
+        font-family:'Sora',sans-serif; font-size:17px; font-weight:800;
+        color:#1a2e2a; margin-bottom:4px;
+    }
+    .login-form-hint {
+        font-size:11.5px; color:#9aaa9a; margin-bottom:20px;
+        font-family:'DM Sans',sans-serif;
+    }
+
+    /* Botón Ingresar fijo en la landing */
     div[data-testid="stVerticalBlock"] > div:first-child {
-        position:fixed; top:13px; right:52px; z-index:200;
+        position:fixed; top:14px; right:52px; z-index:200;
+    }
+    div[data-testid="stVerticalBlock"] > div:first-child .stButton > button {
+        background:#4db8a0 !important; border:none !important;
+        font-family:'Sora',sans-serif !important; font-weight:700 !important;
+        border-radius:8px !important; padding:9px 22px !important;
+        font-size:14px !important; color:white !important;
+    }
+    div[data-testid="stVerticalBlock"] > div:first-child .stButton > button:hover {
+        background:#2a9a82 !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
+    # Botón "Ingresar" arriba a la derecha en la landing
     _, col_btn = st.columns([12, 1])
     with col_btn:
         if st.button("Ingresar →", type="primary", key="open_login"):
-            st.session_state.show_login_panel = True
-            st.session_state.show_colegio = False
+            st.session_state.login_panel = "select"
             st.rerun()
 
-    if not st.session_state.show_login_panel:
+    # ── Si no hay panel activo, no mostramos nada más ─────────────────────────
+    if st.session_state.login_panel is None:
         return
 
-    # Overlay
+    # ── PANTALLA DE SELECCIÓN DE PERFIL ──────────────────────────────────────
+    panel = st.session_state.login_panel
+
     st.markdown("""
     <style>
-    .ov { position:fixed; inset:0; z-index:998;
-          background:rgba(3,9,26,0.9); backdrop-filter:blur(16px); }
-    .pcard-wrap { border-radius:16px; padding:24px 14px 20px;
-        border:1px solid rgba(74,158,255,0.13);
-        background:rgba(255,255,255,0.035);
-        text-align:center; margin-bottom:4px; }
-    .pcard-ico { font-size:38px; margin-bottom:10px; }
-    .pcard-nm  { font-family:'Sora',sans-serif; font-size:14px;
-        font-weight:700; color:#0a1f5c; margin-bottom:4px; }
-    .pcard-ds  { font-size:11px; color:#5c6e8a; line-height:1.5; }
-    .panel-hd  { font-family:'Sora',sans-serif; font-size:19px;
-        font-weight:800; color:#0a1f5c; letter-spacing:-0.4px;
-        margin-bottom:4px; margin-top:12px; }
-    .panel-sb  { font-size:12.5px; color:#5c6e8a; margin-bottom:20px; }
+    /* Cuando el panel está activo, ocultamos la landing y mostramos fondo crema */
+    .main > div { background:#f5f0eb !important; }
+    .block-container { padding-top:0 !important; }
     </style>
-    <div class="ov"></div>
     """, unsafe_allow_html=True)
 
-    _, col_mid, _ = st.columns([1, 1.6, 1])
-    with col_mid:
-        with st.container(border=True):
-            # Logo
-            st.markdown(
-                "<div style='display:flex;align-items:center;gap:8px;'>"
-                + LOGO_NAV
-                + "<span style='font-family:Sora,sans-serif;font-size:17px;"
-                  "font-weight:800;color:#0a1f5c;'>Con<span style='color:#1a6fff;'>"
-                  "Vivir</span></span></div>",
-                unsafe_allow_html=True
-            )
+    # Encabezado con logo
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    _, col_c, _ = st.columns([1, 3, 1])
+    with col_c:
+        st.markdown(
+            "<div style='text-align:center;margin-bottom:8px;'>" + LOGO_NAV + "</div>"
+            "<p style='text-align:center;font-family:Sora,sans-serif;font-size:22px;"
+            "font-weight:800;color:#1a2e2a;margin:12px 0 4px;'>¿Con qué perfil ingresás?</p>"
+            "<p style='text-align:center;font-size:14px;color:#8a9a92;margin-bottom:32px;'>"
+            "Hacé click en tu perfil y cargá tus datos</p>",
+            unsafe_allow_html=True
+        )
 
-            # ── Vista 1: Admin + Colegio ──────────────────────────────────────
-            if not st.session_state.show_colegio:
+    # ── 4 widgets ────────────────────────────────────────────────────────────
+    PERFILES = [
+        ("colegio", "🏫", "Colegio",       "Docentes que gestionan<br>aulas y sociogramas"),
+        ("admin",   "🏛️", "Administrador", "Gestión institucional<br>y validación KYC"),
+        ("familia", "👨‍👩‍👧", "Familia",       "Familias y tutores<br>de alumnos"),
+        ("alumno",  "🎒", "Alumno",        "Estudiantes que responden<br>la encuesta"),
+    ]
+
+    _, col_grid, _ = st.columns([0.3, 4, 0.3])
+    with col_grid:
+        cols = st.columns(4)
+        for i, (key, ico, nombre, desc) in enumerate(PERFILES):
+            is_active = (panel == key)
+            active_class = "pwidget-active" if is_active else ""
+            with cols[i]:
                 st.markdown(
-                    "<div class='panel-hd'>¿Cómo querés ingresar?</div>"
-                    "<div class='panel-sb'>Seleccioná tu perfil para entrar directo</div>",
+                    f"<div class='pwidget {active_class}'>"
+                    f"<span class='pwidget-ico'>{ico}</span>"
+                    f"<div class='pwidget-name'>{nombre}</div>"
+                    f"<div class='pwidget-desc'>{desc}</div>"
+                    f"</div>",
                     unsafe_allow_html=True
                 )
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    st.markdown(
-                        "<div class='pcard-wrap'>"
-                        "<div class='pcard-ico'>🏛️</div>"
-                        "<div class='pcard-nm'>Administrador</div>"
-                        "<div class='pcard-ds'>Gestión de colegios,<br>docentes y KYC</div>"
-                        "</div>",
-                        unsafe_allow_html=True
-                    )
-                    if st.button("Entrar como Admin", key="go_admin",
-                                 use_container_width=True, type="primary"):
-                        login_as("admin", "Administrador", "admin@convivir.ar")
-
-                with col_b:
-                    st.markdown(
-                        "<div class='pcard-wrap'>"
-                        "<div class='pcard-ico'>🏫</div>"
-                        "<div class='pcard-nm'>Colegio</div>"
-                        "<div class='pcard-ds'>Docentes, familias<br>y alumnos</div>"
-                        "</div>",
-                        unsafe_allow_html=True
-                    )
-                    if st.button("Entrar a Colegio →", key="go_colegio",
-                                 use_container_width=True):
-                        st.session_state.show_colegio = True
-                        st.rerun()
-
-                st.markdown("---")
-                if st.button("← Cerrar", key="cancel_login", use_container_width=True):
-                    st.session_state.show_login_panel = False
+                btn_label = "✓ Seleccionado" if is_active else f"Ingresar como {nombre}"
+                if st.button(btn_label, key=f"sel_{key}",
+                             use_container_width=True,
+                             type="primary" if is_active else "secondary"):
+                    st.session_state.login_panel = key
                     st.rerun()
 
-            # ── Vista 2: Docente / Familia / Alumno ───────────────────────────
-            else:
+    # ── Formulario del perfil seleccionado ────────────────────────────────────
+    if panel not in ("select", None) and panel in CREDS:
+        cred    = CREDS[panel]
+        nombres = {"colegio":"Colegio","admin":"Administrador","familia":"Familia","alumno":"Alumno"}
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        _, col_form, _ = st.columns([1, 1.2, 1])
+        with col_form:
+            with st.container(border=True):
                 st.markdown(
-                    "<div class='panel-hd'>Colegio</div>"
-                    "<div class='panel-sb'>¿Con qué perfil ingresás?</div>",
+                    f"<div class='login-form-title'>Acceso — {nombres[panel]}</div>"
+                    f"<div class='login-form-hint'>Demo: {cred['email']} / {cred['password']}</div>",
                     unsafe_allow_html=True
                 )
-                c1, c2, c3 = st.columns(3)
-                with c1:
-                    st.markdown(
-                        "<div class='pcard-wrap'>"
-                        "<div class='pcard-ico'>👨‍🏫</div>"
-                        "<div class='pcard-nm'>Docente</div>"
-                        "<div class='pcard-ds'>Sociograma, alertas<br>y reportes</div>"
-                        "</div>",
-                        unsafe_allow_html=True
-                    )
-                    if st.button("Soy Docente", key="go_teacher",
-                                 use_container_width=True, type="primary"):
-                        login_as("teacher", "Prof. María García", "docente@colegio.ar")
+                with st.form(f"form_{panel}"):
+                    email = st.text_input("Email", value=cred["email"], key=f"email_{panel}")
+                    pwd   = st.text_input("Contraseña", type="password",
+                                          value=cred["password"], key=f"pwd_{panel}")
+                    col_a, col_b = st.columns(2)
+                    with col_a:
+                        submitted = st.form_submit_button(
+                            "Ingresar →", type="primary", use_container_width=True)
+                    with col_b:
+                        cancelled = st.form_submit_button(
+                            "Cancelar", use_container_width=True)
 
-                with c2:
-                    st.markdown(
-                        "<div class='pcard-wrap'>"
-                        "<div class='pcard-ico'>👨‍👩‍👧</div>"
-                        "<div class='pcard-nm'>Familia</div>"
-                        "<div class='pcard-ds'>Contenido y<br>seguimiento</div>"
-                        "</div>",
-                        unsafe_allow_html=True
-                    )
-                    if st.button("Soy Familia", key="go_family",
-                                 use_container_width=True, type="primary"):
-                        login_as("student", "Carlos Martínez (Padre)", "familia@colegio.ar")
-
-                with c3:
-                    st.markdown(
-                        "<div class='pcard-wrap'>"
-                        "<div class='pcard-ico'>🎒</div>"
-                        "<div class='pcard-nm'>Alumno</div>"
-                        "<div class='pcard-ds'>Encuesta y<br>contenido</div>"
-                        "</div>",
-                        unsafe_allow_html=True
-                    )
-                    if st.button("Soy Alumno", key="go_student",
-                                 use_container_width=True, type="primary"):
-                        login_as("student", "Lucas Martínez", "alumno@colegio.ar")
-
-                st.markdown("---")
-                if st.button("← Volver", key="back_colegio", use_container_width=True):
-                    st.session_state.show_colegio = False
+                if submitted:
+                    do_login(panel, email, pwd)
+                if cancelled:
+                    st.session_state.login_panel = "select"
                     st.rerun()
+
+    # Botón para volver a la landing
+    st.markdown("<br>", unsafe_allow_html=True)
+    _, col_back, _ = st.columns([1, 1.2, 1])
+    with col_back:
+        if st.button("← Volver a la landing", use_container_width=True, key="back_landing"):
+            st.session_state.login_panel = None
+            st.rerun()
 
 # ── Sidebar post-login ────────────────────────────────────────────────────────
 def show_sidebar():
