@@ -27,75 +27,69 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# LOGOS SVG — Marca Animar fiel
-# A grande en teal con figura humana, texto ANIMAR bold, subtítulo spaced,
-# cuadradito naranja sobre la A (como en la identidad visual original)
+# LOGOS SVG
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Logo horizontal navbar (ícono A + texto ANIMAR + subtítulo)
 LOGO_NAV = (
-    '<svg width="148" height="40" viewBox="0 0 296 80" xmlns="http://www.w3.org/2000/svg">' 
-    '<path d="M4,76 L24,8 L32,8 L32,76 Z" fill="#4db8a0"/>' 
-    '<path d="M60,76 L40,8 L32,8 L32,76 Z" fill="#4db8a0"/>' 
-    '<circle cx="32" cy="23" r="7.5" fill="#0e1c19"/>' 
-    '<path d="M32,30.5 Q21,25 17,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>' 
-    '<path d="M32,30.5 Q43,25 47,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>' 
-    '<line x1="32" y1="30.5" x2="32" y2="48" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>' 
-    '<line x1="32" y1="48" x2="26" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>' 
-    '<line x1="32" y1="48" x2="38" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>' 
-    '<rect x="27" y="3" width="10" height="7" rx="1.5" fill="#e8621a"/>' 
-    '<text x="74" y="50" font-family="Arial Black,Impact,sans-serif" font-size="36" font-weight="900" fill="#1a2e2a" letter-spacing="1">ANIMAR</text>' 
-    '<text x="74" y="66" font-family="Arial,sans-serif" font-size="9.5" font-weight="400" fill="#4db8a0" letter-spacing="2.5">INFANCIAS &amp; EDUCACI&#xD3;N</text>' 
+    '<svg width="148" height="40" viewBox="0 0 296 80" xmlns="http://www.w3.org/2000/svg">'
+    '<path d="M4,76 L24,8 L32,8 L32,76 Z" fill="#4db8a0"/>'
+    '<path d="M60,76 L40,8 L32,8 L32,76 Z" fill="#4db8a0"/>'
+    '<circle cx="32" cy="23" r="7.5" fill="#0e1c19"/>'
+    '<path d="M32,30.5 Q21,25 17,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>'
+    '<path d="M32,30.5 Q43,25 47,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>'
+    '<line x1="32" y1="30.5" x2="32" y2="48" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>'
+    '<line x1="32" y1="48" x2="26" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>'
+    '<line x1="32" y1="48" x2="38" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>'
+    '<rect x="27" y="3" width="10" height="7" rx="1.5" fill="#e8621a"/>'
+    '<text x="74" y="50" font-family="Arial Black,Impact,sans-serif" font-size="36" font-weight="900" fill="#1a2e2a" letter-spacing="1">ANIMAR</text>'
+    '<text x="74" y="66" font-family="Arial,sans-serif" font-size="9.5" font-weight="400" fill="#4db8a0" letter-spacing="2.5">INFANCIAS &amp; EDUCACI&#xD3;N</text>'
     '</svg>'
 )
 
-# Logo vertical para el hero (solo ícono grande + texto debajo, sin anillos)
 LOGO_HERO = (
-    '<svg width="200" height="228" viewBox="0 0 200 228" xmlns="http://www.w3.org/2000/svg">' 
-    '<path d="M8,182 L70,10 L100,10 L100,182 Z" fill="#4db8a0"/>' 
-    '<path d="M192,182 L130,10 L100,10 L100,182 Z" fill="#4db8a0"/>' 
-    '<circle cx="100" cy="48" r="17" fill="#0e1c19"/>' 
-    '<path d="M100,65 Q74,53 58,32" stroke="#0e1c19" stroke-width="13" stroke-linecap="round" fill="none"/>' 
-    '<path d="M100,65 Q126,53 142,32" stroke="#0e1c19" stroke-width="13" stroke-linecap="round" fill="none"/>' 
-    '<line x1="100" y1="65" x2="100" y2="108" stroke="#0e1c19" stroke-width="13" stroke-linecap="round"/>' 
-    '<line x1="100" y1="108" x2="83" y2="140" stroke="#0e1c19" stroke-width="11" stroke-linecap="round"/>' 
-    '<line x1="100" y1="108" x2="117" y2="140" stroke="#0e1c19" stroke-width="11" stroke-linecap="round"/>' 
-    '<rect x="88" y="2" width="24" height="15" rx="3" fill="#e8621a"/>' 
-    '<text x="100" y="207" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-size="38" font-weight="900" fill="white" letter-spacing="2">ANIMAR</text>' 
-    '<text x="100" y="224" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="400" fill="rgba(221,232,228,0.55)" letter-spacing="2.5">INFANCIAS &amp; EDUCACI&#xD3;N</text>' 
+    '<svg width="200" height="228" viewBox="0 0 200 228" xmlns="http://www.w3.org/2000/svg">'
+    '<path d="M8,182 L70,10 L100,10 L100,182 Z" fill="#4db8a0"/>'
+    '<path d="M192,182 L130,10 L100,10 L100,182 Z" fill="#4db8a0"/>'
+    '<circle cx="100" cy="48" r="17" fill="#0e1c19"/>'
+    '<path d="M100,65 Q74,53 58,32" stroke="#0e1c19" stroke-width="13" stroke-linecap="round" fill="none"/>'
+    '<path d="M100,65 Q126,53 142,32" stroke="#0e1c19" stroke-width="13" stroke-linecap="round" fill="none"/>'
+    '<line x1="100" y1="65" x2="100" y2="108" stroke="#0e1c19" stroke-width="13" stroke-linecap="round"/>'
+    '<line x1="100" y1="108" x2="83" y2="140" stroke="#0e1c19" stroke-width="11" stroke-linecap="round"/>'
+    '<line x1="100" y1="108" x2="117" y2="140" stroke="#0e1c19" stroke-width="11" stroke-linecap="round"/>'
+    '<rect x="88" y="2" width="24" height="15" rx="3" fill="#e8621a"/>'
+    '<text x="100" y="207" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-size="38" font-weight="900" fill="white" letter-spacing="2">ANIMAR</text>'
+    '<text x="100" y="224" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="400" fill="rgba(221,232,228,0.55)" letter-spacing="2.5">INFANCIAS &amp; EDUCACI&#xD3;N</text>'
     '</svg>'
 )
 
-# Logo ícono solo para M3 / módulo sociograma
 LOGO_MOD = (
-    '<svg width="42" height="42" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' 
-    '<rect width="100" height="100" rx="14" fill="rgba(77,184,160,0.15)"/>' 
-    '<path d="M8,94 L33,12 L50,12 L50,94 Z" fill="#4db8a0"/>' 
-    '<path d="M92,94 L67,12 L50,12 L50,94 Z" fill="#4db8a0"/>' 
-    '<circle cx="50" cy="30" r="9" fill="#0e1c19"/>' 
-    '<path d="M50,39 Q38,33 31,21" stroke="#0e1c19" stroke-width="6.5" stroke-linecap="round" fill="none"/>' 
-    '<path d="M50,39 Q62,33 69,21" stroke="#0e1c19" stroke-width="6.5" stroke-linecap="round" fill="none"/>' 
-    '<line x1="50" y1="39" x2="50" y2="58" stroke="#0e1c19" stroke-width="6.5" stroke-linecap="round"/>' 
-    '<line x1="50" y1="58" x2="43" y2="72" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>' 
-    '<line x1="50" y1="58" x2="57" y2="72" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>' 
-    '<rect x="44" y="6" width="12" height="8" rx="2" fill="#e8621a"/>' 
+    '<svg width="42" height="42" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
+    '<rect width="100" height="100" rx="14" fill="rgba(77,184,160,0.15)"/>'
+    '<path d="M8,94 L33,12 L50,12 L50,94 Z" fill="#4db8a0"/>'
+    '<path d="M92,94 L67,12 L50,12 L50,94 Z" fill="#4db8a0"/>'
+    '<circle cx="50" cy="30" r="9" fill="#0e1c19"/>'
+    '<path d="M50,39 Q38,33 31,21" stroke="#0e1c19" stroke-width="6.5" stroke-linecap="round" fill="none"/>'
+    '<path d="M50,39 Q62,33 69,21" stroke="#0e1c19" stroke-width="6.5" stroke-linecap="round" fill="none"/>'
+    '<line x1="50" y1="39" x2="50" y2="58" stroke="#0e1c19" stroke-width="6.5" stroke-linecap="round"/>'
+    '<line x1="50" y1="58" x2="43" y2="72" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>'
+    '<line x1="50" y1="58" x2="57" y2="72" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>'
+    '<rect x="44" y="6" width="12" height="8" rx="2" fill="#e8621a"/>'
     '</svg>'
 )
 
-# Logo horizontal para sidebar (sobre fondo oscuro)
 LOGO_SIDEBAR = (
-    '<svg width="148" height="40" viewBox="0 0 296 80" xmlns="http://www.w3.org/2000/svg">' 
-    '<path d="M4,76 L24,8 L32,8 L32,76 Z" fill="#4db8a0"/>' 
-    '<path d="M60,76 L40,8 L32,8 L32,76 Z" fill="#4db8a0"/>' 
-    '<circle cx="32" cy="23" r="7.5" fill="#0e1c19"/>' 
-    '<path d="M32,30.5 Q21,25 17,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>' 
-    '<path d="M32,30.5 Q43,25 47,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>' 
-    '<line x1="32" y1="30.5" x2="32" y2="48" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>' 
-    '<line x1="32" y1="48" x2="26" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>' 
-    '<line x1="32" y1="48" x2="38" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>' 
-    '<rect x="27" y="3" width="10" height="7" rx="1.5" fill="#e8621a"/>' 
-    '<text x="74" y="50" font-family="Arial Black,Impact,sans-serif" font-size="36" font-weight="900" fill="white" letter-spacing="1">ANIMAR</text>' 
-    '<text x="74" y="66" font-family="Arial,sans-serif" font-size="9.5" font-weight="400" fill="rgba(77,184,160,0.65)" letter-spacing="2.5">INFANCIAS &amp; EDUCACI&#xD3;N</text>' 
+    '<svg width="148" height="40" viewBox="0 0 296 80" xmlns="http://www.w3.org/2000/svg">'
+    '<path d="M4,76 L24,8 L32,8 L32,76 Z" fill="#4db8a0"/>'
+    '<path d="M60,76 L40,8 L32,8 L32,76 Z" fill="#4db8a0"/>'
+    '<circle cx="32" cy="23" r="7.5" fill="#0e1c19"/>'
+    '<path d="M32,30.5 Q21,25 17,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>'
+    '<path d="M32,30.5 Q43,25 47,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>'
+    '<line x1="32" y1="30.5" x2="32" y2="48" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>'
+    '<line x1="32" y1="48" x2="26" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>'
+    '<line x1="32" y1="48" x2="38" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>'
+    '<rect x="27" y="3" width="10" height="7" rx="1.5" fill="#e8621a"/>'
+    '<text x="74" y="50" font-family="Arial Black,Impact,sans-serif" font-size="36" font-weight="900" fill="white" letter-spacing="1">ANIMAR</text>'
+    '<text x="74" y="66" font-family="Arial,sans-serif" font-size="9.5" font-weight="400" fill="rgba(77,184,160,0.65)" letter-spacing="2.5">INFANCIAS &amp; EDUCACI&#xD3;N</text>'
     '</svg>'
 )
 
@@ -112,7 +106,7 @@ if "logged_in" not in st.session_state:
 if "user" not in st.session_state:
     st.session_state.user = None
 
-# ── CSS de la landing (sin variables Python, sin f-string) ────────────────────
+# ── CSS de la landing ─────────────────────────────────────────────────────────
 LANDING_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
@@ -261,7 +255,6 @@ header[data-testid="stHeader"] { display:none; }
 </style>
 """
 
-# ── HTML de la landing (sin variables Python) ─────────────────────────────────
 LANDING_HTML_1 = """
 <div class="cv">
   <nav class="cv-nav">
@@ -388,13 +381,7 @@ LANDING_HTML_5 = """
 </div>
 """
 
-# ── Login directo por perfil ──────────────────────────────────────────────────
-# ══════════════════════════════════════════════════════════════════════════════
-# LOGIN — 4 widgets: Colegio / Admin / Familia / Alumno
-# Al hacer click en un widget aparece el formulario de esa cuenta
-# ══════════════════════════════════════════════════════════════════════════════
-
-# Credenciales demo por perfil
+# ── Credenciales demo por perfil ──────────────────────────────────────────────
 CREDS = {
     "colegio":  {"email": "docente@colegio.ar",  "password": "docente123", "role": "teacher", "name": "Prof. María García"},
     "admin":    {"email": "admin@convivir.ar",    "password": "admin123",   "role": "admin",   "name": "Administrador"},
@@ -418,7 +405,7 @@ def do_login(profile, email_input, pass_input):
 
 def show_login():
     if "login_panel" not in st.session_state:
-        st.session_state.login_panel = None  # None | "colegio" | "admin" | "familia" | "alumno"
+        st.session_state.login_panel = None
 
     # ── Renderizar landing completa ───────────────────────────────────────────
     full_html = (
@@ -436,7 +423,6 @@ def show_login():
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap');
 
-    /* Oculta la landing y muestra solo el selector cuando está activo */
     .login-screen {
         position:fixed; inset:0; z-index:999;
         background:#f5f0eb;
@@ -444,20 +430,16 @@ def show_login():
         align-items:center; justify-content:center;
         padding:32px 16px;
     }
-    .login-header {
-        text-align:center; margin-bottom:40px;
-    }
+    .login-header { text-align:center; margin-bottom:40px; }
     .login-title {
         font-family:'Sora',sans-serif; font-size:26px; font-weight:800;
         color:#1a2e2a; letter-spacing:-0.5px; margin:16px 0 6px;
     }
-    .login-sub {
-        font-size:14px; color:#7a8a82; margin:0;
-    }
+    .login-sub { font-size:14px; color:#7a8a82; margin:0; }
 
-    /* Los 4 widgets */
+    /* Los 2 widgets */
     .profile-grid {
-        display:grid; grid-template-columns:1fr 1fr 1fr 1fr;
+        display:grid; grid-template-columns:1fr 1fr;
         gap:16px; width:100%; max-width:860px; margin-bottom:0;
     }
     .pwidget {
@@ -480,14 +462,12 @@ def show_login():
     }
     .pwidget-desc { font-size:12px; color:#8a9a92; line-height:1.5; }
 
-    /* Widget activo (seleccionado) */
     .pwidget-active {
         border-color:#4db8a0 !important;
         background:linear-gradient(160deg,#f0faf7,white) !important;
         box-shadow:0 8px 28px rgba(77,184,160,0.2) !important;
     }
 
-    /* Formulario de login */
     .login-form-wrap {
         background:white; border-radius:20px;
         border:2px solid #4db8a0;
@@ -504,7 +484,6 @@ def show_login():
         font-family:'DM Sans',sans-serif;
     }
 
-    /* Botón Ingresar fijo en la landing */
     div[data-testid="stVerticalBlock"] > div:first-child {
         position:fixed; top:14px; right:52px; z-index:200;
     }
@@ -527,22 +506,18 @@ def show_login():
             st.session_state.login_panel = "select"
             st.rerun()
 
-    # ── Si no hay panel activo, no mostramos nada más ─────────────────────────
     if st.session_state.login_panel is None:
         return
 
-    # ── PANTALLA DE SELECCIÓN DE PERFIL ──────────────────────────────────────
     panel = st.session_state.login_panel
 
     st.markdown("""
     <style>
-    /* Cuando el panel está activo, ocultamos la landing y mostramos fondo crema */
     .main > div { background:#f5f0eb !important; }
     .block-container { padding-top:0 !important; }
     </style>
     """, unsafe_allow_html=True)
 
-    # Encabezado con logo
     st.markdown("<br><br>", unsafe_allow_html=True)
     _, col_c, _ = st.columns([1, 3, 1])
     with col_c:
@@ -555,17 +530,15 @@ def show_login():
             unsafe_allow_html=True
         )
 
-    # ── 4 widgets ────────────────────────────────────────────────────────────
+    # ── Solo 2 perfiles: Colegio y Administrador ──────────────────────────────
     PERFILES = [
         ("colegio", "🏫", "Colegio",       "Docentes que gestionan<br>aulas y sociogramas"),
         ("admin",   "🏛️", "Administrador", "Gestión institucional<br>y validación KYC"),
-        ("familia", "👨‍👩‍👧", "Familia",       "Familias y tutores<br>de alumnos"),
-        ("alumno",  "🎒", "Alumno",        "Estudiantes que responden<br>la encuesta"),
     ]
 
-    _, col_grid, _ = st.columns([0.3, 4, 0.3])
+    _, col_grid, _ = st.columns([1, 2, 1])
     with col_grid:
-        cols = st.columns(4)
+        cols = st.columns(2)
         for i, (key, ico, nombre, desc) in enumerate(PERFILES):
             is_active = (panel == key)
             active_class = "pwidget-active" if is_active else ""
@@ -588,7 +561,7 @@ def show_login():
     # ── Formulario del perfil seleccionado ────────────────────────────────────
     if panel not in ("select", None) and panel in CREDS:
         cred    = CREDS[panel]
-        nombres = {"colegio":"Colegio","admin":"Administrador","familia":"Familia","alumno":"Alumno"}
+        nombres = {"colegio": "Colegio", "admin": "Administrador"}
 
         st.markdown("<br>", unsafe_allow_html=True)
         _, col_form, _ = st.columns([1, 1.2, 1])
@@ -617,7 +590,6 @@ def show_login():
                     st.session_state.login_panel = "select"
                     st.rerun()
 
-    # Botón para volver a la landing
     st.markdown("<br>", unsafe_allow_html=True)
     _, col_back, _ = st.columns([1, 1.2, 1])
     with col_back:
