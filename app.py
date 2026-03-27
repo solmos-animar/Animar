@@ -1,6 +1,20 @@
 import streamlit as st
 from secciones.landing import show_landing, LOGO_SIDEBAR, LOGO_MOD
-from secciones.estudiantes import show_estudiantes
+
+# ── Imports de todas las secciones ───────────────────────────────────────────
+from secciones.admin_colegios   import show_admin_colegios
+from secciones.admin_dashboard  import show_admin_dashboard
+from secciones.admin_docentes   import show_admin_docentes
+from secciones.admin_kyc        import show_admin_kyc
+from secciones.sociogramas      import show_sociogramas
+from secciones.student_contenido import show_student_contenido
+from secciones.student_encuesta  import show_student_encuesta
+from secciones.student_home      import show_student_home
+from secciones.teacher_alertas   import show_teacher_alertas
+from secciones.teacher_aulas     import show_teacher_aulas
+from secciones.teacher_dashboard import show_teacher_dashboard
+from secciones.teacher_reportes  import show_teacher_reportes
+from secciones.teacher_sociograma import show_teacher_sociograma
 
 st.set_page_config(
     page_title="ConVivir — Plataforma de Convivencia Escolar",
@@ -9,12 +23,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ── Estilos globales ──────────────────────────────────────────────────────────
 st.markdown("""
 <style>
   .block-container { padding-top: 1rem !important; }
-
-  /* Barra de tabs siempre visible y fija arriba */
   div[data-testid="stTabs"] {
       position: sticky;
       top: 0;
@@ -23,8 +34,6 @@ st.markdown("""
       padding-bottom: 4px;
       border-bottom: 2px solid #e0d8d0;
   }
-
-  /* Estilo de los tabs */
   div[data-testid="stTabs"] button {
       font-weight: 700;
       font-size: 13px;
@@ -34,33 +43,24 @@ st.markdown("""
       color: #1a2e2a;
       border-bottom: 3px solid #4db8a0;
   }
-
-  /* Separadores de grupo entre tabs */
-  .tab-group-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #4db8a0;
-      padding: 0 8px;
-      display: flex;
-      align-items: center;
-  }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Estado de sesión ──────────────────────────────────────────────────────────
-if "active_tab" not in st.session_state:
-    st.session_state.active_tab = 0  # 0 = Landing (inicio)
-
 # ════════════════════════════════════════════════════════════════════════════
-# MENÚ DE TABS — siempre visible
-# Orden: Inicio | Admin Global | — Colegio — | Directora | Docente | Alumno | Tutor | — Animar — | Moderadora
+# TABS — siempre visibles
 # ════════════════════════════════════════════════════════════════════════════
 
-tab_inicio, tab_admin, tab_directora, tab_docente, tab_alumno, tab_tutor, tab_moderadora = st.tabs([
+(
+    tab_inicio,
+    tab_admin,
+    tab_directora,   # placeholder — agregar sección cuando esté lista
+    tab_docente,
+    tab_alumno,
+    tab_tutor,       # placeholder — agregar sección cuando esté lista
+    tab_moderadora,  # placeholder — agregar sección cuando esté lista
+) = st.tabs([
     "🏠 Inicio",
-    "🏛️ Admin Global",
+    "🏛️ Admin",
     "👩‍💼 Directora",
     "👨‍🏫 Docente",
     "🎒 Alumno",
@@ -68,31 +68,70 @@ tab_inicio, tab_admin, tab_directora, tab_docente, tab_alumno, tab_tutor, tab_mo
     "🛡️ Moderadora",
 ])
 
-# ── Contenido de cada tab ─────────────────────────────────────────────────────
-
+# ── Inicio ────────────────────────────────────────────────────────────────────
 with tab_inicio:
     show_landing()
 
+# ── Admin Global ──────────────────────────────────────────────────────────────
 with tab_admin:
-    st.markdown("### 🏛️ Admin Global")
-    st.info("Sección en construcción.")
+    subtab_dash, subtab_colegios, subtab_docentes, subtab_kyc = st.tabs([
+        "📊 Dashboard",
+        "🏫 Colegios",
+        "👨‍🏫 Docentes",
+        "📋 KYC",
+    ])
+    with subtab_dash:
+        show_admin_dashboard()
+    with subtab_colegios:
+        show_admin_colegios()
+    with subtab_docentes:
+        show_admin_docentes()
+    with subtab_kyc:
+        show_admin_kyc()
 
+# ── Directora ─────────────────────────────────────────────────────────────────
 with tab_directora:
-    st.markdown("### 👩‍💼 Directora")
-    st.info("Sección en construcción.")
+    st.info("🚧 Sección Directora en construcción.")
 
+# ── Docente ───────────────────────────────────────────────────────────────────
 with tab_docente:
-    st.markdown("### 👨‍🏫 Docente")
-    st.info("Sección en construcción.")
+    subtab_dash_t, subtab_aulas, subtab_sociograma, subtab_alertas, subtab_reportes = st.tabs([
+        "📊 Dashboard",
+        "🚪 Aulas",
+        "🕸️ Sociograma",
+        "🚨 Alertas",
+        "📈 Reportes",
+    ])
+    with subtab_dash_t:
+        show_teacher_dashboard()
+    with subtab_aulas:
+        show_teacher_aulas()
+    with subtab_sociograma:
+        show_sociogramas()
+        show_teacher_sociograma()
+    with subtab_alertas:
+        show_teacher_alertas()
+    with subtab_reportes:
+        show_teacher_reportes()
 
+# ── Alumno ────────────────────────────────────────────────────────────────────
 with tab_alumno:
-    st.markdown("### 🎒 Alumno")
-    show_estudiantes()   # ← ya existe en secciones/estudiantes.py
+    subtab_home, subtab_encuesta, subtab_contenido = st.tabs([
+        "🏠 Inicio",
+        "📝 Encuesta",
+        "📚 Contenido",
+    ])
+    with subtab_home:
+        show_student_home()
+    with subtab_encuesta:
+        show_student_encuesta()
+    with subtab_contenido:
+        show_student_contenido()
 
+# ── Tutor ─────────────────────────────────────────────────────────────────────
 with tab_tutor:
-    st.markdown("### 👨‍👩‍👧 Tutor")
-    st.info("Sección en construcción.")
+    st.info("🚧 Sección Tutor en construcción.")
 
+# ── Moderadora ────────────────────────────────────────────────────────────────
 with tab_moderadora:
-    st.markdown("### 🛡️ Moderadora")
-    st.info("Sección en construcción.")
+    st.info("🚧 Sección Moderadora en construcción.")
