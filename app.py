@@ -1,6 +1,6 @@
 import streamlit as st
 from secciones.landing import show_landing
-from secciones.estudiantes import show_estudiantes  # ← vamos a corregir esto
+from secciones.estudiantes import render
 
 st.set_page_config(
     page_title="ConVivir — Plataforma de Convivencia Escolar",
@@ -9,7 +9,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Ocultar las páginas automáticas del sidebar
 st.markdown("""
 <style>
   [data-testid="stSidebarNav"] { display: none; }
@@ -22,6 +21,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Inicializar session_state necesario para estudiantes
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "student_home"
+if "user" not in st.session_state:
+    st.session_state.user = {"name": "Lucas Martínez"}
+
 tab_inicio, tab_alumno = st.tabs([
     "🏠 Inicio",
     "🎒 Alumno",
@@ -31,4 +36,4 @@ with tab_inicio:
     show_landing()
 
 with tab_alumno:
-    show_estudiantes()
+    render()
