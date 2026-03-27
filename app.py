@@ -8,13 +8,13 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Estilos globales ──────────────────────────────────────────────────────────
+# ── Estilos globales post-login ───────────────────────────────────────────────
 st.markdown("""
 <style>
   [data-testid="stSidebar"] { background-color: #1a2e2a; }
   [data-testid="stSidebar"] * { color: white !important; }
   [data-testid="stSidebar"] hr { border-color: rgba(77,184,160,0.25); }
-  .main .block-container { padding-top: 1rem; }
+  .main .block-container { padding-top: 0 !important; padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
   h1 { color: #0a1f5c; }
   h2 { color: #0a1f5c; }
   h3 { color: #1a56a0; }
@@ -27,54 +27,18 @@ st.markdown("""
   .alert-high   { background:#fdeaea; border-left:4px solid #c0392b; border-radius:8px; padding:12px 16px; margin:8px 0; }
   .alert-medium { background:#fef3e2; border-left:4px solid #d4580a; border-radius:8px; padding:12px 16px; margin:8px 0; }
   .alert-low    { background:#e6f4ee; border-left:4px solid #1d7a55; border-radius:8px; padding:12px 16px; margin:8px 0; }
-
-  /* ── Tabs superiores ── */
-  div[data-testid="stTabs"] > div:first-child {
-      background: #0e1c19;
-      border-radius: 12px 12px 0 0;
-      padding: 4px 8px 0;
-  }
-  div[data-testid="stTabs"] button[data-baseweb="tab"] {
-      font-size: 13px !important;
-      font-weight: 700 !important;
-      color: rgba(255,255,255,0.45) !important;
-      border-radius: 8px 8px 0 0 !important;
-      padding: 10px 18px !important;
-      border: none !important;
-      background: transparent !important;
-      transition: all .15s !important;
-  }
-  div[data-testid="stTabs"] button[data-baseweb="tab"]:hover {
-      color: rgba(255,255,255,0.85) !important;
-      background: rgba(77,184,160,0.12) !important;
-  }
-  div[data-testid="stTabs"] button[aria-selected="true"] {
-      color: #4db8a0 !important;
-      background: #1a2e2a !important;
-      border-bottom: 2px solid #4db8a0 !important;
-  }
-  /* Separadores de grupo: opacos, no interactivos */
-  div[data-testid="stTabs"] button[data-baseweb="tab"]:disabled,
-  div[data-testid="stTabs"] button[data-baseweb="tab"][aria-disabled="true"] {
-      color: rgba(77,184,160,0.5) !important;
-      cursor: default !important;
-      font-size: 10px !important;
-      letter-spacing: 1.5px !important;
-      text-transform: uppercase !important;
-      padding: 10px 10px !important;
-  }
 </style>
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# DEFINICIÓN DE PERFILES
+# PERFILES
 # ══════════════════════════════════════════════════════════════════════════════
 
 PROFILES = {
     "admin_global": {
         "label": "Admin Global", "icon": "🏛️",
         "role": "admin", "name": "Administrador Global",
-        "email": "admin@convivir.ar", "password": "admin123",
+        "email": "admin@convivir.ar",
         "group": "Animar",
         "pages": [
             {"name": "Gestión Colegios", "icon": "🏛️"},
@@ -85,7 +49,7 @@ PROFILES = {
     "directora": {
         "label": "Directora", "icon": "👩‍💼",
         "role": "director", "name": "Dir. Ana Rodríguez",
-        "email": "directora@colegio.ar", "password": "directora123",
+        "email": "directora@colegio.ar",
         "group": "Colegio",
         "pages": [
             {"name": "Panel Institucional", "icon": "🏫"},
@@ -96,7 +60,7 @@ PROFILES = {
     "docente": {
         "label": "Docente", "icon": "👨‍🏫",
         "role": "teacher", "name": "Prof. María García",
-        "email": "docente@colegio.ar", "password": "docente123",
+        "email": "docente@colegio.ar",
         "group": "Colegio",
         "pages": [
             {"name": "Mis Aulas",          "icon": "🚪"},
@@ -108,7 +72,7 @@ PROFILES = {
     "alumno": {
         "label": "Alumno", "icon": "🎒",
         "role": "student", "name": "Lucas Martínez",
-        "email": "alumno@colegio.ar", "password": "alumno123",
+        "email": "alumno@colegio.ar",
         "group": "Colegio",
         "pages": [
             {"name": "Encuesta Sociométrica", "icon": "📝"},
@@ -118,7 +82,7 @@ PROFILES = {
     "tutor": {
         "label": "Tutor", "icon": "👨‍👩‍👧",
         "role": "family", "name": "Carlos Martínez",
-        "email": "tutor@colegio.ar", "password": "tutor123",
+        "email": "tutor@colegio.ar",
         "group": "Colegio",
         "pages": [
             {"name": "Mi Alumno",      "icon": "👨‍👩‍👧"},
@@ -128,7 +92,7 @@ PROFILES = {
     "moderadora": {
         "label": "Moderadora", "icon": "🛡️",
         "role": "moderator", "name": "Lic. Sofía Herrera",
-        "email": "moderadora@animar.ar", "password": "moderadora123",
+        "email": "moderadora@animar.ar",
         "group": "Animar",
         "pages": [
             {"name": "Moderación Contenido", "icon": "🛡️"},
@@ -138,7 +102,7 @@ PROFILES = {
     },
 }
 
-# Orden de tabs: los keys "__sep_*" son separadores de grupo (no clickeables)
+# Orden visual de los tabs (con separadores de grupo)
 TAB_ORDER = [
     "admin_global",
     "__sep_colegio__",
@@ -150,11 +114,21 @@ TAB_ORDER = [
     "moderadora",
 ]
 
+REAL_TABS = [k for k in TAB_ORDER if not k.startswith("__sep")]
+
 # ── Estado de sesión ──────────────────────────────────────────────────────────
-if "logged_in"         not in st.session_state: st.session_state.logged_in         = False
-if "user"              not in st.session_state: st.session_state.user              = None
-if "active_profile"    not in st.session_state: st.session_state.active_profile    = None
-if "show_login_panel"  not in st.session_state: st.session_state.show_login_panel  = False
+def _init_state():
+    defaults = {
+        "logged_in":        False,
+        "user":             None,
+        "active_profile":   "admin_global",
+        "show_login_panel": False,
+    }
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
+
+_init_state()
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -171,6 +145,131 @@ def auto_login(profile_key: str):
         "name":  p["name"],
     }
     st.rerun()
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# BARRA DE TABS HTML (reemplaza st.tabs)
+# ════════════════════════════════════════════════════════════════════════════
+
+def render_tab_bar():
+    """
+    Renderiza la barra de tabs como HTML puro.
+    Los clics se capturan con botones invisibles de Streamlit superpuestos.
+    """
+    active = st.session_state.active_profile
+
+    # ── CSS de la barra ──────────────────────────────────────────────────────
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@700;800&display=swap');
+
+    .tabbar-wrap {
+        width: 100%;
+        background: #0e1c19;
+        border-radius: 14px 14px 0 0;
+        padding: 0 12px;
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+        margin-bottom: 0;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        overflow-x: auto;
+    }
+    .tabbar-wrap::-webkit-scrollbar { height: 3px; }
+    .tabbar-wrap::-webkit-scrollbar-thumb { background: #4db8a0; border-radius: 2px; }
+
+    .tab-item {
+        display: flex; align-items: center; gap: 6px;
+        padding: 12px 16px 11px;
+        font-family: 'Sora', sans-serif;
+        font-size: 13px; font-weight: 700;
+        color: rgba(255,255,255,0.42);
+        border-radius: 10px 10px 0 0;
+        cursor: pointer;
+        transition: all .15s;
+        white-space: nowrap;
+        border-bottom: 2px solid transparent;
+        user-select: none;
+    }
+    .tab-item:hover {
+        color: rgba(255,255,255,0.85);
+        background: rgba(77,184,160,0.1);
+    }
+    .tab-item.active {
+        color: #4db8a0;
+        background: #1a2e2a;
+        border-bottom: 2px solid #4db8a0;
+    }
+    .tab-sep {
+        padding: 10px 8px;
+        font-size: 9px; font-weight: 700;
+        letter-spacing: 2px; text-transform: uppercase;
+        color: rgba(77,184,160,0.35);
+        display: flex; align-items: center;
+        white-space: nowrap; cursor: default;
+        border-left: 1px solid rgba(77,184,160,0.12);
+        border-right: 1px solid rgba(77,184,160,0.12);
+        margin: 0 4px;
+    }
+    .tab-content-area {
+        background: #f7f9f8;
+        border: 1px solid rgba(77,184,160,0.15);
+        border-top: none;
+        border-radius: 0 0 14px 14px;
+        padding: 24px 28px;
+        min-height: 200px;
+    }
+
+    /* Ocultar los botones nativos de Streamlit que usamos para capturar clics */
+    .tab-btn-row { display: flex; gap: 2px; margin: 0; padding: 0; }
+    .tab-btn-row .stButton { margin: 0 !important; padding: 0 !important; }
+    .tab-btn-row .stButton > button {
+        opacity: 0 !important;
+        position: absolute !important;
+        height: 44px !important;
+        min-width: 60px !important;
+        cursor: pointer !important;
+        border: none !important;
+        background: transparent !important;
+        z-index: 10;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ── HTML de la barra ─────────────────────────────────────────────────────
+    tabs_html = '<div class="tabbar-wrap">'
+    for key in TAB_ORDER:
+        if key == "__sep_colegio__":
+            tabs_html += '<div class="tab-sep">Colegio</div>'
+        elif key == "__sep_animar__":
+            tabs_html += '<div class="tab-sep">Animar</div>'
+        else:
+            p = PROFILES[key]
+            active_class = " active" if key == active else ""
+            tabs_html += (
+                f'<div class="tab-item{active_class}" id="tab-{key}">'
+                f'{p["icon"]} {p["label"]}'
+                f'</div>'
+            )
+    tabs_html += '</div>'
+    st.markdown(tabs_html, unsafe_allow_html=True)
+
+    # ── Botones invisibles superpuestos para capturar clics ──────────────────
+    # Los posicionamos en una fila debajo (Streamlit no permite superposición real),
+    # pero los ocultamos visualmente y los mostramos con st.columns alineados.
+    cols = st.columns(len(REAL_TABS))
+    for col, key in zip(cols, REAL_TABS):
+        with col:
+            p = PROFILES[key]
+            label = f"{p['icon']} {p['label']}"
+            if st.button(label, key=f"tabclick_{key}", use_container_width=True):
+                st.session_state.active_profile = key
+                st.session_state.user = {
+                    "email": p["email"],
+                    "role":  p["role"],
+                    "name":  p["name"],
+                }
+                st.rerun()
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -208,41 +307,39 @@ def render_sidebar(profile_key: str):
     if st.sidebar.button("Cerrar Sesión", key="logout", use_container_width=True):
         st.session_state.logged_in      = False
         st.session_state.user           = None
-        st.session_state.active_profile = None
+        st.session_state.active_profile = "admin_global"
         st.rerun()
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# DASHBOARDS POR ROL
+# DASHBOARDS
 # ════════════════════════════════════════════════════════════════════════════
 
 def render_dashboard(profile_key: str):
     p    = PROFILES[profile_key]
     user = st.session_state.user
+    first = user["name"].split()[0]
 
-    render_sidebar(profile_key)
-
-    first_name = user["name"].split()[0] if p["role"] != "admin" else user["name"]
     st.markdown(f"""
-        <div style="display:flex; align-items:center; gap:16px; margin-bottom:4px;">
-            <span style="font-size:36px;">{p['icon']}</span>
+        <div style="display:flex; align-items:center; gap:14px; margin: 20px 0 4px;">
+            <span style="font-size:32px;">{p['icon']}</span>
             <div>
-                <h1 style="margin:0;">Bienvenida/o, {first_name}</h1>
-                <p style="color:#7a8a82; margin:0; font-size:14px;">
+                <h1 style="margin:0; font-size:26px;">Bienvenida/o, {first}</h1>
+                <p style="color:#7a8a82; margin:0; font-size:13px;">
                     {p['group']} · {p['label']} — {user['email']}
                 </p>
             </div>
         </div>
-        <hr style="border-color:rgba(77,184,160,0.15); margin:16px 0;">
+        <hr style="border-color:rgba(77,184,160,0.2); margin:14px 0 20px;">
     """, unsafe_allow_html=True)
 
     role = p["role"]
-    if role == "admin":           _dash_admin()
-    elif role == "director":      _dash_director()
-    elif role == "teacher":       _dash_teacher()
-    elif role == "student":       _dash_student()
-    elif role == "family":        _dash_family()
-    elif role == "moderator":     _dash_moderator()
+    if role == "admin":       _dash_admin()
+    elif role == "director":  _dash_director()
+    elif role == "teacher":   _dash_teacher()
+    elif role == "student":   _dash_student()
+    elif role == "family":    _dash_family()
+    elif role == "moderator": _dash_moderator()
 
 
 def _dash_admin():
@@ -258,7 +355,7 @@ def _dash_director():
     c1, c2, c3 = st.columns(3)
     with c1: st.metric("Docentes activos",  "12")
     with c2: st.metric("Aulas habilitadas", "8")
-    with c3: st.metric("Alertas abiertas",  "2",  delta_color="inverse")
+    with c3: st.metric("Alertas abiertas",  "2", delta_color="inverse")
     st.markdown("### Estado institucional")
     st.markdown('<div class="alert-medium"><b>ATENCIÓN:</b> 2 alertas de riesgo activas en 4º Año "A".</div>', unsafe_allow_html=True)
     st.markdown('<div class="alert-low"><b>OK:</b> 5º Año "B" — sin alertas activas.</div>', unsafe_allow_html=True)
@@ -267,14 +364,14 @@ def _dash_teacher():
     st.markdown("### Mis Aulas Activas")
     c1, c2, _ = st.columns(3)
     with c1:
-        st.markdown("""<div style="background:white;border:2px solid #e0d8d0;border-radius:16px;padding:20px;">
+        st.markdown("""<div style="background:white;border:2px solid #e0d8d0;border-radius:14px;padding:18px;">
             <h4 style="margin:0;color:#1a2e2a;">4º Año "A"</h4>
-            <p style="font-size:12px;color:#7a8a82;">32 Alumnos · 1 Alerta Alta</p>
+            <p style="font-size:12px;color:#7a8a82;margin:4px 0 8px;">32 Alumnos · 1 Alerta Alta</p>
             <span class="badge-teacher">SOCIOGRAMA ACTIVO</span></div>""", unsafe_allow_html=True)
     with c2:
-        st.markdown("""<div style="background:white;border:2px solid #e0d8d0;border-radius:16px;padding:20px;">
+        st.markdown("""<div style="background:white;border:2px solid #e0d8d0;border-radius:14px;padding:18px;">
             <h4 style="margin:0;color:#1a2e2a;">5º Año "B"</h4>
-            <p style="font-size:12px;color:#7a8a82;">28 Alumnos · 0 Alertas</p>
+            <p style="font-size:12px;color:#7a8a82;margin:4px 0 8px;">28 Alumnos · 0 Alertas</p>
             <span class="badge-admin">REPORTES LISTOS</span></div>""", unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("### Alertas Preventivas")
@@ -282,21 +379,18 @@ def _dash_teacher():
     st.markdown('<div class="alert-medium"><b>RIESGO MEDIO:</b> Conflicto grupal entre subgrupos en 5ºB.</div>', unsafe_allow_html=True)
 
 def _dash_student():
-    st.markdown("### Tu espacio, Lucas")
     st.info("📝 Tenés una encuesta pendiente de completar para tu aula.")
     st.markdown("### Contenido para vos")
     st.markdown('<div class="alert-low"><b>Nuevo:</b> ¿Qué hacer si ves que alguien es excluido? — Guía para alumnos.</div>', unsafe_allow_html=True)
 
 def _dash_family():
-    st.markdown("### Panel de Carlos Martínez")
     st.markdown("**Alumno vinculado:** Lucas Martínez — 4º Año A")
     st.markdown('<div class="alert-low"><b>Sin alertas activas</b> para Lucas esta semana.</div>', unsafe_allow_html=True)
-    st.markdown("### Recursos para el hogar")
     st.markdown("📥 Guía de convivencia familiar — descargable")
 
 def _dash_moderator():
     c1, c2 = st.columns(2)
-    with c1: st.metric("Contenidos para revisar", "7")
+    with c1: st.metric("Contenidos para revisar",  "7")
     with c2: st.metric("Alertas críticas activas", "1", delta_color="inverse")
     st.markdown("### Cola de moderación")
     st.markdown('<div class="alert-high"><b>CRÍTICO:</b> Reporte de 4ºA — Colegio San Martín. Requiere revisión manual.</div>', unsafe_allow_html=True)
@@ -304,7 +398,7 @@ def _dash_moderator():
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# PANTALLA DE LOGIN (landing + selector de perfil)
+# PANTALLA LOGIN (landing + selector de perfil)
 # ════════════════════════════════════════════════════════════════════════════
 
 def show_login():
@@ -314,16 +408,18 @@ def show_login():
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&display=swap');
     .pwidget {
-        background:white; border-radius:20px; border:2px solid #e0d8d0;
-        padding:28px 14px 22px; text-align:center; cursor:pointer;
-        box-shadow:0 4px 20px rgba(26,46,42,0.06); transition:all .18s;
+        background:white; border-radius:18px; border:2px solid #e0d8d0;
+        padding:24px 12px 20px; text-align:center;
+        box-shadow:0 4px 18px rgba(26,46,42,0.06); transition:all .18s;
     }
-    .pwidget:hover { border-color:#4db8a0; transform:translateY(-4px); box-shadow:0 12px 32px rgba(77,184,160,0.18); }
-    .pwidget-ico  { font-size:40px; margin-bottom:10px; display:block; }
-    .pwidget-name { font-family:'Sora',sans-serif; font-size:14px; font-weight:800; color:#1a2e2a; margin-bottom:4px; }
-    .pwidget-desc { font-size:11px; color:#8a9a92; line-height:1.5; }
+    .pwidget:hover { border-color:#4db8a0; transform:translateY(-3px); box-shadow:0 10px 28px rgba(77,184,160,0.18); }
+    .pwidget-ico  { font-size:38px; margin-bottom:8px; display:block; }
+    .pwidget-name { font-family:'Sora',sans-serif; font-size:13px; font-weight:800; color:#1a2e2a; margin-bottom:3px; }
+    .pwidget-desc { font-size:10.5px; color:#8a9a92; line-height:1.45; }
+
+    /* Botón Ingresar → fijo sobre la navbar de la landing */
     div[data-testid="stVerticalBlock"] > div:first-child {
-        position:fixed; top:14px; right:52px; z-index:200;
+        position:fixed; top:14px; right:52px; z-index:9999;
     }
     div[data-testid="stVerticalBlock"] > div:first-child .stButton > button {
         background:#4db8a0 !important; border:none !important;
@@ -331,9 +427,13 @@ def show_login():
         border-radius:8px !important; padding:9px 22px !important;
         font-size:14px !important; color:white !important;
     }
+    div[data-testid="stVerticalBlock"] > div:first-child .stButton > button:hover {
+        background:#2a9a82 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
+    # Botón flotante en la navbar
     _, col_btn = st.columns([12, 1])
     with col_btn:
         if st.button("Ingresar →", type="primary", key="open_login"):
@@ -345,89 +445,68 @@ def show_login():
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown(f"""
-        <div style="text-align:center; margin-bottom:32px;">
-            <div style="transform:scale(0.5); transform-origin:center top;">{LOGO_SIDEBAR}</div>
-            <h2 style="font-family:'Sora',sans-serif; font-size:24px; font-weight:800;
-                       color:#1a2e2a; letter-spacing:-0.5px; margin:12px 0 6px;">
+        <div style="text-align:center; margin-bottom:28px;">
+            <div style="transform:scale(0.45); transform-origin:center top; margin-bottom:-30px;">{LOGO_SIDEBAR}</div>
+            <h2 style="font-family:'Sora',sans-serif; font-size:22px; font-weight:800;
+                       color:#1a2e2a; letter-spacing:-0.5px; margin:0 0 4px;">
                 Seleccioná tu perfil
             </h2>
-            <p style="font-size:13px; color:#7a8a82;">Acceso directo al dashboard de cada rol</p>
+            <p style="font-size:12px; color:#7a8a82;">Acceso directo al dashboard de cada rol</p>
         </div>
     """, unsafe_allow_html=True)
 
     # Grupo Animar
-    st.markdown("**🏛️ Animar**")
+    st.markdown(
+        "<p style='font-size:11px; font-weight:700; letter-spacing:2px; "
+        "text-transform:uppercase; color:#4db8a0; margin-bottom:8px;'>🏛️ Animar</p>",
+        unsafe_allow_html=True
+    )
     a1, a2, *_ = st.columns(6)
     with a1:
         st.markdown('<div class="pwidget"><span class="pwidget-ico">🏛️</span><div class="pwidget-name">Admin Global</div><div class="pwidget-desc">Backoffice central</div></div>', unsafe_allow_html=True)
-        if st.button("Ingresar", key="btn_admin_global", use_container_width=True):
+        if st.button("Entrar", key="btn_admin_global", use_container_width=True):
             auto_login("admin_global")
     with a2:
         st.markdown('<div class="pwidget"><span class="pwidget-ico">🛡️</span><div class="pwidget-name">Moderadora</div><div class="pwidget-desc">Contenido y alertas</div></div>', unsafe_allow_html=True)
-        if st.button("Ingresar", key="btn_moderadora", use_container_width=True):
+        if st.button("Entrar", key="btn_moderadora", use_container_width=True):
             auto_login("moderadora")
 
     st.markdown("<br>", unsafe_allow_html=True)
 
     # Grupo Colegio
-    st.markdown("**🏫 Colegio**")
+    st.markdown(
+        "<p style='font-size:11px; font-weight:700; letter-spacing:2px; "
+        "text-transform:uppercase; color:#4db8a0; margin-bottom:8px;'>🏫 Colegio</p>",
+        unsafe_allow_html=True
+    )
     c1, c2, c3, c4, *_ = st.columns(6)
     with c1:
         st.markdown('<div class="pwidget"><span class="pwidget-ico">👩‍💼</span><div class="pwidget-name">Directora</div><div class="pwidget-desc">Panel institucional</div></div>', unsafe_allow_html=True)
-        if st.button("Ingresar", key="btn_directora", use_container_width=True):
+        if st.button("Entrar", key="btn_directora", use_container_width=True):
             auto_login("directora")
     with c2:
         st.markdown('<div class="pwidget"><span class="pwidget-ico">👨‍🏫</span><div class="pwidget-name">Docente</div><div class="pwidget-desc">Aulas y sociograma</div></div>', unsafe_allow_html=True)
-        if st.button("Ingresar", key="btn_docente", use_container_width=True):
+        if st.button("Entrar", key="btn_docente", use_container_width=True):
             auto_login("docente")
     with c3:
         st.markdown('<div class="pwidget"><span class="pwidget-ico">🎒</span><div class="pwidget-name">Alumno</div><div class="pwidget-desc">Encuesta y contenido</div></div>', unsafe_allow_html=True)
-        if st.button("Ingresar", key="btn_alumno", use_container_width=True):
+        if st.button("Entrar", key="btn_alumno", use_container_width=True):
             auto_login("alumno")
     with c4:
         st.markdown('<div class="pwidget"><span class="pwidget-ico">👨‍👩‍👧</span><div class="pwidget-name">Tutor</div><div class="pwidget-desc">Seguimiento familiar</div></div>', unsafe_allow_html=True)
-        if st.button("Ingresar", key="btn_tutor", use_container_width=True):
+        if st.button("Entrar", key="btn_tutor", use_container_width=True):
             auto_login("tutor")
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# PANTALLA PRINCIPAL POST-LOGIN: tabs superiores
+# PANTALLA PRINCIPAL POST-LOGIN
 # ════════════════════════════════════════════════════════════════════════════
 
 def show_main():
-    # Construir labels de tabs
-    tab_labels = []
-    for key in TAB_ORDER:
-        if key == "__sep_colegio__":
-            tab_labels.append("┊ Colegio")
-        elif key == "__sep_animar__":
-            tab_labels.append("┊ Animar")
-        else:
-            p = PROFILES[key]
-            tab_labels.append(f"{p['icon']} {p['label']}")
-
-    tabs = st.tabs(tab_labels)
-
-    for tab, key in zip(tabs, TAB_ORDER):
-        with tab:
-            if key.startswith("__sep"):
-                group = "Colegio" if "colegio" in key else "Animar"
-                st.markdown(
-                    f"<p style='color:#7a8a82; font-size:13px; padding:8px 0;'>"
-                    f"Seleccioná un perfil del grupo <b>{group}</b> en las pestañas de la barra superior.</p>",
-                    unsafe_allow_html=True
-                )
-            else:
-                # Actualizar perfil activo si el usuario cambió de tab
-                if st.session_state.active_profile != key:
-                    p = PROFILES[key]
-                    st.session_state.active_profile = key
-                    st.session_state.user = {
-                        "email": p["email"],
-                        "role":  p["role"],
-                        "name":  p["name"],
-                    }
-                render_dashboard(key)
+    active = st.session_state.active_profile
+    render_sidebar(active)
+    render_tab_bar()          # barra de tabs HTML + botones invisibles
+    render_dashboard(active)  # contenido del perfil activo
 
 
 # ════════════════════════════════════════════════════════════════════════════
