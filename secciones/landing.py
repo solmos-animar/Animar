@@ -235,7 +235,7 @@ LANDING_HTML_2 = """
     <div class="cv-hero-inner">
       <div>
         <div class="cv-tag">Plataforma de Convivencia Escolar</div>
-        <h1>Prevención del bullying<br><em>basada en datos</em><br>para colegios</h1>
+        <h1>PrevenciónBBBBADFAEFdel bullying<br><em>basada en datos</em><br>para colegios</h1>
         <p class="cv-hero-sub">ConVivir combina sociogramas de aula, contenido educativo y gestión institucional para que docentes detecten situaciones de acoso antes de que escalen.</p>
       </div>
       <div class="cv-logo-hero">
