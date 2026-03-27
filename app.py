@@ -35,7 +35,7 @@ st.markdown("""
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 tab_inicio, tab_direccion, tab_docente, tab_alumno, tab_familia, tab_moderador, tab_admin = st.tabs([
-    "🏠 Inicio",
+    "🏠 Landing",
     "👩‍💼 Dirección",
     "👨‍🏫 Docente",
     "🎒 Alumno",
