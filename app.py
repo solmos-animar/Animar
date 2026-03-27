@@ -21,46 +21,74 @@ def load_css(filepath: str):
 load_css("utilidades/desktop.css")
 
 # ── Inicializar estado ────────────────────────────────────────────────────────
+if "seccion" not in st.session_state:
+    st.session_state.seccion = "inicio"
 if "current_page" not in st.session_state:
     st.session_state.current_page = "student_home"
 if "user" not in st.session_state:
     st.session_state.user = {"name": "Lucas Martínez"}
 
-# ── Navbar fija ───────────────────────────────────────────────────────────────
+# ── Navbar: logo + menú custom ────────────────────────────────────────────────
 st.markdown("""
 <div class="menu-bar">
   <div class="menu-logo">Con<em>Vivir</em></div>
 </div>
+<div class="nb-menu">
+  <div class="nb-item" id="nb-inicio"    onclick="nbClick('inicio')">🏠 Inicio</div>
+  <div class="nb-sep"></div>
+  <span class="nb-group-label">Colegio</span>
+  <div class="nb-item" id="nb-direccion" onclick="nbClick('direccion')">👩‍💼 Dirección</div>
+  <div class="nb-item" id="nb-docente"   onclick="nbClick('docente')">👨‍🏫 Docente</div>
+  <div class="nb-item" id="nb-alumno"    onclick="nbClick('alumno')">🎒 Alumno</div>
+  <div class="nb-item" id="nb-familia"   onclick="nbClick('familia')">👨‍👩‍👧 Familia</div>
+  <div class="nb-sep"></div>
+  <span class="nb-group-label">Animar</span>
+  <div class="nb-item" id="nb-moderador" onclick="nbClick('moderador')">🛡️ Moderador</div>
+  <div class="nb-item" id="nb-admin"     onclick="nbClick('admin')">🏛️ Admin Global</div>
+</div>
+
+<script>
+function nbClick(seccion) {
+  // Marcar activo visualmente
+  document.querySelectorAll('.nb-item').forEach(i => i.classList.remove('active'));
+  const el = document.getElementById('nb-' + seccion);
+  if (el) el.classList.add('active');
+
+  // Enviar al backend de Streamlit via query param + reload
+  const url = new URL(window.parent.location.href);
+  url.searchParams.set('seccion', seccion);
+  window.parent.location.href = url.toString();
+}
+
+// Marcar activo el item actual al cargar
+const params = new URLSearchParams(window.parent.location.search);
+const current = params.get('seccion') || 'inicio';
+const el = document.getElementById('nb-' + current);
+if (el) el.classList.add('active');
+</script>
 """, unsafe_allow_html=True)
 
-# ── Tabs ──────────────────────────────────────────────────────────────────────
-tab_inicio, tab_direccion, tab_docente, tab_alumno, tab_familia, tab_moderador, tab_admin = st.tabs([
-    "🏠 Landing",
-    "👩‍💼 Dirección",
-    "👨‍🏫 Docente",
-    "🎒 Alumno",
-    "👨‍👩‍👧 Familia",
-    "🛡️ Moderador",
-    "🏛️ Admin Global",
-])
+# ── Leer sección desde query params ──────────────────────────────────────────
+params = st.query_params
+if "seccion" in params:
+    st.session_state.seccion = params["seccion"]
 
-with tab_inicio:
+# ── Renderizar sección activa ─────────────────────────────────────────────────
+seccion = st.session_state.seccion
+
+if seccion == "inicio":
     show_landing()
-
-with tab_direccion:
+elif seccion == "direccion":
     render_direccion()
-
-with tab_docente:
+elif seccion == "docente":
     render_docente()
-
-with tab_alumno:
+elif seccion == "alumno":
     render_estudiantes()
-
-with tab_familia:
+elif seccion == "familia":
     render_familia()
-
-with tab_moderador:
+elif seccion == "moderador":
     render_moderador()
-
-with tab_admin:
+elif seccion == "admin":
     render_global_admin()
+else:
+    show_landing()
