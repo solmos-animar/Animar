@@ -1,5 +1,6 @@
 import streamlit as st
 
+# Mantenemos tus SVGs originales porque son la identidad visual del proyecto
 LOGO_NAV = (
     '<svg width="148" height="40" viewBox="0 0 296 80" xmlns="http://www.w3.org/2000/svg">'
     '<path d="M4,76 L24,8 L32,8 L32,76 Z" fill="#4db8a0"/>'
@@ -47,48 +48,24 @@ LOGO_MOD = (
     '</svg>'
 )
 
-LOGO_SIDEBAR = (
-    '<svg width="148" height="40" viewBox="0 0 296 80" xmlns="http://www.w3.org/2000/svg">'
-    '<path d="M4,76 L24,8 L32,8 L32,76 Z" fill="#4db8a0"/>'
-    '<path d="M60,76 L40,8 L32,8 L32,76 Z" fill="#4db8a0"/>'
-    '<circle cx="32" cy="23" r="7.5" fill="#0e1c19"/>'
-    '<path d="M32,30.5 Q21,25 17,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>'
-    '<path d="M32,30.5 Q43,25 47,14" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round" fill="none"/>'
-    '<line x1="32" y1="30.5" x2="32" y2="48" stroke="#0e1c19" stroke-width="5.5" stroke-linecap="round"/>'
-    '<line x1="32" y1="48" x2="26" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>'
-    '<line x1="32" y1="48" x2="38" y2="61" stroke="#0e1c19" stroke-width="4.5" stroke-linecap="round"/>'
-    '<rect x="27" y="3" width="10" height="7" rx="1.5" fill="#e8621a"/>'
-    '<text x="74" y="50" font-family="Arial Black,Impact,sans-serif" font-size="36" font-weight="900" fill="white" letter-spacing="1">ANIMAR</text>'
-    '<text x="74" y="66" font-family="Arial,sans-serif" font-size="9.5" font-weight="400" fill="rgba(77,184,160,0.65)" letter-spacing="2.5">INFANCIAS &amp; EDUCACI&#xD3;N</text>'
-    '</svg>'
-)
-
-
 def show_landing():
+    # Eliminamos LANDING_HTML_1 y 2 que contenían el nav viejo
+    # Empezamos directamente con la sección Hero
     full_html = (
-        # CSS ya está en desktop.css — solo el HTML aquí
-        LANDING_HTML_1 + LOGO_NAV
-        + LANDING_HTML_2 + LOGO_HERO
-        + LANDING_HTML_3 + LOGO_MOD
-        + LANDING_HTML_4 + LOGO_NAV
-        + LANDING_HTML_5
+        LANDING_HERO_START 
+        + LOGO_HERO
+        + LANDING_BODY_CONTENT 
+        + LOGO_MOD
+        + LANDING_FOOTER_START 
+        + LOGO_NAV
+        + LANDING_FOOTER_END
     )
     st.markdown(full_html, unsafe_allow_html=True)
 
+# ── ESTRUCTURA HTML LIMPIA ──────────────────────────────────────────────────
 
-LANDING_HTML_1 = """
+LANDING_HERO_START = """
 <div class="cv">
-  <nav class="cv-nav">
-    <div class="cv-logo">
-"""
-
-LANDING_HTML_2 = """
-      <span class="cv-logo-txt">Con<em>Vivir</em></span>
-    </div>
-    <div class="cv-nav-links">
-      <span>El problema</span><span>Solución</span><span>Actores</span><span>Roadmap</span>
-    </div>
-  </nav>
   <section class="cv-hero">
     <div class="cv-hero-inner">
       <div>
@@ -99,7 +76,7 @@ LANDING_HTML_2 = """
       <div class="cv-logo-hero">
 """
 
-LANDING_HTML_3 = """
+LANDING_BODY_CONTENT = """
       </div>
     </div>
     <div class="cv-stats">
@@ -131,60 +108,10 @@ LANDING_HTML_3 = """
       <div class="mc"><div class="mc-logo">
 """
 
-LANDING_HTML_4 = """
+LANDING_FOOTER_START = """
       </div><div class="mc-id">M3</div><div class="mc-name">Sociograma</div><div class="mc-desc">Encuesta confidencial y mapa de relaciones</div></div>
       <div class="mc"><div class="mc-icon">📚</div><div class="mc-id">M4</div><div class="mc-name">Contenido</div><div class="mc-desc">Guías adaptadas al rol del usuario</div></div>
       <div class="mc"><div class="mc-icon">📊</div><div class="mc-id">M5</div><div class="mc-name">Reportes</div><div class="mc-desc">Alertas automáticas y PDF descargables</div></div>
-    </div>
-  </section>
-
-  <section class="cv-s">
-    <div class="cv-eyebrow">Actores del Sistema</div>
-    <h2>Cuatro roles. Flujos completamente diferenciados.</h2>
-    <p class="cv-intro">Cada usuario accede únicamente a lo que necesita y está autorizado a ver.</p>
-    <div class="ag">
-      <div class="ac ac-adm"><span class="ac-emoji">🏛️</span><div><span class="ac-badge ab-a">Administrador</span></div><div class="ac-name">Backoffice Admin</div><p class="ac-desc">Gestiona colegios, valida docentes mediante KYC y controla el acceso al ecosistema.</p></div>
-      <div class="ac ac-tch"><span class="ac-emoji">👨‍🏫</span><div><span class="ac-badge ab-t">Docente</span></div><div class="ac-name">Docente Validado</div><p class="ac-desc">Habilita aulas, visualiza el sociograma, gestiona alertas y descarga reportes completos.</p></div>
-      <div class="ac ac-stu"><span class="ac-emoji">🎒</span><div><span class="ac-badge ab-s">Alumno</span></div><div class="ac-name">Alumno Registrado</div><p class="ac-desc">Completa la encuesta de forma confidencial y accede a contenido adaptado a su edad.</p></div>
-      <div class="ac ac-fam"><span class="ac-emoji">👨‍👩‍👧</span><div><span class="ac-badge ab-f">Familia</span></div><div class="ac-name">Familia / Tutor</div><p class="ac-desc">Se vincula al alumno y accede a recursos orientados a prevención en el hogar.</p></div>
-    </div>
-  </section>
-
-  <section class="cv-sa">
-    <div class="cv-eyebrow">Cómo Funciona</div>
-    <h2>Del registro al diagnóstico en 6 pasos.</h2>
-    <p class="cv-intro">El flujo principal del docente, desde el alta institucional hasta la intervención sobre una alerta.</p>
-    <div class="fg">
-      <div class="fs"><div class="fs-n">1</div><div class="fs-t">Alta institucional</div><div class="fs-d">El colegio se registra y pasa el proceso KYC</div></div>
-      <div class="fs"><div class="fs-n">2</div><div class="fs-t">Habilitación del aula</div><div class="fs-d">El docente crea el aula y comparte el código</div></div>
-      <div class="fs"><div class="fs-n">3</div><div class="fs-t">Encuesta sociométrica</div><div class="fs-d">Los alumnos responden de forma confidencial</div></div>
-      <div class="fs"><div class="fs-n">4</div><div class="fs-t">Sociograma generado</div><div class="fs-d">El sistema genera el mapa de relaciones</div></div>
-      <div class="fs"><div class="fs-n">5</div><div class="fs-t">Alerta automática</div><div class="fs-d">El docente es notificado si hay alumno en riesgo</div></div>
-      <div class="fs"><div class="fs-n">6</div><div class="fs-t">Intervención y reporte</div><div class="fs-d">El docente actúa y descarga el reporte PDF</div></div>
-    </div>
-  </section>
-
-  <section class="cv-s">
-    <div class="cv-eyebrow">Privacidad y Seguridad</div>
-    <h2>Los datos de los menores son intocables.</h2>
-    <p class="cv-intro">El diseño garantiza por arquitectura que ningún alumno pueda ver las respuestas de otro.</p>
-    <div class="priv-g">
-      <div class="priv-i"><div class="priv-ico">🔒</div><div><div class="priv-t">Respuestas 100% confidenciales</div><div class="priv-d">Ningún compañero puede ver las elecciones de otro. Solo el docente accede a resultados agregados.</div></div></div>
-      <div class="priv-i"><div class="priv-ico">🛡️</div><div><div class="priv-t">Cumplimiento Ley 25.326</div><div class="priv-d">Protección de Datos Personales de Argentina. Consentimiento digital de tutores para datos de menores.</div></div></div>
-      <div class="priv-i"><div class="priv-ico">🔑</div><div><div class="priv-t">Autenticación robusta</div><div class="priv-d">JWT con refresh tokens. 2FA obligatorio para el Admin. Roles validados en cada endpoint.</div></div></div>
-      <div class="priv-i"><div class="priv-ico">📋</div><div><div class="priv-t">Auditoría inmutable</div><div class="priv-d">Log de acciones críticas: KYC, habilitación de aulas y acceso a datos sensibles.</div></div></div>
-    </div>
-  </section>
-
-  <section class="cv-sa">
-    <div class="cv-eyebrow">Roadmap de Desarrollo</div>
-    <h2>MVP funcional. Evolución controlada.</h2>
-    <p class="cv-intro">Cuatro fases que permiten lanzar rápido e incorporar complejidad de forma progresiva.</p>
-    <div class="rm-g">
-      <div class="rm-p r1"><div class="rm-tag">Fase 1 — MVP</div><div class="rm-title">Institucional + Registro</div><ul><li>Alta de colegios y docentes</li><li>KYC básico con aprobación manual</li><li>Registro de alumnos con código</li><li>Login seguro y gestión de roles</li></ul></div>
-      <div class="rm-p r2"><div class="rm-tag">Fase 2 — Core</div><div class="rm-title">Sociograma + Contenido</div><ul><li>Encuesta sociométrica completa</li><li>Algoritmo de procesamiento</li><li>Mapa de red visual</li><li>Módulo de contenido inicial</li></ul></div>
-      <div class="rm-p r3"><div class="rm-tag">Fase 3 — Reportes</div><div class="rm-title">Alertas + PDF</div><ul><li>Dashboard del docente</li><li>Alertas automáticas por riesgo</li><li>Reporte PDF descargable</li><li>Encuesta para familias</li></ul></div>
-      <div class="rm-p r4"><div class="rm-tag">Fase 4 — Evolución</div><div class="rm-title">Features Avanzados</div><ul><li>Sociograma histórico evolutivo</li><li>Integración con orientación</li><li>App móvil nativa</li><li>Gamificación para alumnos</li></ul></div>
     </div>
   </section>
 
@@ -197,10 +124,10 @@ LANDING_HTML_4 = """
     <div class="cv-ft-logo">
 """
 
-LANDING_HTML_5 = """
-      <span>© 2025 ConVivir — Plataforma de Convivencia Escolar</span>
+LANDING_FOOTER_END = """
+      <span>© 2026 ConVivir — Plataforma de Convivencia Escolar</span>
     </div>
-    <span>Confidencial · v1.0 · Borrador Inicial</span>
+    <span>Confidencial · v1.1 · 2026</span>
   </footer>
 </div>
 """
