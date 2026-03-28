@@ -63,7 +63,7 @@ def render():
         except Exception as e:
             st.error(f"Error al cargar la lista: {e}")
 
-    # --- TAB 4: CARGA DE ALUMNOS ---
+    # --- TAB 4: CARGA DE ALUMNOS (Lógica de Inserción Masiva) ---
     with tab4:
         st.subheader("Gestión de Alumnos")
         try:
@@ -75,24 +75,53 @@ def render():
                 colegio_sel = st.selectbox(
                     "Seleccionar Colegio para la carga", 
                     options=df_lista_col['id'].tolist(), 
-                    format_func=lambda x: df_lista_col[df_lista_col['id']==x]['nombre'].iloc[0]
+                    format_func=lambda x: df_lista_col[df_lista_col['id']==x]['nombre'].iloc[0],
+                    key="sel_col_alu"
                 )
                 
-                st.info(f"Colegio seleccionado ID: {colegio_sel}")
-                
-                # Preparado para la lógica de Excel
                 archivo = st.file_uploader("Subir Excel de alumnos (.xlsx)", type=["xlsx"])
+                
                 if archivo:
-                    df_preview = pd.read_excel(archivo)
-                    st.write("Previsualización del archivo:")
-                    st.dataframe(df_preview.head(), use_container_width=True)
+                    df_alumnos = pd.read_excel(archivo)
+                    st.write("📋 Vista previa del archivo:")
+                    st.dataframe(df_alumnos.head(), use_container_width=True)
                     
-                    if st.button("Confirmar Carga Masiva", type="primary"):
-                        st.warning("Lógica de inserción masiva lista para conectar.")
+                    # Verificamos que el Excel tenga las columnas necesarias
+                    columnas_req = ['Nombre', 'Apellido', 'DNI', 'Grado']
+                    if all(col in df_alumnos.columns for col in columnas_req):
+                        
+                        if st.button("🚀 Confirmar Carga Masiva", type="primary"):
+                            exitos = 0
+                            errores = 0
+                            
+                            with conn.session as s:
+                                for _, row in df_alumnos.iterrows():
+                                    try:
+                                        s.execute(
+                                            text("""INSERT INTO alumnos (colegio_id, nombre, apellido, dni, grado) 
+                                                 VALUES (:col, :nom, :ape, :dni, :gra)"""),
+                                            {
+                                                "col": colegio_sel,
+                                                "nom": str(row['Nombre']),
+                                                "ape": str(row['Apellido']),
+                                                "dni": str(row['DNI']),
+                                                "gra": str(row['Grado'])
+                                            }
+                                        )
+                                        exitos += 1
+                                    except Exception as e:
+                                        errores += 1
+                                s.commit()
+                            
+                            st.success(f"✅ Proceso finalizado. Alumnos cargados: {exitos}")
+                            if errores > 0:
+                                st.error(f"❌ No se pudieron cargar {errores} alumnos (posible DNI duplicado).")
+                    else:
+                        st.error(f"El Excel debe contener las columnas: {', '.join(columnas_req)}")
             else:
-                st.warning("Primero debes registrar un colegio en la pestaña correspondiente.")
+                st.warning("Primero debes registrar un colegio.")
         except Exception as e:
-            st.error(f"Error en la conexión de alumnos: {e}")
+            st.error(f"Error: {e}")
 
     # --- TABS EN DESARROLLO ---
     with tab2:
