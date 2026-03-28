@@ -30,6 +30,7 @@ if "user" not in st.session_state:
     st.session_state.user = {"name": "Lucas Martínez"}
 
 # ── Botones reales de Streamlit (ocultos con CSS) ─────────────────────────────
+# IMPORTANTE: El texto aquí debe coincidir exactamente con el argumento de go()
 secciones = ["inicio", "direccion", "docente", "alumno", "familia", "moderador", "admin"]
 cols = st.columns(len(secciones))
 for col, key in zip(cols, secciones):
@@ -66,12 +67,17 @@ st.markdown(f"""
 
 <script>
 function go(key) {{
-    const btns = window.parent.document.querySelectorAll('[data-testid="stButton"] button');
-    for (let btn of btns) {{
-        if (btn.innerText.trim() === key) {{
-            btn.click();
-            break;
-        }}
+    // Buscamos en el DOM del padre donde Streamlit renderiza los botones reales
+    const doc = window.parent.document;
+    const buttons = Array.from(doc.querySelectorAll('button[kind="secondary"], button[kind="primary"], [data-testid="stButton"] button'));
+    
+    // Buscamos el botón cuyo texto coincida con la clave enviada
+    const target = buttons.find(btn => btn.innerText.trim().toLowerCase() === key.toLowerCase());
+    
+    if (target) {{
+        target.click();
+    }} else {{
+        console.warn("Navegación: No se encontró el botón para " + key);
     }}
 }}
 </script>
