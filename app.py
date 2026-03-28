@@ -19,6 +19,7 @@ def load_css(filepath: str):
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 load_css("utilidades/desktop.css")
+load_css("utilidades/mobile.css")
 
 # ── Inicializar estado ────────────────────────────────────────────────────────
 if "current_page" not in st.session_state:
@@ -30,8 +31,10 @@ if "user" not in st.session_state:
 st.markdown("""
 <div class="menu-bar">
   <div class="menu-logo">Con<em>Vivir</em></div>
+  <div class="nb-toggle" onclick="toggleMenu()" id="nb-toggle">☰</div>
 </div>
-<div class="nb-menu">
+
+<div class="nb-menu" id="nb-menu">
   <div class="nb-item active" onclick="nbClick(0)">🏠 Inicio</div>
   <div class="nb-sep"></div>
   <span class="nb-group-label">Colegio</span>
@@ -46,10 +49,19 @@ st.markdown("""
 </div>
 
 <script>
+function toggleMenu() {
+    const menu = document.getElementById('nb-menu');
+    const toggle = document.getElementById('nb-toggle');
+    const isOpen = menu.classList.toggle('open');
+    toggle.textContent = isOpen ? '✕' : '☰';
+}
+
 function nbClick(index) {
     document.querySelectorAll('.nb-item').forEach((el, i) => {
         el.classList.toggle('active', i === index);
     });
+    document.getElementById('nb-menu').classList.remove('open');
+    document.getElementById('nb-toggle').textContent = '☰';
     const tabs = window.parent.document.querySelectorAll('[data-testid="stTabs"] button[role="tab"]');
     if (tabs[index]) tabs[index].click();
 }
