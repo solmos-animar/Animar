@@ -36,6 +36,14 @@ def render():
     # -------------------------------
     st.markdown("### 📋 Alumnos")
 
+# -------------------------------
+# BUSCADOR
+# -------------------------------
+busqueda = st.text_input("🔍 Buscar alumno por nombre")
+
+if busqueda:
+    df = df[df["nombre"].str.contains(busqueda, case=False, na=False)]
+
     if df.empty:
         st.info("No hay alumnos cargados todavía.")
     else:
