@@ -7,6 +7,7 @@ import os
 # -------------------------------------------------------------------
 
 DATA_PATH = "data/alumnos.csv"
+PLANTILLA_PATH = "data/alumnos_primaria_500.xlsx"
 
 # -------------------------------------------------------------------
 # FUNCIONES DE DATOS
@@ -32,9 +33,63 @@ def render():
     df = cargar_alumnos()
     df = df.reset_index(drop=True)
 
-    # -------------------------------
+    # ===============================
+    # DESCARGAR PLANTILLA
+    # ===============================
+    st.markdown("### 📥 Descargar plantilla")
+
+    st.info("Descargá esta plantilla para cargar alumnos de forma masiva.")
+
+    if os.path.exists(PLANTILLA_PATH):
+        with open(PLANTILLA_PATH, "rb") as file:
+            st.download_button(
+                label="⬇️ Descargar Excel de ejemplo",
+                data=file,
+                file_name="plantilla_alumnos.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+    else:
+        st.warning("No se encontró el archivo de plantilla.")
+
+    # ===============================
+    # SUBIR EXCEL
+    # ===============================
+    st.markdown("### 📤 Cargar alumnos desde Excel")
+
+    archivo = st.file_uploader("Subí el archivo Excel", type=["xlsx"])
+
+    if archivo is not None:
+        try:
+            df_excel = pd.read_excel(archivo)
+
+            st.write("Vista previa:")
+            st.dataframe(df_excel.head())
+
+            if st.button("✅ Importar alumnos"):
+                df_actual = cargar_alumnos()
+
+                # Ajustar nombres de columnas según el Excel
+                df_excel = df_excel.rename(columns={
+                    "Nombre": "nombre",
+                    "Fecha de nacimiento": "fecha_nac",
+                    "Grado": "grado"
+                })
+
+                df_total = pd.concat([df_actual, df_excel], ignore_index=True)
+
+                guardar_alumnos(df_total)
+
+                st.success("Alumnos importados correctamente")
+                st.rerun()
+
+        except Exception as e:
+            st.error(f"Error al leer el archivo: {e}")
+
+    st.markdown("---")
+
+    # ===============================
     # BUSCADOR
-    # -------------------------------
+    # ===============================
     st.markdown("### 📋 Alumnos")
 
     busqueda = st.text_input("🔍 Buscar alumno")
@@ -43,11 +98,11 @@ def render():
         df = df[
             df["nombre"].str.contains(busqueda, case=False, na=False) |
             df["grado"].str.contains(busqueda, case=False, na=False)
-        ]
+        ].reset_index(drop=True)
 
-    # -------------------------------
+    # ===============================
     # LISTADO
-    # -------------------------------
+    # ===============================
     if df.empty:
         st.info("No hay alumnos cargados.")
     else:
@@ -69,9 +124,9 @@ def render():
                     if st.button("❌ Borrar", key=f"del_{i}"):
                         st.session_state.confirmar_borrar = i
 
-    # -------------------------------
+    # ===============================
     # CONFIRMAR BORRADO
-    # -------------------------------
+    # ===============================
     if "confirmar_borrar" in st.session_state:
         i = st.session_state.confirmar_borrar
 
@@ -97,9 +152,9 @@ def render():
 
     st.markdown("---")
 
-    # -------------------------------
+    # ===============================
     # EDITAR
-    # -------------------------------
+    # ===============================
     if "editando" in st.session_state:
         i = st.session_state.editando
 
@@ -131,9 +186,9 @@ def render():
                     del st.session_state.editando
                     st.rerun()
 
-    # -------------------------------
+    # ===============================
     # AGREGAR
-    # -------------------------------
+    # ===============================
     st.markdown("### ➕ Agregar nuevo alumno")
 
     with st.form("form_nuevo"):
