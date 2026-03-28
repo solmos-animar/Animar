@@ -32,20 +32,23 @@ def render():
     df = cargar_alumnos()
 
     # -------------------------------
-    # LISTADO
+    # BUSCADOR
     # -------------------------------
     st.markdown("### 📋 Alumnos")
 
-# -------------------------------
-# BUSCADOR
-# -------------------------------
-busqueda = st.text_input("🔍 Buscar alumno por nombre")
+    busqueda = st.text_input("🔍 Buscar alumno por nombre")
 
-if busqueda:
-    df = df[df["nombre"].str.contains(busqueda, case=False, na=False)]
+    if busqueda:
+        df = df[
+            df["nombre"].str.contains(busqueda, case=False, na=False) |
+            df["grado"].str.contains(busqueda, case=False, na=False)
+        ]
 
+    # -------------------------------
+    # LISTADO
+    # -------------------------------
     if df.empty:
-        st.info("No hay alumnos cargados todavía.")
+        st.info("No hay alumnos cargados.")
     else:
         for i, alumno in df.iterrows():
             with st.container(border=True):
