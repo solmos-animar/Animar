@@ -29,64 +29,36 @@ if "current_page" not in st.session_state:
 if "user" not in st.session_state:
     st.session_state.user = {"name": "Lucas Martínez"}
 
-# ── Botones invisibles de navegación ─────────────────────────────────────────
-# Ocultos con CSS — la navbar custom los clickea via JS
-with st.container():
-    cols = st.columns(7)
-    secciones = ["inicio", "direccion", "docente", "alumno", "familia", "moderador", "admin"]
-    for col, key in zip(cols, secciones):
-        with col:
-            if st.button(key, key=f"nav_{key}"):
-                st.session_state.seccion = key
-                st.rerun()
+# ── Navegación en sidebar (funciona en todos los dispositivos) ────────────────
+with st.sidebar:
+    st.markdown("### ConVivir")
+    st.markdown("---")
 
-# ── Navbar custom HTML ────────────────────────────────────────────────────────
-seccion_actual = st.session_state.seccion
+    if st.button("🏠 Inicio", use_container_width=True):
+        st.session_state.seccion = "inicio"
+        st.rerun()
 
-def nav_class(key):
-    return "nb-item active" if seccion_actual == key else "nb-item"
+    st.markdown("**— Colegio —**")
+    if st.button("👩‍💼 Dirección", use_container_width=True):
+        st.session_state.seccion = "direccion"
+        st.rerun()
+    if st.button("👨‍🏫 Docente", use_container_width=True):
+        st.session_state.seccion = "docente"
+        st.rerun()
+    if st.button("🎒 Alumno", use_container_width=True):
+        st.session_state.seccion = "alumno"
+        st.rerun()
+    if st.button("👨‍👩‍👧 Familia", use_container_width=True):
+        st.session_state.seccion = "familia"
+        st.rerun()
 
-st.markdown(f"""
-<div class="menu-bar">
-  <div class="menu-logo">Con<em>Vivir</em></div>
-  <div class="nb-toggle" onclick="toggleMenu()" id="nb-toggle">☰</div>
-</div>
-
-<div class="nb-menu" id="nb-menu">
-  <div class="{nav_class('inicio')}"    onclick="navClick('inicio')">🏠 Inicio</div>
-  <div class="nb-sep"></div>
-  <span class="nb-group-label">Colegio</span>
-  <div class="{nav_class('direccion')}" onclick="navClick('direccion')">👩‍💼 Dirección</div>
-  <div class="{nav_class('docente')}"   onclick="navClick('docente')">👨‍🏫 Docente</div>
-  <div class="{nav_class('alumno')}"    onclick="navClick('alumno')">🎒 Alumno</div>
-  <div class="{nav_class('familia')}"   onclick="navClick('familia')">👨‍👩‍👧 Familia</div>
-  <div class="nb-sep"></div>
-  <span class="nb-group-label">Animar</span>
-  <div class="{nav_class('moderador')}" onclick="navClick('moderador')">🛡️ Moderador</div>
-  <div class="{nav_class('admin')}"     onclick="navClick('admin')">🏛️ Admin Global</div>
-</div>
-
-<script>
-function toggleMenu() {{
-    const menu = document.getElementById('nb-menu');
-    const toggle = document.getElementById('nb-toggle');
-    const isOpen = menu.classList.toggle('open');
-    toggle.textContent = isOpen ? '✕' : '☰';
-}}
-
-function navClick(key) {{
-    document.getElementById('nb-menu').classList.remove('open');
-    document.getElementById('nb-toggle').textContent = '☰';
-    const btns = window.parent.document.querySelectorAll('[data-testid="stButton"] button');
-    for (let btn of btns) {{
-        if (btn.innerText.trim() === key) {{
-            btn.click();
-            break;
-        }}
-    }}
-}}
-</script>
-""", unsafe_allow_html=True)
+    st.markdown("**— Animar —**")
+    if st.button("🛡️ Moderador", use_container_width=True):
+        st.session_state.seccion = "moderador"
+        st.rerun()
+    if st.button("🏛️ Admin Global", use_container_width=True):
+        st.session_state.seccion = "admin"
+        st.rerun()
 
 # ── Renderizar sección activa ─────────────────────────────────────────────────
 seccion = st.session_state.seccion
