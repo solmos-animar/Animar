@@ -18,7 +18,7 @@ def load_css(filepath: str):
     with open(filepath) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Cargamos los estilos
+# Cargamos el CSS de escritorio
 load_css("utilidades/desktop.css")
 
 # ── Inicializar estado ────────────────────────────────────────────────────────
@@ -28,18 +28,6 @@ if "current_page" not in st.session_state:
     st.session_state.current_page = "student_home"
 if "user" not in st.session_state:
     st.session_state.user = {"name": "Lucas Martínez"}
-
-# ── Botones reales de Streamlit (ocultos con CSS) ─────────────────────────────
-# Los colocamos en un contenedor identificado para el script de JS
-secciones_lista = ["inicio", "direccion", "docente", "alumno", "familia", "moderador", "admin"]
-
-with st.container():
-    st.markdown('<div id="st-nav-buttons" style="display:none">', unsafe_allow_html=True)
-    for key in secciones_lista:
-        if st.button(key, key=f"btn_{key}"):
-            st.session_state.seccion = key
-            st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # ── Navbar blanca minimalista ─────────────────────────────────────────────────
 seccion_actual = st.session_state.seccion
@@ -69,28 +57,30 @@ st.markdown(f"""
 
 <script>
 function go(key) {{
-    // Buscamos los botones dentro del contenedor específico que creamos arriba
-    const navContainer = window.parent.document.getElementById('st-nav-buttons');
-    const buttons = Array.from(window.parent.document.querySelectorAll('button'));
-    
-    // Filtramos por el texto exacto del botón
+    // Buscamos en el documento principal de Streamlit
+    const mainDoc = window.parent.document;
+    // Buscamos específicamente el contenedor de navegación oculto
+    const navZone = mainDoc.getElementById("nav-zone");
+    if (!navZone) return;
+
+    // Buscamos todos los botones dentro de esa zona
+    const buttons = Array.from(navZone.querySelectorAll('button'));
     const target = buttons.find(btn => btn.innerText.trim().toLowerCase() === key.toLowerCase());
     
     if (target) {{
         target.click();
     }} else {{
-        console.warn("Navegación: No se encontró el botón para " + key);
+        console.error("No se encontró el botón para: " + key);
     }}
 }}
 </script>
 """, unsafe_allow_html=True)
 
-# ── Renderizar sección activa ─────────────────────────────────────────────────
-# Agregamos un div de espaciado para que el contenido no quede debajo de la navbar
-st.markdown('<div style="height: 52px;"></div>', unsafe_allow_html=True)
+# ── Espaciador para la Navbar ─────────────────────────────────────────────────
+st.markdown('<div class="nav-spacer"></div>', unsafe_allow_html=True)
 
+# ── Renderizar sección activa ─────────────────────────────────────────────────
 if st.session_state.seccion == "inicio":
-    # La landing suele tener su propio contenedor con fondo oscuro en su archivo landing.py
     show_landing()
 elif st.session_state.seccion == "alumno":
     render_estudiantes()
@@ -104,3 +94,14 @@ elif st.session_state.seccion == "moderador":
     render_moderador()
 elif st.session_state.seccion == "admin":
     render_global_admin()
+
+# ── Botones Reales (Ocultos al final del DOM) ─────────────────────────────────
+st.markdown('<div id="nav-zone" class="hidden-nav">', unsafe_allow_html=True)
+secciones_lista = ["inicio", "direccion", "docente", "alumno", "familia", "moderador", "admin"]
+cols_hidden = st.columns(len(secciones_lista))
+for i, key in enumerate(secciones_lista):
+    with cols_hidden[i]:
+        if st.button(key, key=f"nav_btn_{key}"):
+            st.session_state.seccion = key
+            st.rerun()
+st.markdown('</div>', unsafe_allow_html=True)
