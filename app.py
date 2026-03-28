@@ -1,23 +1,24 @@
 import streamlit as st
 
-# 1. Configuración básica (Nativa)
 st.set_page_config(
-    page_title="ConVivir — Gestión Escolar",
+    page_title="ConVivir",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded" # Obligamos a que inicie abierto
 )
 
-# 2. Inicializar el estado de navegación
+# Cargar el CSS que bloquea las flechas
+with open("utilidades/desktop.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 if "seccion" not in st.session_state:
     st.session_state.seccion = "inicio"
 
-# 3. Sidebar Nativo (Fácil para tus colaboradoras)
+# Sidebar Nativo
 with st.sidebar:
-    st.title("ConVivir")
-    st.write("v1.1 · 2026")
-    st.divider() # Línea separadora nativa
+    st.markdown('<h1 style="color:white; font-size:28px;">ConVivir</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="color:rgba(255,255,255,0.5);">v1.1 · 2026</p>', unsafe_allow_html=True)
+    st.divider()
     
-    # Botones simples. Al hacer clic, Streamlit recarga la sección automáticamente.
     if st.button("📋 Resumen Ejecutivo", use_container_width=True):
         st.session_state.seccion = "inicio"
     
@@ -27,26 +28,14 @@ with st.sidebar:
     if st.button("🎒 Vista Alumno", use_container_width=True):
         st.session_state.seccion = "alumno"
 
-# 4. Renderizado de Contenido
+# Render de secciones
 seccion = st.session_state.seccion
-
 if seccion == "inicio":
-    try:
-        from secciones.landing import show_landing
-        show_landing()
-    except Exception as e:
-        st.error(f"No se pudo cargar la Landing. Error: {e}")
-
+    from secciones.landing import show_landing
+    show_landing()
 elif seccion == "direccion":
-    try:
-        from secciones.direccion import render
-        render()
-    except Exception as e:
-        st.error(f"No se pudo cargar Dirección. Error: {e}")
-
+    from secciones.direccion import render
+    render()
 elif seccion == "alumno":
-    try:
-        from secciones.estudiantes import render
-        render()
-    except Exception as e:
-        st.error(f"No se pudo cargar Alumnos. Error: {e}")
+    from secciones.estudiantes import render
+    render()
