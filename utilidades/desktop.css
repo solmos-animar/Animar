@@ -1,59 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap');
-
-/* --- 1. RESET CRÍTICO DE STREAMLIT --- */
-/* Eliminamos el espacio blanco superior que genera Streamlit por defecto */
-[data-testid="stHeader"] { display: none !important; }
-[data-testid="stToolbar"] { display: none !important; }
-
-.block-container {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
-/* --- 2. SIDEBAR (MENÚ FIJO) --- */
+/* --- SIDEBAR COMPACTO --- */
 [data-testid="stSidebar"] {
     background-color: #0f2240 !important;
-    color: white !important;
-    border-right: 1px solid rgba(255,255,255,0.1);
+    width: 260px !important;
 }
 
-/* Ocultar flechas de cierre */
-[data-testid="collapsedControl"], 
-[data-testid="stSidebarNavSeparator"] + div button {
-    display: none !important;
+/* Reducimos el margen superior del logo */
+.sb-brand {
+    padding: 20px 16px 5px 16px !important;
 }
 
-/* Estilo de botones del sidebar */
+/* Ajustamos los botones para que ocupen menos espacio vertical */
 [data-testid="stSidebar"] button {
     text-align: left !important;
-    font-family: 'DM Sans', sans-serif !important;
-    background-color: transparent !important;
-    border: none !important;
-    color: rgba(255,255,255,0.7) !important;
-    padding: 10px 15px !important;
-    width: 100% !important;
+    padding: 6px 12px !important; /* Menos alto */
+    margin: 1px 0 !important;
+    font-size: 13px !important; /* Un punto más chico para ganar espacio */
+    min-height: 35px !important;
 }
 
-[data-testid="stSidebar"] button:hover {
-    background-color: rgba(255,255,255,0.1) !important;
-    color: white !important;
+/* Achicamos el espacio que ocupan los st.divider */
+[data-testid="stSidebar"] hr {
+    margin: 10px 0 !important;
+    opacity: 0.1;
 }
 
-/* --- 3. CONTENIDO PRINCIPAL --- */
-/* Este es el fondo crema para las secciones que NO son la landing */
-.main-content {
-    background-color: #f9f6f0;
-    min-height: 100vh;
+/* Ajustamos los títulos de categorías (Institución, Familia...) */
+[data-testid="stSidebar"] p {
+    margin-top: 10px !important;
+    margin-bottom: 5px !important;
+    font-size: 10px !important;
+    opacity: 0.6;
 }
-
-/* Forzar que la Landing ocupe todo el ancho y alto sin márgenes */
-.cv {
-    margin-top: 0 !important;
-    width: 100% !important;
-}
-
-/* Tipografías */
-h1, h2, h3 { font-family: 'Sora', sans-serif; color: #0f2240; }
-body { font-family: 'DM Sans', sans-serif; }
