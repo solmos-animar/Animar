@@ -2,15 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-# -------------------------------------------------------------------
-# CONFIG
-# -------------------------------------------------------------------
-
 DATA_PATH = "data/alumnos.csv"
-
-# -------------------------------------------------------------------
-# FUNCIONES DE DATOS
-# -------------------------------------------------------------------
 
 def cargar_alumnos():
     if os.path.exists(DATA_PATH):
@@ -21,10 +13,6 @@ def cargar_alumnos():
 def guardar_alumnos(df):
     os.makedirs("data", exist_ok=True)
     df.to_csv(DATA_PATH, index=False)
-
-# -------------------------------------------------------------------
-# UI PRINCIPAL
-# -------------------------------------------------------------------
 
 def render():
     st.title("🏫 Panel de Dirección")
@@ -39,10 +27,7 @@ def render():
     busqueda = st.text_input("🔍 Buscar alumno")
 
     if busqueda:
-        df = df[
-            df["nombre"].str.contains(busqueda, case=False, na=False) |
-            df["grado"].str.contains(busqueda, case=False, na=False)
-        ]
+        df = df[df["nombre"].str.contains(busqueda, case=False, na=False)]
 
     # -------------------------------
     # LISTADO
