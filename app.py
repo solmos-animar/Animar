@@ -18,8 +18,8 @@ def load_css(filepath: str):
     with open(filepath) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+# Cargamos los estilos
 load_css("utilidades/desktop.css")
-load_css("utilidades/mobile.css")
 
 # ── Inicializar estado ────────────────────────────────────────────────────────
 if "seccion" not in st.session_state:
@@ -30,14 +30,16 @@ if "user" not in st.session_state:
     st.session_state.user = {"name": "Lucas Martínez"}
 
 # ── Botones reales de Streamlit (ocultos con CSS) ─────────────────────────────
-# IMPORTANTE: El texto aquí debe coincidir exactamente con el argumento de go()
-secciones = ["inicio", "direccion", "docente", "alumno", "familia", "moderador", "admin"]
-cols = st.columns(len(secciones))
-for col, key in zip(cols, secciones):
-    with col:
-        if st.button(key, key=f"nav_{key}"):
+# Los colocamos en un contenedor identificado para el script de JS
+secciones_lista = ["inicio", "direccion", "docente", "alumno", "familia", "moderador", "admin"]
+
+with st.container():
+    st.markdown('<div id="st-nav-buttons" style="display:none">', unsafe_allow_html=True)
+    for key in secciones_lista:
+        if st.button(key, key=f"btn_{key}"):
             st.session_state.seccion = key
             st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ── Navbar blanca minimalista ─────────────────────────────────────────────────
 seccion_actual = st.session_state.seccion
@@ -48,7 +50,7 @@ def cls(key):
 st.markdown(f"""
 <div class="topnav">
   <div class="topnav-inner">
-    <div class="topnav-logo">Con<em>Vivir</em></div>
+    <div class="topnav-logo" onclick="go('inicio')" style="cursor:pointer">Con<em>Vivir</em></div>
     <nav class="topnav-links">
       <span class="{cls('inicio')}"    onclick="go('inicio')">Inicio</span>
       <span class="nav-sep">|</span>
@@ -67,11 +69,11 @@ st.markdown(f"""
 
 <script>
 function go(key) {{
-    // Buscamos en el DOM del padre donde Streamlit renderiza los botones reales
-    const doc = window.parent.document;
-    const buttons = Array.from(doc.querySelectorAll('button[kind="secondary"], button[kind="primary"], [data-testid="stButton"] button'));
+    // Buscamos los botones dentro del contenedor específico que creamos arriba
+    const navContainer = window.parent.document.getElementById('st-nav-buttons');
+    const buttons = Array.from(window.parent.document.querySelectorAll('button'));
     
-    // Buscamos el botón cuyo texto coincida con la clave enviada
+    // Filtramos por el texto exacto del botón
     const target = buttons.find(btn => btn.innerText.trim().toLowerCase() === key.toLowerCase());
     
     if (target) {{
@@ -84,19 +86,21 @@ function go(key) {{
 """, unsafe_allow_html=True)
 
 # ── Renderizar sección activa ─────────────────────────────────────────────────
-seccion = st.session_state.seccion
+# Agregamos un div de espaciado para que el contenido no quede debajo de la navbar
+st.markdown('<div style="height: 52px;"></div>', unsafe_allow_html=True)
 
-if seccion == "inicio":
+if st.session_state.seccion == "inicio":
+    # La landing suele tener su propio contenedor con fondo oscuro en su archivo landing.py
     show_landing()
-elif seccion == "direccion":
-    render_direccion()
-elif seccion == "docente":
-    render_docente()
-elif seccion == "alumno":
+elif st.session_state.seccion == "alumno":
     render_estudiantes()
-elif seccion == "familia":
+elif st.session_state.seccion == "direccion":
+    render_direccion()
+elif st.session_state.seccion == "docente":
+    render_docente()
+elif st.session_state.seccion == "familia":
     render_familia()
-elif seccion == "moderador":
+elif st.session_state.seccion == "moderador":
     render_moderador()
-elif seccion == "admin":
+elif st.session_state.seccion == "admin":
     render_global_admin()
