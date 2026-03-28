@@ -13,6 +13,9 @@ section[data-testid="stMain"]        { overflow: visible !important; }
 /* Ocultar barra de tabs pero mantenerlos funcionales */
 div[data-testid="stTabs"] [data-testid="stTabsBar"] { display: none !important; }
 
+/* Botón hamburguesa oculto en desktop */
+.nb-toggle { display: none; }
+
 /* ── Navbar fija — logo ──────────────────────────────────────────────────── */
 .menu-bar {
     position: fixed;
