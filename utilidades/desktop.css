@@ -1,19 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap');
 
-/* Ocultar flechas de Streamlit */
-[data-testid="collapsedControl"], 
-[data-testid="stSidebarNavSeparator"] + div button {
-    display: none !important;
+/* --- 1. RESET CRÍTICO DE STREAMLIT --- */
+/* Eliminamos el espacio blanco superior que genera Streamlit por defecto */
+[data-testid="stHeader"] { display: none !important; }
+[data-testid="stToolbar"] { display: none !important; }
+
+.block-container {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
-/* Sidebar Estilo ConVivir */
+/* --- 2. SIDEBAR (MENÚ FIJO) --- */
 [data-testid="stSidebar"] {
     background-color: #0f2240 !important;
     color: white !important;
     border-right: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Botones del Sidebar */
+/* Ocultar flechas de cierre */
+[data-testid="collapsedControl"], 
+[data-testid="stSidebarNavSeparator"] + div button {
+    display: none !important;
+}
+
+/* Estilo de botones del sidebar */
 [data-testid="stSidebar"] button {
     text-align: left !important;
     font-family: 'DM Sans', sans-serif !important;
@@ -22,7 +34,6 @@
     color: rgba(255,255,255,0.7) !important;
     padding: 10px 15px !important;
     width: 100% !important;
-    border-radius: 8px !important;
 }
 
 [data-testid="stSidebar"] button:hover {
@@ -30,12 +41,19 @@
     color: white !important;
 }
 
-/* Contenido Principal */
+/* --- 3. CONTENIDO PRINCIPAL --- */
+/* Este es el fondo crema para las secciones que NO son la landing */
 .main-content {
     background-color: #f9f6f0;
     min-height: 100vh;
-    padding: 40px;
 }
 
+/* Forzar que la Landing ocupe todo el ancho y alto sin márgenes */
+.cv {
+    margin-top: 0 !important;
+    width: 100% !important;
+}
+
+/* Tipografías */
 h1, h2, h3 { font-family: 'Sora', sans-serif; color: #0f2240; }
 body { font-family: 'DM Sans', sans-serif; }
