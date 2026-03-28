@@ -1,14 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
 /* ── Streamlit reset total ───────────────────────────────────────────────── */
-[data-testid="stSidebarNav"]    { display: none !important; }
-[data-testid="stSidebar"]       { display: none !important; }
-[data-testid="stHeader"]        { display: none !important; }
-[data-testid="stToolbar"]       { display: none !important; }
-[data-testid="stDecoration"]    { display: none !important; }
+[data-testid="stSidebarNav"]         { display: none !important; }
+[data-testid="stSidebar"]            { display: none !important; }
+[data-testid="stHeader"]             { display: none !important; }
+[data-testid="stToolbar"]            { display: none !important; }
+[data-testid="stDecoration"]         { display: none !important; }
 [data-testid="stMainBlockContainer"] { padding: 0 !important; }
-.block-container                { padding: 0 !important; max-width: 100% !important; }
-section[data-testid="stMain"]   { overflow: visible !important; }
+.block-container                     { padding: 0 !important; max-width: 100% !important; }
+section[data-testid="stMain"]        { overflow: visible !important; }
+
+/* Ocultar barra de tabs pero mantenerlos funcionales */
+div[data-testid="stTabs"] [data-testid="stTabsBar"] { display: none !important; }
 
 /* ── Navbar fija — logo ──────────────────────────────────────────────────── */
 .menu-bar {
@@ -87,30 +90,23 @@ section[data-testid="stMain"]   { overflow: visible !important; }
     flex-shrink: 0;
 }
 
-/* ── Ocultar tabs nativos de Streamlit ───────────────────────────────────── */
-div[data-testid="stTabs"] { display: none !important; }
-
 /* ── Ocultar navbar original de la landing ───────────────────────────────── */
 .cv-nav { display: none !important; }
 
-/* ── Empujar contenido debajo de las dos barras fijas ────────────────────── */
-.cv { margin-top: 104px; }
+/* ── Landing ─────────────────────────────────────────────────────────────── */
+.cv { font-family: 'DM Sans', sans-serif; background: #03091a; color: #dde8f8; min-height: 100vh; margin-top: 104px; }
 .cv-hero {
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    display: flex; flex-direction: column; justify-content: center;
     padding: 80px 52px 80px;
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
     background:
         radial-gradient(ellipse 90% 65% at 50% -5%, rgba(26,111,255,0.2) 0%, transparent 65%),
         radial-gradient(ellipse 45% 45% at 87% 38%, rgba(59,130,246,0.08) 0%, transparent 55%),
         #03091a;
 }
 .cv-hero::before {
-    content: '';
-    position: absolute; inset: 0;
+    content: ''; position: absolute; inset: 0;
     background-image:
         linear-gradient(rgba(74,158,255,0.035) 1px, transparent 1px),
         linear-gradient(90deg, rgba(74,158,255,0.035) 1px, transparent 1px);
@@ -121,7 +117,6 @@ div[data-testid="stTabs"] { display: none !important; }
     display: grid; grid-template-columns: 1fr auto; gap: 72px;
     align-items: center; max-width: 1200px; position: relative; z-index: 1;
 }
-.cv { font-family: 'DM Sans', sans-serif; background: #03091a; color: #dde8f8; min-height: 100vh; }
 .cv-tag {
     display: inline-flex; align-items: center; gap: 7px;
     background: rgba(26,111,255,0.1); border: 1px solid rgba(74,158,255,0.22);
@@ -167,7 +162,7 @@ div[data-testid="stTabs"] { display: none !important; }
 .pc-sub  { font-size: 10.5px; color: rgba(221,232,248,0.28); margin-top: 2px; }
 .mg { display: grid; grid-template-columns: repeat(5,1fr); gap: 11px; }
 .mc { background: rgba(255,255,255,0.02); border: 1px solid rgba(74,158,255,0.08); border-radius: 16px; padding: 22px 14px 18px; text-align: center; transition: all .2s; }
-.mc:hover { background: rgba(26,111,255,0.07); border-color: rgba(74,158,255,0.28); transform: translateY(-5px); box-shadow: 0 12px 30px rgba(26,111,255,0.14); }
+.mc:hover { background: rgba(26,111,255,0.07); border-color: rgba(74,158,255,0.28); transform: translateY(-5px); }
 .mc-icon { font-size: 26px; margin-bottom: 8px; }
 .mc-logo { width: 40px; height: 40px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; }
 .mc-id   { font-family: 'Sora', monospace; font-size: 9px; color: #4a9eff; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 5px; }
