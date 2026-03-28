@@ -1,32 +1,90 @@
 import streamlit as st
-from auth.session import require_role
+import pandas as pd
+import os
 
-# Mock de alumnos (después lo conectamos a DB o CSV)
-ALUMNOS = [
-    {"nombre": "Juan Pérez", "fecha_nac": "12/05/2013", "grado": "3° A"},
-    {"nombre": "María López", "fecha_nac": "22/09/2012", "grado": "4° B"},
-    {"nombre": "Tomás García", "fecha_nac": "03/11/2013", "grado": "3° A"},
-]
+# -------------------------------------------------------------------
+# CONFIG
+# -------------------------------------------------------------------
+
+DATA_PATH = "data/alumnos.csv"
+
+# -------------------------------------------------------------------
+# FUNCIONES DE DATOS
+# -------------------------------------------------------------------
+
+def cargar_alumnos():
+    if os.path.exists(DATA_PATH):
+        return pd.read_csv(DATA_PATH)
+    else:
+        return pd.DataFrame(columns=["nombre", "fecha_nac", "grado"])
+
+def guardar_alumnos(df):
+    os.makedirs("data", exist_ok=True)
+    df.to_csv(DATA_PATH, index=False)
+
+# -------------------------------------------------------------------
+# UI PRINCIPAL
+# -------------------------------------------------------------------
 
 def render():
-    require_role("admin")  # o "direccion" si después separás roles
+    st.title("🏫 Panel de Dirección")
 
-    st.title("🏫 Dirección - Alumnos")
+    # Cargar datos
+    df = cargar_alumnos()
 
+    # -------------------------------
+    # FILTRO
+    # -------------------------------
+    st.markdown("### 🔍 Filtros")
+
+    if not df.empty:
+        grados = ["Todos"] + sorted(df["grado"].dropna().unique().tolist())
+    else:
+        grados = ["Todos"]
+
+    filtro_grado = st.selectbox("Filtrar por grado", grados)
+
+    if filtro_grado != "Todos":
+        df_filtrado = df[df["grado"] == filtro_grado]
+    else:
+        df_filtrado = df
+
+    # -------------------------------
+    # TABLA
+    # -------------------------------
     st.markdown("### 📋 Listado de alumnos")
 
-    for alumno in ALUMNOS:
-        with st.container(border=True):
-            col1, col2, col3 = st.columns(3)
+    if df_filtrado.empty:
+        st.info("No hay alumnos cargados todavía.")
+    else:
+        st.dataframe(df_filtrado, use_container_width=True)
 
-            with col1:
-                st.markdown("**👤 Nombre**")
-                st.write(alumno["nombre"])
+    st.markdown("---")
 
-            with col2:
-                st.markdown("**🎂 Fecha de nacimiento**")
-                st.write(alumno["fecha_nac"])
+    # -------------------------------
+    # FORMULARIO NUEVO ALUMNO
+    # -------------------------------
+    st.markdown("### ➕ Agregar nuevo alumno")
 
-            with col3:
-                st.markdown("**🏫 Grado / División**")
-                st.write(alumno["grado"])
+    with st.form("form_nuevo_alumno"):
+        nombre = st.text_input("Nombre completo")
+        fecha_nac = st.date_input("Fecha de nacimiento")
+        grado = st.text_input("Grado / División (ej: 3° A)")
+
+        submitted = st.form_submit_button("Guardar alumno")
+
+        if submitted:
+            if not nombre or not grado:
+                st.error("Completá todos los campos")
+            else:
+                nuevo = pd.DataFrame([{
+                    "nombre": nombre,
+                    "fecha_nac": fecha_nac.strftime("%d/%m/%Y"),
+                    "grado": grado
+                }])
+
+                df = pd.concat([df, nuevo], ignore_index=True)
+                guardar_alumnos(df)
+
+                st.success("✅ Alumno agregado correctamente")
+                st.rerun()
