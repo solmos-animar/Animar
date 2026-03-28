@@ -61,7 +61,7 @@ with st.sidebar:
     if st.button("🛡️ Moderadores", use_container_width=True):
         st.session_state.seccion = "moderador"
         st.rerun()
-    if st.button("⚙️ Administradores", use_container_width=True):
+    if st.button("⚙️ Admin Institución", use_container_width=True):
         st.session_state.seccion = "admin"
         st.rerun()
 
