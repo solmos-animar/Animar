@@ -29,36 +29,53 @@ if "current_page" not in st.session_state:
 if "user" not in st.session_state:
     st.session_state.user = {"name": "Lucas Martínez"}
 
-# ── Navegación en sidebar (funciona en todos los dispositivos) ────────────────
-with st.sidebar:
-    st.markdown("### ConVivir")
-    st.markdown("---")
+# ── Botones reales de Streamlit (ocultos con CSS) ─────────────────────────────
+secciones = ["inicio", "direccion", "docente", "alumno", "familia", "moderador", "admin"]
+cols = st.columns(len(secciones))
+for col, key in zip(cols, secciones):
+    with col:
+        if st.button(key, key=f"nav_{key}"):
+            st.session_state.seccion = key
+            st.rerun()
 
-    if st.button("🏠 Inicio", use_container_width=True):
-        st.session_state.seccion = "inicio"
-        st.rerun()
+# ── Navbar blanca minimalista ─────────────────────────────────────────────────
+seccion_actual = st.session_state.seccion
 
-    st.markdown("**— Colegio —**")
-    if st.button("👩‍💼 Dirección", use_container_width=True):
-        st.session_state.seccion = "direccion"
-        st.rerun()
-    if st.button("👨‍🏫 Docente", use_container_width=True):
-        st.session_state.seccion = "docente"
-        st.rerun()
-    if st.button("🎒 Alumno", use_container_width=True):
-        st.session_state.seccion = "alumno"
-        st.rerun()
-    if st.button("👨‍👩‍👧 Familia", use_container_width=True):
-        st.session_state.seccion = "familia"
-        st.rerun()
+def cls(key):
+    return "nav-item active" if seccion_actual == key else "nav-item"
 
-    st.markdown("**— Animar —**")
-    if st.button("🛡️ Moderador", use_container_width=True):
-        st.session_state.seccion = "moderador"
-        st.rerun()
-    if st.button("🏛️ Admin Global", use_container_width=True):
-        st.session_state.seccion = "admin"
-        st.rerun()
+st.markdown(f"""
+<div class="topnav">
+  <div class="topnav-inner">
+    <div class="topnav-logo">Con<em>Vivir</em></div>
+    <nav class="topnav-links">
+      <span class="{cls('inicio')}"    onclick="go('inicio')">Inicio</span>
+      <span class="nav-sep">|</span>
+      <span class="nav-group">Colegio</span>
+      <span class="{cls('direccion')}" onclick="go('direccion')">Dirección</span>
+      <span class="{cls('docente')}"   onclick="go('docente')">Docente</span>
+      <span class="{cls('alumno')}"    onclick="go('alumno')">Alumno</span>
+      <span class="{cls('familia')}"   onclick="go('familia')">Familia</span>
+      <span class="nav-sep">|</span>
+      <span class="nav-group">Animar</span>
+      <span class="{cls('moderador')}" onclick="go('moderador')">Moderador</span>
+      <span class="{cls('admin')}"     onclick="go('admin')">Admin</span>
+    </nav>
+  </div>
+</div>
+
+<script>
+function go(key) {{
+    const btns = window.parent.document.querySelectorAll('[data-testid="stButton"] button');
+    for (let btn of btns) {{
+        if (btn.innerText.trim() === key) {{
+            btn.click();
+            break;
+        }}
+    }}
+}}
+</script>
+""", unsafe_allow_html=True)
 
 # ── Renderizar sección activa ─────────────────────────────────────────────────
 seccion = st.session_state.seccion
