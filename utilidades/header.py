@@ -1,79 +1,47 @@
 import streamlit as st
 
 def render_header():
-    # Recuperamos la sección actual del estado
+    # Detectamos la sección activa para el estilo visual
     seccion_actual = st.session_state.get("seccion", "inicio")
     
-    # CSS específico para que los botones de Streamlit parezcan links de navegación
-    st.markdown("""
-        <style>
-        .nav-container {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 60px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 56px;
-            border-bottom: 1px solid #e8e5df;
-            z-index: 999999;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-        }
-        .logo {
-            font-family: 'Sora', sans-serif;
-            font-size: 22px;
-            font-weight: 800;
-            color: #0f2240;
-            cursor: pointer;
-        }
-        .logo em { font-style: normal; color: #1a56a0; }
-        
-        /* Estilo para los botones de Streamlit dentro del menú */
-        div[data-testid="stHorizontalBlock"] .stButton button {
-            background: transparent !important;
-            border: none !important;
-            color: #6b7280 !important;
-            font-family: 'DM Sans', sans-serif !important;
-            font-size: 13px !important;
-            font-weight: 600 !important;
-            padding: 8px 16px !important;
-            transition: all 0.2s ease !important;
-            line-height: 1.5 !important;
-        }
-        div[data-testid="stHorizontalBlock"] .stButton button:hover {
-            color: #0f2240 !important;
-            background: #f3f4f6 !important;
-        }
-        /* Clase para el botón activo (la inyectamos vía JS o lógica de color) */
-        </style>
-    """, unsafe_allow_html=True)
-
-    # HTML del Header (Logo y Estructura)
-    st.markdown(f"""
-        <div class="nav-container">
-            <div class="logo">Con<em>Vivir</em></div>
-            <div id="nav-placeholder"></div>
-        </div>
-    """, unsafe_allow_html=True)
-
-    # Botones reales de Streamlit que disparan el cambio sin recargar la URL
-    cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
+    # Contenedor principal del Header
+    st.markdown('<div class="nav-container">', unsafe_allow_html=True)
     
-    with cols[0]:
+    # Creamos un layout de columnas: 
+    # c1: Logo | c2: Espacio flexible | c3-c8: Botones del menú
+    c1, c2, c3, c4, c5, c6, c7, c8 = st.columns([2, 3, 1, 1, 1, 1, 1, 1])
+    
+    with c1:
+        # El logo ahora es un botón invisible que lleva al inicio
+        if st.button("ConVivir", key="logo_home"):
+            st.session_state.seccion = "inicio"
+            st.rerun()
+            
+    # c2 queda vacío para empujar el resto a la derecha
+    
+    with c3:
         if st.button("Inicio", key="nav_inicio"):
             st.session_state.seccion = "inicio"
             st.rerun()
-    with cols[2]:
+    with c4:
         if st.button("Dirección", key="nav_dir"):
             st.session_state.seccion = "direccion"
             st.rerun()
-    with cols[3]:
+    with c5:
         if st.button("Docente", key="nav_doc"):
             st.session_state.seccion = "docente"
             st.rerun()
-    with cols[4]:
+    with c6:
         if st.button("Alumno", key="nav_alu"):
             st.session_state.seccion = "alumno"
             st.rerun()
-    # ... puedes agregar el resto de los botones aquí
+    with c7:
+        if st.button("Moderador", key="nav_mod"):
+            st.session_state.seccion = "moderador"
+            st.rerun()
+    with c8:
+        if st.button("Admin", key="nav_adm"):
+            st.session_state.seccion = "admin"
+            st.rerun()
+            
+    st.markdown('</div>', unsafe_allow_html=True)
