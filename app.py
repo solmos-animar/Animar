@@ -1,6 +1,6 @@
 import streamlit as st
 
-# 1. Configuración de página (Debe ser lo primero)
+# 1. Configuración de página
 st.set_page_config(
     page_title="ConVivir — v1.1",
     page_icon="🕸️",
@@ -8,7 +8,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Cargar CSS Institucional (Asegúrate de que desktop.css tenga el padding-top: 0)
+# 2. Cargar CSS Institucional
 try:
     with open("utilidades/desktop.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -19,7 +19,7 @@ except FileNotFoundError:
 if "seccion" not in st.session_state:
     st.session_state.seccion = "inicio"
 
-# 4. SIDEBAR ESTRUCTURADO (Menú de la izquierda)
+# 4. SIDEBAR ESTRUCTURADO
 with st.sidebar:
     st.markdown('<h1 style="color:white; font-size:28px; margin-bottom:0;">ConVivir</h1>', unsafe_allow_html=True)
     st.markdown('<p style="color:rgba(255,255,255,0.5); margin-bottom:20px;">v1.1 · 2026</p>', unsafe_allow_html=True)
@@ -67,14 +67,12 @@ with st.sidebar:
 
     st.markdown('<br><br><div style="color:rgba(255,255,255,0.2); font-size:10px; padding-left:15px;">Confidencial · 2026</div>', unsafe_allow_html=True)
 
-# 5. RENDERIZADO DE CONTENIDO (Área Principal)
+# 5. RENDERIZADO DE CONTENIDO
 seccion = st.session_state.seccion
 
-# Contenedor para el resto de secciones que no son Landing (para aplicar fondo crema)
 if seccion != "inicio":
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
-# Lógica de ruteo
 try:
     if seccion == "inicio":
         from secciones.landing import show_landing
@@ -87,15 +85,19 @@ try:
     elif seccion == "alumno":
         from secciones.estudiantes import render
         render()
+
+    # NUEVA SECCIÓN DE ADMIN GLOBAL
+    elif seccion == "admin":
+        from secciones.admin_colegio import render
+        render()
         
-    # Agregaremos el resto de los módulos (docente, familia, etc.) aquí
     else:
         st.title(f"Sección: {seccion.replace('_', ' ').capitalize()}")
         st.info("Esta pantalla está siendo preparada para el despliegue.")
 
 except ModuleNotFoundError as e:
     st.warning(f"Todavía no has creado el archivo para la sección '{seccion}'.")
-    st.info("Crea el archivo correspondiente en la carpeta 'secciones/' para activarlo.")
+    st.info(f"Detalle: {e}")
 except Exception as e:
     st.error(f"Ocurrió un error al cargar la sección: {e}")
 
