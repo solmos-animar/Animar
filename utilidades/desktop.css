@@ -1,66 +1,42 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap');
 
-/* ── Reset de Streamlit ── */
-[data-testid="stHeader"], [data-testid="stToolbar"] { display: none !important; }
+/* Ocultar elementos nativos de Streamlit */
+[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stSidebar"] { display: none !important; }
+.block-container { padding: 0 !important; max-width: 100% !important; }
 
-/* ── Sidebar "ConVivir" ── */
-[data-testid="stSidebar"] {
-    background-color: #0f2240 !important; /* Azul marino institucional */
-    border-right: 1px solid rgba(255,255,255,0.1);
+/* Sidebar azul oscuro */
+.cv-sidebar {
+    width: 270px;
+    background-color: #0f2240;
+    color: white;
+    position: fixed;
+    height: 100vh;
+    padding: 32px 24px;
+    z-index: 100;
 }
+.cv-sidebar h1 { font-family: 'Sora', sans-serif; font-size: 28px; margin: 0; }
+.cv-sidebar .sub { font-size: 12px; opacity: 0.6; margin-top: 8px; }
 
-/* Estilo de los botones dentro del sidebar */
-[data-testid="stSidebar"] .stButton button {
-    background-color: transparent !important;
+/* Botones del menú lateral */
+.stButton button {
+    background: transparent !important;
     border: none !important;
     color: rgba(255,255,255,0.7) !important;
     text-align: left !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    padding: 12px 16px !important;
     width: 100% !important;
+    padding: 12px 16px !important;
+    font-family: 'DM Sans', sans-serif !important;
     border-radius: 12px !important;
-    transition: all 0.2s;
+    display: block !important;
+}
+.stButton button:hover {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
 }
 
-[data-testid="stSidebar"] .stButton button:hover {
-    background-color: rgba(255,255,255,0.08) !important;
-    color: #ffffff !important;
-}
-
-/* Botón activo (simulado por foco) */
-[data-testid="stSidebar"] .stButton button:focus {
-    background-color: rgba(255,255,255,0.15) !important;
-    color: #ffffff !important;
-}
-
-/* Títulos en el sidebar */
-.sb-title {
-    font-family: 'Sora', sans-serif;
-    color: white;
-    font-size: 28px;
-    font-weight: 800;
-    margin-bottom: 8px;
-    padding: 0 16px;
-}
-.sb-sub {
-    color: rgba(255,255,255,0.5);
-    font-size: 12px;
-    padding: 0 16px;
-    margin-bottom: 40px;
-}
-
-/* ── Área Principal ── */
-.main {
+/* Área de contenido a la derecha */
+.cv-content {
+    margin-left: 270px;
     background-color: #f9f6f0;
     min-height: 100vh;
-}
-
-/* Landing Dark Mode */
-.landing-dark {
-    background-color: #03091a;
-    color: #dde8f8;
-    min-height: 100vh;
-    padding: 60px;
 }
