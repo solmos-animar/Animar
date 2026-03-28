@@ -14,94 +14,65 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# ── 1. Lógica de Navegación Robusta (Query Params) ────────────────────────────
+# Leemos la URL. Si no hay nada, por defecto es 'inicio'
+query_params = st.query_params
+if "p" not in query_params:
+    st.query_params["p"] = "inicio"
+
+seccion_actual = st.query_params.get("p", "inicio")
+
+# ── 2. Cargar Estilos ─────────────────────────────────────────────────────────
 def load_css(filepath: str):
     with open(filepath) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Cargamos el CSS de escritorio
 load_css("utilidades/desktop.css")
 
-# ── Inicializar estado ────────────────────────────────────────────────────────
-if "seccion" not in st.session_state:
-    st.session_state.seccion = "inicio"
-if "current_page" not in st.session_state:
-    st.session_state.current_page = "student_home"
-if "user" not in st.session_state:
-    st.session_state.user = {"name": "Lucas Martínez"}
-
-# ── Navbar blanca minimalista ─────────────────────────────────────────────────
-seccion_actual = st.session_state.seccion
-
-def cls(key):
-    return "nav-item active" if seccion_actual == key else "nav-item"
+# ── 3. Navbar (Enlaces directos que cambian la URL) ───────────────────────────
+def nav_item(label, key):
+    active_class = "active" if seccion_actual == key else ""
+    # Creamos un link que recarga la página con el parámetro p=key
+    return f'<a href="/?p={key}" target="_self" class="nav-item {active_class}">{label}</a>'
 
 st.markdown(f"""
 <div class="topnav">
   <div class="topnav-inner">
-    <div class="topnav-logo" onclick="go('inicio')" style="cursor:pointer">Con<em>Vivir</em></div>
+    <div class="topnav-logo"><a href="/?p=inicio" target="_self" style="text-decoration:none; color:inherit;">Con<em>Vivir</em></a></div>
     <nav class="topnav-links">
-      <span class="{cls('inicio')}"    onclick="go('inicio')">Inicio</span>
-      <span class="nav-sep">|</span>
-      <span class="nav-group">Colegio</span>
-      <span class="{cls('direccion')}" onclick="go('direccion')">Dirección</span>
-      <span class="{cls('docente')}"   onclick="go('docente')">Docente</span>
-      <span class="{cls('alumno')}"    onclick="go('alumno')">Alumno</span>
-      <span class="{cls('familia')}"   onclick="go('familia')">Familia</span>
-      <span class="nav-sep">|</span>
-      <span class="nav-group">Animar</span>
-      <span class="{cls('moderador')}" onclick="go('moderador')">Moderador</span>
-      <span class="{cls('admin')}"     onclick="go('admin')">Admin</span>
+        {nav_item('Inicio', 'inicio')}
+        <span class="nav-sep">|</span>
+        <span class="nav-group">Colegio</span>
+        {nav_item('Dirección', 'direccion')}
+        {nav_item('Docente', 'docente')}
+        {nav_item('Alumno', 'alumno')}
+        {nav_item('Familia', 'familia')}
+        <span class="nav-sep">|</span>
+        <span class="nav-group">Animar</span>
+        {nav_item('Moderador', 'moderador')}
+        {nav_item('Admin', 'admin')}
     </nav>
   </div>
 </div>
-
-<script>
-function go(key) {{
-    // Buscamos en el documento principal de Streamlit
-    const mainDoc = window.parent.document;
-    // Buscamos específicamente el contenedor de navegación oculto
-    const navZone = mainDoc.getElementById("nav-zone");
-    if (!navZone) return;
-
-    // Buscamos todos los botones dentro de esa zona
-    const buttons = Array.from(navZone.querySelectorAll('button'));
-    const target = buttons.find(btn => btn.innerText.trim().toLowerCase() === key.toLowerCase());
-    
-    if (target) {{
-        target.click();
-    }} else {{
-        console.error("No se encontró el botón para: " + key);
-    }}
-}}
-</script>
+<div class="nav-spacer"></div>
 """, unsafe_allow_html=True)
 
-# ── Espaciador para la Navbar ─────────────────────────────────────────────────
-st.markdown('<div class="nav-spacer"></div>', unsafe_allow_html=True)
+# ── 4. Renderizar Sección ─────────────────────────────────────────────────────
+# Inicializamos el estado de usuario por si las moscas
+if "user" not in st.session_state:
+    st.session_state.user = {"name": "Lucas Martínez"}
 
-# ── Renderizar sección activa ─────────────────────────────────────────────────
-if st.session_state.seccion == "inicio":
+if seccion_actual == "inicio":
     show_landing()
-elif st.session_state.seccion == "alumno":
+elif seccion_actual == "alumno":
     render_estudiantes()
-elif st.session_state.seccion == "direccion":
+elif seccion_actual == "direccion":
     render_direccion()
-elif st.session_state.seccion == "docente":
+elif seccion_actual == "docente":
     render_docente()
-elif st.session_state.seccion == "familia":
+elif seccion_actual == "familia":
     render_familia()
-elif st.session_state.seccion == "moderador":
+elif seccion_actual == "moderador":
     render_moderador()
-elif st.session_state.seccion == "admin":
+elif seccion_actual == "admin":
     render_global_admin()
-
-# ── Botones Reales (Ocultos al final del DOM) ─────────────────────────────────
-st.markdown('<div id="nav-zone" class="hidden-nav">', unsafe_allow_html=True)
-secciones_lista = ["inicio", "direccion", "docente", "alumno", "familia", "moderador", "admin"]
-cols_hidden = st.columns(len(secciones_lista))
-for i, key in enumerate(secciones_lista):
-    with cols_hidden[i]:
-        if st.button(key, key=f"nav_btn_{key}"):
-            st.session_state.seccion = key
-            st.rerun()
-st.markdown('</div>', unsafe_allow_html=True)
