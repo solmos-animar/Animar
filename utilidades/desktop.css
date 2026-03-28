@@ -1,68 +1,109 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap');
 
-/* Reset de Streamlit */
+/* ── Reset General ──────────────────────────────────────────────────────── */
 [data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stSidebar"] { display: none !important; }
 .block-container { padding: 0 !important; max-width: 100% !important; }
 
-/* Navbar */
+body {
+    background-color: #f9f6f0; /* El color "Cream" del documento original */
+    color: #171717;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Navbar Refinada ────────────────────────────────────────────────────── */
 .topnav {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 9999;
     background: #ffffff;
-    border-bottom: 1px solid #f0f0f0;
-    height: 52px;
+    border-bottom: 1px solid #e8e5df;
+    height: 60px;
     display: flex;
     align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
 }
 .topnav-inner {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 40px;
+    padding: 0 56px;
 }
 .topnav-logo {
     font-family: 'Sora', sans-serif;
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 800;
-    color: #111;
+    letter-spacing: -1px;
 }
-.topnav-logo em { font-style: normal; color: #4a9eff; }
-.topnav-links { display: flex; align-items: center; gap: 5px; }
+.topnav-logo a { text-decoration: none; color: #0f2240; }
+.topnav-logo em { font-style: normal; color: #1a56a0; }
 
-/* Estilo para los enlaces del menú */
+.topnav-links { display: flex; align-items: center; gap: 8px; }
+
 .nav-item {
     font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    color: #666;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
     text-decoration: none;
-    padding: 8px 12px;
-    transition: all .2s;
-    border-radius: 4px;
+    padding: 8px 16px;
+    transition: all .2s ease;
+    border-radius: 12px;
 }
 .nav-item:hover {
-    color: #111;
-    background: #f8f8f8;
+    color: #0f2240;
+    background: #f3f4f6;
 }
 .nav-item.active {
-    color: #111;
-    background: #f0f0f0;
-    font-weight: 700;
+    color: #1a56a0;
+    background: #e9eef8;
 }
 
-.nav-sep { color: #eee; padding: 0 5px; }
+.nav-sep { color: #e8e5df; padding: 0 10px; font-weight: 300; }
 .nav-group {
-    font-size: 9px;
+    font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: #bbb;
+    letter-spacing: 0.1em;
+    color: #9ca3af;
     font-weight: 700;
-    padding: 0 10px;
+    padding-right: 8px;
 }
 
-.nav-spacer { height: 52px; }
+.nav-spacer { height: 60px; }
 
-/* Estilos básicos para las secciones institucionales */
-h1, h2, h3 { font-family: 'Sora', sans-serif; }
+/* ── Componentes Estilo "ConVivir" ────────────────────────────── */
+.cv-card {
+    background: #ffffff;
+    border: 1px solid #e8e5df;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(15,34,64,.05);
+    margin-bottom: 20px;
+}
+
+.cv-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+.pill-blue { background: #e8f0fb; color: #1a56a0; }
+.pill-green { background: #eaf6f0; color: #1d7a55; }
+.pill-orange { background: #fff1e8; color: #d4580a; }
+
+/* Títulos */
+h1, h2, h3 {
+    font-family: 'Sora', sans-serif;
+    color: #0f2240;
+    letter-spacing: -0.02em;
+}
+
+/* ── Landing Override ───────────────────────────────────────────────────── */
+/* Cuando p=inicio, usamos el modo oscuro que ya tenías */
+.landing-wrapper {
+    background: #03091a;
+    margin-top: -60px; /* Para que el hero suba */
+}
