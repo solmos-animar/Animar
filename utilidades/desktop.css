@@ -10,8 +10,14 @@
 .block-container                     { padding: 0 !important; max-width: 100% !important; }
 section[data-testid="stMain"]        { overflow: visible !important; }
 
-/* Ocultar barra de tabs pero mantenerlos funcionales */
-div[data-testid="stTabs"] [data-testid="stTabsBar"] { display: none !important; }
+/* Ocultar botones invisibles de navegación */
+div[data-testid="stHorizontalBlock"]:first-of-type { 
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
 
 /* Botón hamburguesa oculto en desktop */
 .nb-toggle { display: none; }
