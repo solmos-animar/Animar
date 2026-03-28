@@ -1,15 +1,41 @@
-/* Solo fuentes y estilos de tarjetas para que se vea lindo lo de adentro */
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;800&family=DM+Sans:wght@400;500&display=swap');
+/* --- Bloqueo visual del Sidebar --- */
 
-html, body, [class*="css"] {
-    font-family: 'DM Sans', sans-serif;
+/* 1. Oculta el botón de las flechas dentro del sidebar */
+[data-testid="stSidebarNavSeparator"] + div button, 
+[data-testid="collapsedControl"] {
+    display: none !important;
 }
+
+/* 2. Estilo institucional para el sidebar */
+[data-testid="stSidebar"] {
+    background-color: #0f2240 !important; /* Azul original del documento */
+    color: white !important;
+}
+
+/* 3. Estilo para los botones nativos del sidebar */
+[data-testid="stSidebar"] button {
+    text-align: left !important;
+    font-family: 'DM Sans', sans-serif !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: rgba(255,255,255,0.7) !important;
+    padding: 10px 15px !important;
+    width: 100% !important;
+}
+
+[data-testid="stSidebar"] button:hover {
+    background-color: rgba(255,255,255,0.1) !important;
+    color: white !important;
+}
+
+/* --- Tipografía del contenido --- */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;800&family=DM+Sans:wght@400;500&display=swap');
 
 h1, h2, h3 {
     font-family: 'Sora', sans-serif;
 }
 
-/* Tarjetas simples para mostrar info */
-.stAlert {
-    border-radius: 15px;
+body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #f9f6f0;
 }
