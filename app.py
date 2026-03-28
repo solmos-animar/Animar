@@ -21,74 +21,48 @@ def load_css(filepath: str):
 load_css("utilidades/desktop.css")
 
 # ── Inicializar estado ────────────────────────────────────────────────────────
-if "seccion" not in st.session_state:
-    st.session_state.seccion = "inicio"
 if "current_page" not in st.session_state:
     st.session_state.current_page = "student_home"
 if "user" not in st.session_state:
     st.session_state.user = {"name": "Lucas Martínez"}
 
-# ── Navbar: logo + menú custom ────────────────────────────────────────────────
+# ── Navbar custom ─────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="menu-bar">
   <div class="menu-logo">Con<em>Vivir</em></div>
 </div>
 <div class="nb-menu">
-  <div class="nb-item" id="nb-inicio"    onclick="nbClick('inicio')">🏠 Inicio</div>
+  <div class="nb-item active" onclick="nbClick(0)">🏠 Inicio</div>
   <div class="nb-sep"></div>
   <span class="nb-group-label">Colegio</span>
-  <div class="nb-item" id="nb-direccion" onclick="nbClick('direccion')">👩‍💼 Dirección</div>
-  <div class="nb-item" id="nb-docente"   onclick="nbClick('docente')">👨‍🏫 Docente</div>
-  <div class="nb-item" id="nb-alumno"    onclick="nbClick('alumno')">🎒 Alumno</div>
-  <div class="nb-item" id="nb-familia"   onclick="nbClick('familia')">👨‍👩‍👧 Familia</div>
+  <div class="nb-item" onclick="nbClick(1)">👩‍💼 Dirección</div>
+  <div class="nb-item" onclick="nbClick(2)">👨‍🏫 Docente</div>
+  <div class="nb-item" onclick="nbClick(3)">🎒 Alumno</div>
+  <div class="nb-item" onclick="nbClick(4)">👨‍👩‍👧 Familia</div>
   <div class="nb-sep"></div>
   <span class="nb-group-label">Animar</span>
-  <div class="nb-item" id="nb-moderador" onclick="nbClick('moderador')">🛡️ Moderador</div>
-  <div class="nb-item" id="nb-admin"     onclick="nbClick('admin')">🏛️ Admin Global</div>
+  <div class="nb-item" onclick="nbClick(5)">🛡️ Moderador</div>
+  <div class="nb-item" onclick="nbClick(6)">🏛️ Admin Global</div>
 </div>
 
 <script>
-function nbClick(seccion) {
-  // Marcar activo visualmente
-  document.querySelectorAll('.nb-item').forEach(i => i.classList.remove('active'));
-  const el = document.getElementById('nb-' + seccion);
-  if (el) el.classList.add('active');
-
-  // Enviar al backend de Streamlit via query param + reload
-  const url = new URL(window.parent.location.href);
-  url.searchParams.set('seccion', seccion);
-  window.parent.location.href = url.toString();
+function nbClick(index) {
+    document.querySelectorAll('.nb-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+    });
+    const tabs = window.parent.document.querySelectorAll('[data-testid="stTabs"] button[role="tab"]');
+    if (tabs[index]) tabs[index].click();
 }
-
-// Marcar activo el item actual al cargar
-const params = new URLSearchParams(window.parent.location.search);
-const current = params.get('seccion') || 'inicio';
-const el = document.getElementById('nb-' + current);
-if (el) el.classList.add('active');
 </script>
 """, unsafe_allow_html=True)
 
-# ── Leer sección desde query params ──────────────────────────────────────────
-params = st.query_params
-if "seccion" in params:
-    st.session_state.seccion = params["seccion"]
+# ── Tabs reales (ocultos, controlados por la navbar) ──────────────────────────
+tabs = st.tabs(["Inicio", "Dirección", "Docente", "Alumno", "Familia", "Moderador", "Admin Global"])
 
-# ── Renderizar sección activa ─────────────────────────────────────────────────
-seccion = st.session_state.seccion
-
-if seccion == "inicio":
-    show_landing()
-elif seccion == "direccion":
-    render_direccion()
-elif seccion == "docente":
-    render_docente()
-elif seccion == "alumno":
-    render_estudiantes()
-elif seccion == "familia":
-    render_familia()
-elif seccion == "moderador":
-    render_moderador()
-elif seccion == "admin":
-    render_global_admin()
-else:
-    show_landing()
+with tabs[0]: show_landing()
+with tabs[1]: render_direccion()
+with tabs[2]: render_docente()
+with tabs[3]: render_estudiantes()
+with tabs[4]: render_familia()
+with tabs[5]: render_moderador()
+with tabs[6]: render_global_admin()
