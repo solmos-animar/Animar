@@ -47,7 +47,7 @@ with st.sidebar:
     
     # --- Familia ---
     st.markdown('<p style="color:rgba(255,255,255,0.4); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-left:15px;">Familia</p>', unsafe_allow_html=True)
-    if st.button("👨‍准确‍♀️ Tutores", use_container_width=True):
+    if st.button("👦 Tutores", use_container_width=True):
         st.session_state.seccion = "familia"
         st.rerun()
     if st.button("👦 Alumnos (Fam)", key="nav_fam_alu", use_container_width=True):
