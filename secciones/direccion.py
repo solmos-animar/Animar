@@ -29,49 +29,82 @@ def guardar_alumnos(df):
 def render():
     st.title("🏫 Panel de Dirección")
 
-    # Cargar datos
     df = cargar_alumnos()
 
     # -------------------------------
-    # FILTRO
+    # LISTADO
     # -------------------------------
-    st.markdown("### 🔍 Filtros")
+    st.markdown("### 📋 Alumnos")
 
-    if not df.empty:
-        grados = ["Todos"] + sorted(df["grado"].dropna().unique().tolist())
-    else:
-        grados = ["Todos"]
-
-    filtro_grado = st.selectbox("Filtrar por grado", grados)
-
-    if filtro_grado != "Todos":
-        df_filtrado = df[df["grado"] == filtro_grado]
-    else:
-        df_filtrado = df
-
-    # -------------------------------
-    # TABLA
-    # -------------------------------
-    st.markdown("### 📋 Listado de alumnos")
-
-    if df_filtrado.empty:
+    if df.empty:
         st.info("No hay alumnos cargados todavía.")
     else:
-        st.dataframe(df_filtrado, use_container_width=True)
+        for i, alumno in df.iterrows():
+            with st.container(border=True):
+                col1, col2, col3, col4 = st.columns([3,2,2,2])
+
+                with col1:
+                    st.write(f"**{alumno['nombre']}**")
+                with col2:
+                    st.write(alumno["fecha_nac"])
+                with col3:
+                    st.write(alumno["grado"])
+
+                with col4:
+                    if st.button("✏️ Editar", key=f"edit_{i}"):
+                        st.session_state.editando = i
+
+                    if st.button("❌ Borrar", key=f"del_{i}"):
+                        df = df.drop(i)
+                        guardar_alumnos(df)
+                        st.success("Alumno eliminado")
+                        st.rerun()
 
     st.markdown("---")
 
     # -------------------------------
-    # FORMULARIO NUEVO ALUMNO
+    # EDITAR
+    # -------------------------------
+    if "editando" in st.session_state:
+        i = st.session_state.editando
+        alumno = df.loc[i]
+
+        st.markdown("### ✏️ Editar alumno")
+
+        with st.form("form_editar"):
+            nombre = st.text_input("Nombre", value=alumno["nombre"])
+            fecha_nac = st.text_input("Fecha de nacimiento", value=alumno["fecha_nac"])
+            grado = st.text_input("Grado", value=alumno["grado"])
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                guardar = st.form_submit_button("Guardar cambios")
+            with col2:
+                cancelar = st.form_submit_button("Cancelar")
+
+            if guardar:
+                df.loc[i] = [nombre, fecha_nac, grado]
+                guardar_alumnos(df)
+                del st.session_state.editando
+                st.success("Alumno actualizado")
+                st.rerun()
+
+            if cancelar:
+                del st.session_state.editando
+                st.rerun()
+
+    # -------------------------------
+    # AGREGAR
     # -------------------------------
     st.markdown("### ➕ Agregar nuevo alumno")
 
-    with st.form("form_nuevo_alumno"):
+    with st.form("form_nuevo"):
         nombre = st.text_input("Nombre completo")
         fecha_nac = st.date_input("Fecha de nacimiento")
-        grado = st.text_input("Grado / División (ej: 3° A)")
+        grado = st.text_input("Grado / División")
 
-        submitted = st.form_submit_button("Guardar alumno")
+        submitted = st.form_submit_button("Agregar")
 
         if submitted:
             if not nombre or not grado:
@@ -86,5 +119,5 @@ def render():
                 df = pd.concat([df, nuevo], ignore_index=True)
                 guardar_alumnos(df)
 
-                st.success("✅ Alumno agregado correctamente")
+                st.success("Alumno agregado")
                 st.rerun()
