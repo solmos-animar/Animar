@@ -1,113 +1,51 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
-/* ── Streamlit reset total ───────────────────────────────────────────────── */
-[data-testid="stSidebarNav"]         { display: none !important; }
-[data-testid="stSidebar"]            { display: none !important; }
-[data-testid="stHeader"]             { display: none !important; }
-[data-testid="stToolbar"]            { display: none !important; }
-[data-testid="stDecoration"]         { display: none !important; }
-[data-testid="stMainBlockContainer"] { padding: 0 !important; }
-.block-container                     { padding: 0 !important; max-width: 100% !important; }
-section[data-testid="stMain"]        { overflow: visible !important; }
+/* ── Streamlit reset ─────────────────────────────────────────────────────── */
+[data-testid="stHeader"]      { display: none !important; }
+[data-testid="stToolbar"]     { display: none !important; }
+[data-testid="stDecoration"]  { display: none !important; }
+[data-testid="stSidebarNav"]  { display: none !important; }
 
-/* Ocultar botones invisibles de navegación */
-div[data-testid="stHorizontalBlock"]:first-of-type { 
-    position: absolute !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    height: 0 !important;
-    overflow: hidden !important;
+/* Permitir scroll en todos los contenedores */
+html, body { overflow: auto !important; height: auto !important; }
+section[data-testid="stMain"] { overflow: auto !important; }
+.block-container { 
+    padding: 0 !important; 
+    max-width: 100% !important;
+    overflow: auto !important;
 }
 
-/* Botón hamburguesa oculto en desktop */
-.nb-toggle { display: none; }
-
-/* ── Navbar fija — logo ──────────────────────────────────────────────────── */
-.menu-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    padding: 0 32px;
-    height: 60px;
-    background: #03091a;
-    border-bottom: 1px solid rgba(74,158,255,0.15);
-    font-family: 'Sora', sans-serif;
+/* ── Sidebar estilizado ──────────────────────────────────────────────────── */
+[data-testid="stSidebar"] {
+    background: #03091a !important;
 }
-.menu-logo {
-    font-size: 18px;
-    font-weight: 800;
-    color: white;
-    letter-spacing: -0.4px;
+[data-testid="stSidebar"] * {
+    color: rgba(221,232,248,0.8) !important;
 }
-.menu-logo em { font-style: normal; color: #4a9eff; }
-
-/* ── Navbar segunda fila — menú ──────────────────────────────────────────── */
-.nb-menu {
-    position: fixed;
-    top: 60px; left: 0; right: 0;
-    z-index: 9998;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    padding: 0 32px;
-    height: 44px;
-    background: #03091a;
-    border-bottom: 1px solid rgba(74,158,255,0.08);
-    font-family: 'Sora', sans-serif;
+[data-testid="stSidebar"] .stButton > button {
+    background: transparent !important;
+    border: 1px solid rgba(74,158,255,0.15) !important;
+    border-radius: 8px !important;
+    color: rgba(221,232,248,0.7) !important;
+    font-weight: 600 !important;
+    text-align: left !important;
+    transition: all .15s !important;
 }
-.nb-group-label {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(74,158,255,0.45);
-    padding: 0 12px 0 6px;
-    white-space: nowrap;
-    border-right: 1px solid rgba(74,158,255,0.1);
-    margin-right: 4px;
-}
-.nb-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
-    color: rgba(221,232,248,0.45);
-    cursor: pointer;
-    white-space: nowrap;
-    border: 1px solid transparent;
-    user-select: none;
-}
-.nb-item:hover {
-    color: rgba(221,232,248,0.85);
-    background: rgba(74,158,255,0.08);
-}
-.nb-item.active {
-    color: #4a9eff;
-    background: rgba(74,158,255,0.1);
-    border-color: rgba(74,158,255,0.2);
-}
-.nb-sep {
-    width: 1px;
-    height: 24px;
-    background: rgba(74,158,255,0.1);
-    margin: 0 8px;
-    flex-shrink: 0;
+[data-testid="stSidebar"] .stButton > button:hover {
+    background: rgba(74,158,255,0.1) !important;
+    border-color: rgba(74,158,255,0.3) !important;
+    color: #4a9eff !important;
 }
 
 /* ── Ocultar navbar original de la landing ───────────────────────────────── */
 .cv-nav { display: none !important; }
 
 /* ── Landing ─────────────────────────────────────────────────────────────── */
-.cv { font-family: 'DM Sans', sans-serif; background: #03091a; color: #dde8f8; min-height: 100vh; margin-top: 104px; }
+.cv { font-family: 'DM Sans', sans-serif; background: #03091a; color: #dde8f8; min-height: 100vh; }
 .cv-hero {
     min-height: 100vh;
     display: flex; flex-direction: column; justify-content: center;
-    padding: 80px 52px 80px;
+    padding: 80px 52px;
     position: relative; overflow: hidden;
     background:
         radial-gradient(ellipse 90% 65% at 50% -5%, rgba(26,111,255,0.2) 0%, transparent 65%),
