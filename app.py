@@ -1,64 +1,38 @@
 import streamlit as st
+from secciones.landing import show_landing
+from secciones.estudiantes import render as render_estudiantes
+from secciones.direccion import render as render_direccion
 
-st.set_page_config(
-    page_title="ConVivir — v1.1",
-    layout="wide",
-    initial_sidebar_state="expanded", # Ahora lo dejamos expandido
-)
+st.set_page_config(page_title="ConVivir", layout="wide")
 
-# ── 1. Inicializar Estado ─────────────────────────────────────────────────────
-if "seccion" not in st.session_state:
-    st.session_state.seccion = "inicio"
-
-# ── 2. Cargar Estilos ─────────────────────────────────────────────────────────
 with open("utilidades/desktop.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# ── 3. Sidebar de Navegación ──────────────────────────────────────────────────
-with st.sidebar:
-    st.markdown('<div class="sb-title">ConVivir</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sb-sub">Documento de Análisis · v1.1</div>', unsafe_allow_html=True)
-    
-    if st.button("📋 Resumen Ejecutivo", key="nav_ini"):
+if "seccion" not in st.session_state:
+    st.session_state.seccion = "inicio"
+
+# Render Sidebar
+st.markdown('<div class="cv-sidebar"><h1>ConVivir</h1><div class="sub">Documento de Análisis · v1.1</div></div>', unsafe_allow_html=True)
+
+with st.container():
+    st.markdown('<div style="position:fixed; left:20px; top:120px; width:230px; z-index:200;">', unsafe_allow_html=True)
+    if st.button("📋 Resumen Ejecutivo"):
         st.session_state.seccion = "inicio"
         st.rerun()
-        
-    if st.button("🚀 Dashboard Dirección", key="nav_dir"):
+    if st.button("🚀 Dashboard Dirección"):
         st.session_state.seccion = "direccion"
         st.rerun()
-        
-    if st.button("🎒 Vista Alumno", key="nav_alu"):
+    if st.button("🎒 Vista Alumno"):
         st.session_state.seccion = "alumno"
         st.rerun()
-        
-    st.markdown('<br><br><div style="color:rgba(255,255,255,0.3); font-size:11px; padding: 0 16px;">Confidencial · 2026</div>', unsafe_allow_html=True)
-
-# ── 4. Renderizado del Contenido ──────────────────────────────────────────────
-seccion = st.session_state.seccion
-
-if seccion == "inicio":
-    st.markdown('<div class="landing-dark">', unsafe_allow_html=True)
-    try:
-        from secciones.landing import show_landing
-        show_landing()
-    except Exception as e:
-        st.error(f"Error cargando landing: {e}")
     st.markdown('</div>', unsafe_allow_html=True)
 
-elif seccion == "direccion":
-    st.markdown('<div style="padding: 60px;">', unsafe_allow_html=True)
-    try:
-        from secciones.direccion import render as render_direccion
-        render_direccion()
-    except Exception as e:
-        st.error(f"Error cargando dirección: {e}")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-elif seccion == "alumno":
-    st.markdown('<div style="padding: 60px;">', unsafe_allow_html=True)
-    try:
-        from secciones.estudiantes import render as render_estudiantes
-        render_estudiantes()
-    except Exception as e:
-        st.error(f"Error cargando estudiantes: {e}")
-    st.markdown('</div>', unsafe_allow_html=True)
+# Main Area
+st.markdown('<div class="cv-content">', unsafe_allow_html=True)
+if st.session_state.seccion == "inicio":
+    show_landing()
+elif st.session_state.seccion == "direccion":
+    render_direccion()
+elif st.session_state.seccion == "alumno":
+    render_estudiantes()
+st.markdown('</div>', unsafe_allow_html=True)
