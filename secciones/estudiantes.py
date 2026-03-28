@@ -1,14 +1,18 @@
-
 import streamlit as st
 import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from data.mock_data import ALUMNOS
+
+# Intentar importar mock_data. Si falla por estructura de carpetas, definimos un fallback
+try:
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+    from data.mock_data import ALUMNOS
+    COMPAÑEROS = [a["nombre"] for a in ALUMNOS if a["nombre"] != st.session_state.user.get("name", "Lucas Martínez")]
+except Exception:
+    # Fallback por si no encuentra el archivo data/mock_data.py durante la prueba
+    COMPAÑEROS = ["Mateo García", "Sofía Rodríguez", "Valentina López", "Bautista Pérez", "Martina Gómez"]
 
 # ---------------------------------------------------------------------------
-# Datos locales
+# Datos locales (Contenido Educativo)
 # ---------------------------------------------------------------------------
-
-COMPAÑEROS = [a["nombre"] for a in ALUMNOS if a["nombre"] != "Lucas Martínez"]
 
 ARTICULOS = [
     {
@@ -64,25 +68,6 @@ Ser buen compañero/a no requiere grandes gestos. Las **pequeñas acciones** hac
 más rápido. Vos podés ser ese alguien.
         """,
     },
-    {
-        "titulo": "Emociones difíciles: está bien sentirse así",
-        "tipo": "Artículo",
-        "tiempo": "4 min",
-        "contenido": """
-Enojo, tristeza, miedo, vergüenza... todas estas emociones son **normales** y válidas.
-
-Lo importante no es no sentirlas, sino aprender a reconocerlas y expresarlas de forma sana.
-
-**Técnicas que pueden ayudar:**
-- Respirá profundo y contá hasta 10 cuando estés enojado/a
-- Escribí en un diario lo que sentís
-- Hablá con alguien de confianza
-- Hacé actividad física para liberar tensión
-
-Si sentís que las emociones te desbordan con frecuencia, pedile ayuda a tu docente 
-o al equipo de orientación escolar.
-        """,
-    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -92,8 +77,14 @@ o al equipo de orientación escolar.
 def render_home():
     """Página de bienvenida del estudiante."""
     user = st.session_state.user
-    st.title(f"👋 Hola, {user['name'].split()[0]}!")
-    st.markdown("Bienvenido/a a ConVivir — tu espacio para mejorar la convivencia en el aula.")
+    nombre_pila = user['name'].split()[0] if 'name' in user else "Estudiante"
+    
+    st.markdown(f"""
+        <div style="margin-bottom: 25px;">
+            <h1 style="font-family: 'Sora', sans-serif; color: #111; margin-bottom: 5px;">👋 ¡Hola, {nombre_pila}!</h1>
+            <p style="color: #666; font-size: 16px;">Bienvenido/a a ConVivir — tu espacio para mejorar la convivencia en el aula.</p>
+        </div>
+    """, unsafe_allow_html=True)
 
     # Estado del aula
     with st.container(border=True):
@@ -108,141 +99,104 @@ def render_home():
                 st.session_state.current_page = "student_encuesta"
                 st.rerun()
 
-    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Secciones disponibles
     col1, col2, col3 = st.columns(3)
     with col1:
         with st.container(border=True):
             st.markdown("### 📝 Encuesta")
-            st.markdown("Respondé la encuesta sobre tus compañeros de forma anónima y confidencial.")
-            if st.button("Ir a la encuesta", use_container_width=True):
+            st.markdown("Respondé sobre tus compañeros de forma anónima.")
+            if st.button("Ir a la encuesta", use_container_width=True, key="btn_ir_encuesta"):
                 st.session_state.current_page = "student_encuesta"
                 st.rerun()
     with col2:
         with st.container(border=True):
             st.markdown("### 📚 Contenido")
-            st.markdown("Artículos y guías sobre convivencia, bullying y cómo pedir ayuda.")
-            if st.button("Ver contenido", use_container_width=True):
+            st.markdown("Artículos y guías sobre convivencia y bullying.")
+            if st.button("Ver contenido", use_container_width=True, key="btn_ir_contenido"):
                 st.session_state.current_page = "student_contenido"
                 st.rerun()
     with col3:
         with st.container(border=True):
-            st.markdown("### 💬 Mensaje al docente")
-            st.markdown("Enviá un mensaje confidencial a tu docente si necesitás hablar de algo.")
-            if st.button("Enviar mensaje", use_container_width=True):
+            st.markdown("### 💬 Mensaje")
+            st.markdown("Enviá un mensaje confidencial a tu docente.")
+            if st.button("Enviar mensaje", use_container_width=True, key="btn_ir_mensaje"):
                 st.session_state.show_mensaje = True
                 st.rerun()
 
-    # Panel de mensaje confidencial (se muestra inline si está activo)
+    # Panel de mensaje confidencial
     if st.session_state.get("show_mensaje"):
         st.markdown("---")
         st.subheader("💬 Mensaje confidencial al docente")
         st.info("Este mensaje solo lo va a ver tu docente. Es completamente confidencial.")
-        mensaje = st.text_area(
-            "Escribí tu mensaje aquí:",
-            placeholder="Podés contar lo que está pasando...",
-        )
-        if st.button("Enviar", type="primary"):
+        mensaje = st.text_area("Escribí tu mensaje aquí:", placeholder="Podés contar lo que está pasando...")
+        
+        c1, c2 = st.columns([1, 4])
+        if c1.button("Enviar", type="primary"):
             if mensaje:
-                st.success("✅ Tu mensaje fue enviado. Tu docente lo va a recibir en privado.")
+                st.success("✅ Mensaje enviado en privado.")
                 st.session_state.show_mensaje = False
+                st.rerun()
             else:
-                st.error("Escribí algo antes de enviar.")
-
+                st.error("Escribí algo.")
+        if c2.button("Cancelar"):
+            st.session_state.show_mensaje = False
+            st.rerun()
 
 def render_encuesta():
     """Encuesta sociométrica del estudiante."""
+    if st.button("← Volver al inicio", key="back_home_enc"):
+        st.session_state.current_page = "student_home"
+        st.rerun()
+
     st.title("📝 Encuesta Sociométrica")
+    
+    st.info("🔒 **Tu respuesta es confidencial.** Solo tu docente verá los resultados del aula.")
 
-    with st.container(border=True):
-        st.markdown(
-            """
-            <div style='background:#e8f0fe;border-left:4px solid #1a56a0;border-radius:8px;padding:14px 18px;'>
-              <strong>🔒 Tu respuesta es completamente confidencial</strong><br>
-              <span style='font-size:14px;color:#1a3a7a;'>Ningún compañero puede ver tus elecciones. 
-              Solo tu docente puede ver los resultados agregados del aula.</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("---")
-
-    if "encuesta_enviada" not in st.session_state:
-        st.session_state.encuesta_enviada = False
-
-    if st.session_state.encuesta_enviada:
+    if st.session_state.get("encuesta_enviada"):
         st.success("✅ ¡Gracias! Ya enviaste tu encuesta.")
         st.balloons()
-        st.markdown("Tus respuestas fueron registradas de forma confidencial.")
-        if st.button("Ver mis respuestas (solo esta sesión)"):
+        if st.button("Volver a responder (demo)"):
             st.session_state.encuesta_enviada = False
             st.rerun()
         return
 
     with st.form("encuesta_sociometrica"):
         st.markdown("### 🌟 Elecciones positivas")
-        st.markdown("¿Con cuáles compañeros te gusta trabajar en el aula?")
-        pos1 = st.selectbox("1ª opción positiva", ["— Seleccioná —"] + COMPAÑEROS, key="pos1")
-        pos2 = st.selectbox("2ª opción positiva", ["— Seleccioná —"] + COMPAÑEROS, key="pos2")
-        pos3 = st.selectbox("3ª opción positiva (opcional)", ["— Seleccioná —"] + COMPAÑEROS, key="pos3")
+        st.write("¿Con quién te gusta trabajar?")
+        pos1 = st.selectbox("1ª opción", ["— Seleccioná —"] + COMPAÑEROS)
+        pos2 = st.selectbox("2ª opción", ["— Seleccioná —"] + COMPAÑEROS)
 
-        st.markdown("---")
         st.markdown("### 💭 Elecciones negativas")
-        st.markdown("¿Con cuáles compañeros preferís NO trabajar? (esto es confidencial)")
-        neg1 = st.selectbox("1ª opción negativa", ["— Seleccioná —"] + COMPAÑEROS, key="neg1")
-        neg2 = st.selectbox("2ª opción negativa (opcional)", ["— Seleccioná —"] + COMPAÑEROS, key="neg2")
+        st.write("¿Con quién preferís NO trabajar?")
+        neg1 = st.selectbox("Opción negativa", ["— Seleccioná —"] + COMPAÑEROS)
 
-        st.markdown("---")
-        st.markdown("### 💬 Mensaje para tu docente (opcional)")
-        mensaje = st.text_area(
-            "¿Querés contarle algo a tu docente? Solo lo/a va a ver él/ella.",
-            placeholder="Si estás pasando algo difícil en el aula, podés escribirlo acá...",
-        )
+        st.markdown("### 💬 Mensaje extra")
+        mensaje = st.text_area("¿Querés decirle algo más a tu docente?")
 
         enviado = st.form_submit_button("✅ Enviar encuesta", type="primary", use_container_width=True)
 
         if enviado:
-            if pos1 == "— Seleccioná —" or pos2 == "— Seleccioná —":
-                st.error("Completá al menos las dos primeras elecciones positivas.")
-            elif neg1 == "— Seleccioná —":
-                st.error("Completá al menos la primera elección negativa.")
-            elif len({pos1, pos2, pos3} - {"— Seleccioná —"}) < 2:
-                st.error("No podés elegir al mismo compañero/a más de una vez.")
+            if pos1 == "— Seleccioná —" or neg1 == "— Seleccioná —":
+                st.error("Por favor completá las opciones.")
             else:
                 st.session_state.encuesta_enviada = True
                 st.rerun()
 
-
 def render_contenido():
     """Sección de contenido educativo."""
+    if st.button("← Volver al inicio", key="back_home_cont"):
+        st.session_state.current_page = "student_home"
+        st.rerun()
+
     st.title("📚 Contenido Educativo")
-    st.markdown("Información sobre convivencia y bullying pensada para vos.")
-
+    
     for articulo in ARTICULOS:
-        tipo_icon = {"Artículo": "📄", "Guía": "📋", "Video": "🎬"}.get(articulo["tipo"], "📄")
-        with st.expander(f"{tipo_icon} **{articulo['titulo']}** · {articulo['tiempo']} de lectura"):
+        with st.expander(f"📄 **{articulo['titulo']}**"):
             st.markdown(articulo["contenido"])
-            col1, col2 = st.columns(2)
-            if col1.button("👍 Me fue útil", key=f"util_{articulo['titulo']}"):
-                st.success("¡Gracias por tu feedback!")
-            if col2.button("💬 Quiero hablar con mi docente", key=f"hablar_{articulo['titulo']}"):
-                st.session_state.current_page = "student_home"
-                st.session_state.show_mensaje = True
-                st.rerun()
-
-    st.markdown("---")
-    st.markdown("### 🆘 ¿Necesitás ayuda urgente?")
-    st.warning(
-        """
-Si estás en una situación de riesgo o necesitás hablar con alguien ahora:
-- **Usá el mensaje confidencial** de esta app para contactar a tu docente
-- **Hablá con un adulto de confianza** en tu escuela o en casa
-- **Línea de ayuda:** 102 (Consejo Nacional de la Niñez)
-        """
-    )
-
+            if st.button("👍 Útil", key=f"util_{articulo['titulo']}"):
+                st.toast("¡Gracias!")
 
 # ---------------------------------------------------------------------------
 # Punto de entrada principal
@@ -251,12 +205,11 @@ Si estás en una situación de riesgo o necesitás hablar con alguien ahora:
 def render():
     """
     Enrutador principal del módulo de estudiantes.
-
-    Rutas soportadas en st.session_state.current_page:
-      - "student_home"      → pantalla de bienvenida
-      - "student_encuesta"  → encuesta sociométrica
-      - "student_contenido" → contenido educativo
+    Se asegura de envolver todo en un contenedor de padding consistente.
     """
+    # Contenedor principal con estilo institucional
+    st.markdown('<div style="padding: 0px 40px 40px 40px;">', unsafe_allow_html=True)
+    
     page = st.session_state.get("current_page", "student_home")
 
     if page == "student_encuesta":
@@ -265,3 +218,5 @@ def render():
         render_contenido()
     else:
         render_home()
+        
+    st.markdown('</div>', unsafe_allow_html=True)
