@@ -2,7 +2,15 @@ import streamlit as st
 import pandas as pd
 import os
 
+# -------------------------------------------------------------------
+# CONFIG
+# -------------------------------------------------------------------
+
 DATA_PATH = "data/alumnos.csv"
+
+# -------------------------------------------------------------------
+# FUNCIONES DE DATOS
+# -------------------------------------------------------------------
 
 def cargar_alumnos():
     if os.path.exists(DATA_PATH):
@@ -14,10 +22,15 @@ def guardar_alumnos(df):
     os.makedirs("data", exist_ok=True)
     df.to_csv(DATA_PATH, index=False)
 
+# -------------------------------------------------------------------
+# UI PRINCIPAL
+# -------------------------------------------------------------------
+
 def render():
     st.title("🏫 Panel de Dirección")
 
     df = cargar_alumnos()
+    df = df.reset_index(drop=True)
 
     # -------------------------------
     # BUSCADOR
@@ -27,7 +40,10 @@ def render():
     busqueda = st.text_input("🔍 Buscar alumno")
 
     if busqueda:
-        df = df[df["nombre"].str.contains(busqueda, case=False, na=False)]
+        df = df[
+            df["nombre"].str.contains(busqueda, case=False, na=False) |
+            df["grado"].str.contains(busqueda, case=False, na=False)
+        ]
 
     # -------------------------------
     # LISTADO
@@ -51,10 +67,33 @@ def render():
                         st.session_state.editando = i
 
                     if st.button("❌ Borrar", key=f"del_{i}"):
-                        df = df.drop(i)
-                        guardar_alumnos(df)
-                        st.success("Alumno eliminado")
-                        st.rerun()
+                        st.session_state.confirmar_borrar = i
+
+    # -------------------------------
+    # CONFIRMAR BORRADO
+    # -------------------------------
+    if "confirmar_borrar" in st.session_state:
+        i = st.session_state.confirmar_borrar
+
+        if i < len(df):
+            alumno = df.loc[i]
+
+            st.warning(f"¿Estás seguro que querés borrar a {alumno['nombre']}?")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                if st.button("✅ Sí, borrar"):
+                    df = df.drop(i)
+                    guardar_alumnos(df)
+                    del st.session_state.confirmar_borrar
+                    st.success("Alumno eliminado")
+                    st.rerun()
+
+            with col2:
+                if st.button("❌ Cancelar"):
+                    del st.session_state.confirmar_borrar
+                    st.rerun()
 
     st.markdown("---")
 
@@ -63,32 +102,34 @@ def render():
     # -------------------------------
     if "editando" in st.session_state:
         i = st.session_state.editando
-        alumno = df.loc[i]
 
-        st.markdown("### ✏️ Editar alumno")
+        if i < len(df):
+            alumno = df.loc[i]
 
-        with st.form("form_editar"):
-            nombre = st.text_input("Nombre", value=alumno["nombre"])
-            fecha_nac = st.text_input("Fecha de nacimiento", value=alumno["fecha_nac"])
-            grado = st.text_input("Grado", value=alumno["grado"])
+            st.markdown("### ✏️ Editar alumno")
 
-            col1, col2 = st.columns(2)
+            with st.form("form_editar"):
+                nombre = st.text_input("Nombre", value=alumno["nombre"])
+                fecha_nac = st.text_input("Fecha de nacimiento", value=alumno["fecha_nac"])
+                grado = st.text_input("Grado", value=alumno["grado"])
 
-            with col1:
-                guardar = st.form_submit_button("Guardar cambios")
-            with col2:
-                cancelar = st.form_submit_button("Cancelar")
+                col1, col2 = st.columns(2)
 
-            if guardar:
-                df.loc[i] = [nombre, fecha_nac, grado]
-                guardar_alumnos(df)
-                del st.session_state.editando
-                st.success("Alumno actualizado")
-                st.rerun()
+                with col1:
+                    guardar = st.form_submit_button("Guardar cambios")
+                with col2:
+                    cancelar = st.form_submit_button("Cancelar")
 
-            if cancelar:
-                del st.session_state.editando
-                st.rerun()
+                if guardar:
+                    df.loc[i] = [nombre, fecha_nac, grado]
+                    guardar_alumnos(df)
+                    del st.session_state.editando
+                    st.success("Alumno actualizado")
+                    st.rerun()
+
+                if cancelar:
+                    del st.session_state.editando
+                    st.rerun()
 
     # -------------------------------
     # AGREGAR
