@@ -1,109 +1,154 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap');
 
-/* ── Reset General ──────────────────────────────────────────────────────── */
-[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stSidebar"] { display: none !important; }
-.block-container { padding: 0 !important; max-width: 100% !important; }
+/* ── 1. Reset de Interfaz Streamlit ──────────────────────────────────────── */
+/* Ocultamos cabecera, barra de herramientas y menús laterales nativos */
+[data-testid="stHeader"], 
+[data-testid="stToolbar"], 
+[data-testid="stDecoration"],
+[data-testid="stSidebar"] { 
+    display: none !important; 
+}
 
+/* Forzamos que el contenedor ocupe todo el ancho sin márgenes extraños */
+.block-container { 
+    padding: 0 !important; 
+    max-width: 100% !important; 
+}
+
+/* Fondo crema institucional del documento de análisis */
 body {
-    background-color: #f9f6f0; /* El color "Cream" del documento original */
+    background-color: #f9f6f0 !important;
     color: #171717;
     font-family: 'DM Sans', sans-serif;
 }
 
-/* ── Navbar Refinada ────────────────────────────────────────────────────── */
-.topnav {
+/* ── 2. Header / Navbar Estática ────────────────────────────────────────── */
+.nav-container {
     position: fixed;
     top: 0; left: 0; right: 0;
-    z-index: 9999;
+    height: 64px;
     background: #ffffff;
-    border-bottom: 1px solid #e8e5df;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-}
-.topnav-inner {
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 56px;
+    border-bottom: 1px solid #e8e5df;
+    z-index: 999999;
+    box-shadow: 0 2px 15px rgba(15, 34, 64, 0.04);
 }
-.topnav-logo {
+
+.logo {
     font-family: 'Sora', sans-serif;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 800;
-    letter-spacing: -1px;
-}
-.topnav-logo a { text-decoration: none; color: #0f2240; }
-.topnav-logo em { font-style: normal; color: #1a56a0; }
-
-.topnav-links { display: flex; align-items: center; gap: 8px; }
-
-.nav-item {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: #6b7280;
-    text-decoration: none;
-    padding: 8px 16px;
-    transition: all .2s ease;
-    border-radius: 12px;
-}
-.nav-item:hover {
     color: #0f2240;
-    background: #f3f4f6;
-}
-.nav-item.active {
-    color: #1a56a0;
-    background: #e9eef8;
+    letter-spacing: -1px;
+    user-select: none;
 }
 
-.nav-sep { color: #e8e5df; padding: 0 10px; font-weight: 300; }
-.nav-group {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #9ca3af;
-    font-weight: 700;
-    padding-right: 8px;
+.logo em { 
+    font-style: normal; 
+    color: #1a56a0; 
 }
 
-.nav-spacer { height: 60px; }
+/* ── 3. Estilo de Botones de Navegación (Hack de Streamlit) ───────────────── */
+/* Hacemos que los botones de Streamlit en el header parezcan links elegantes */
+div[data-testid="stHorizontalBlock"] .stButton button {
+    background: transparent !important;
+    border: none !important;
+    color: #6b7280 !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 8px 14px !important;
+    transition: all 0.2s ease-out !important;
+    box-shadow: none !important;
+}
 
-/* ── Componentes Estilo "ConVivir" ────────────────────────────── */
+div[data-testid="stHorizontalBlock"] .stButton button:hover {
+    color: #1a56a0 !important;
+    background: #f3f4f6 !important;
+    border-radius: 12px !important;
+}
+
+/* El botón activo recibe un estilo destacado */
+div[data-testid="stHorizontalBlock"] .stButton button:active,
+div[data-testid="stHorizontalBlock"] .stButton button:focus {
+    color: #1a56a0 !important;
+    background: #e9eef8 !important;
+    border-radius: 12px !important;
+}
+
+/* ── 4. Componentes Visuales "ConVivir" ──────────────────────────────────── */
+
+/* Tarjetas (Cards) Blancas */
 .cv-card {
     background: #ffffff;
     border: 1px solid #e8e5df;
     border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 10px 30px rgba(15,34,64,.05);
-    margin-bottom: 20px;
+    padding: 28px;
+    box-shadow: 0 10px 30px rgba(15, 34, 64, 0.05);
+    transition: transform 0.2s ease;
+    margin-bottom: 16px;
 }
 
+.cv-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(15, 34, 64, 0.08);
+}
+
+/* Etiquetas (Pills) de Roles */
 .cv-pill {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 5px 14px;
     border-radius: 999px;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
     margin-bottom: 12px;
 }
-.pill-blue { background: #e8f0fb; color: #1a56a0; }
-.pill-green { background: #eaf6f0; color: #1d7a55; }
+
+.pill-blue   { background: #e8f0fb; color: #1a56a0; }
+.pill-green  { background: #eaf6f0; color: #1d7a55; }
 .pill-orange { background: #fff1e8; color: #d4580a; }
 
-/* Títulos */
-h1, h2, h3 {
+/* ── 5. Tipografía y Espaciado ───────────────────────────────────────────── */
+h1, h2, h3, h4 {
     font-family: 'Sora', sans-serif;
     color: #0f2240;
+    margin-bottom: 0.5rem;
     letter-spacing: -0.02em;
 }
 
-/* ── Landing Override ───────────────────────────────────────────────────── */
-/* Cuando p=inicio, usamos el modo oscuro que ya tenías */
-.landing-wrapper {
-    background: #03091a;
-    margin-top: -60px; /* Para que el hero suba */
+p {
+    line-height: 1.6;
+    color: #374151;
+}
+
+/* Separadores sutiles */
+hr {
+    border: 0;
+    border-top: 1px solid #e8e5df;
+    margin: 2rem 0;
+}
+
+/* ── 6. Contenedor de Contenido ─────────────────────────────────────────── */
+.main-content {
+    padding: 48px 56px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.nav-spacer {
+    height: 80px; /* Espacio para que el contenido no quede debajo del header */
+}
+
+/* ── 7. Landing Page (Dark Mode Override) ────────────────────────────────── */
+/* Si estamos en la landing, aplicamos el estilo oscuro del archivo original */
+.landing-bg {
+    background: #03091a !important;
+    color: #dde8f8;
+    margin-top: -80px;
+    min-height: 100vh;
 }
