@@ -1,44 +1,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap');
 
-/* ── Reset Streamlit UI ── */
+/* Reset de Streamlit */
 [data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stSidebar"] { display: none !important; }
 .block-container { padding: 0 !important; max-width: 100% !important; }
 
-/* ── Navbar Container ── */
+/* Navbar Principal */
 .nav-container {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: 60px;
-    background: #ffffff;
+    height: 64px;
+    background: #ffffff !important;
     border-bottom: 1px solid #e8e5df;
     z-index: 999999;
     display: flex;
     align-items: center;
-    padding: 0 40px;
+    padding: 0 56px;
 }
 
-/* ── Estilo especial para el Botón Logo ── */
-div[data-testid="stHorizontalBlock"] div:first-child .stButton button {
-    font-family: 'Sora', sans-serif !important;
-    font-size: 22px !important;
-    font-weight: 800 !important;
-    color: #0f2240 !important;
-    letter-spacing: -1px !important;
-    background: transparent !important;
-    padding: 0 !important;
+.logo {
+    font-family: 'Sora', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f2240;
+    letter-spacing: -1px;
+    position: absolute; /* Para que no lo muevan las columnas */
+    left: 56px;
 }
+.logo em { font-style: normal; color: #1a56a0; }
 
-/* ── Estilo de Botones del Menú ── */
+/* Estilo de los Botones del Menú */
 div[data-testid="stHorizontalBlock"] .stButton button {
     background: transparent !important;
     border: none !important;
-    color: #6b7280 !important;
+    color: #4b5563 !important; /* Gris oscuro para que se vea */
     font-family: 'DM Sans', sans-serif !important;
     font-size: 13px !important;
     font-weight: 600 !important;
-    width: auto !important; /* Evita que ocupen todo el ancho */
-    min-width: 80px !important;
-    padding: 6px 10px !important;
+    padding: 10px 5px !important;
+    width: 100% !important;
     transition: all 0.2s ease !important;
 }
 
@@ -49,7 +48,10 @@ div[data-testid="stHorizontalBlock"] .stButton button:hover {
 }
 
 /* Espaciador para el contenido */
-.nav-spacer { height: 60px; }
+.nav-spacer { height: 64px; }
 
-/* Fondo base */
+/* ── Ajuste para la Landing ── */
+/* Ocultamos el menú viejo de la landing si existe para que no se encime */
+.cv-nav, .nav-links-landing { display: none !important; }
+
 body { background-color: #f9f6f0; }
