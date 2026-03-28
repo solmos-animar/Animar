@@ -36,7 +36,7 @@ def render():
     # -------------------------------
     st.markdown("### 📋 Alumnos")
 
-    busqueda = st.text_input("🔍 Buscar alumno por nombre")
+    busqueda = st.text_input("🔍 Buscar alumno")
 
     if busqueda:
         df = df[
