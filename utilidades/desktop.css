@@ -1,154 +1,55 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap');
 
-/* ── 1. Reset de Interfaz Streamlit ──────────────────────────────────────── */
-/* Ocultamos cabecera, barra de herramientas y menús laterales nativos */
-[data-testid="stHeader"], 
-[data-testid="stToolbar"], 
-[data-testid="stDecoration"],
-[data-testid="stSidebar"] { 
-    display: none !important; 
-}
+/* ── Reset Streamlit UI ── */
+[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stSidebar"] { display: none !important; }
+.block-container { padding: 0 !important; max-width: 100% !important; }
 
-/* Forzamos que el contenedor ocupe todo el ancho sin márgenes extraños */
-.block-container { 
-    padding: 0 !important; 
-    max-width: 100% !important; 
-}
-
-/* Fondo crema institucional del documento de análisis */
-body {
-    background-color: #f9f6f0 !important;
-    color: #171717;
-    font-family: 'DM Sans', sans-serif;
-}
-
-/* ── 2. Header / Navbar Estática ────────────────────────────────────────── */
+/* ── Navbar Container ── */
 .nav-container {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: 64px;
+    height: 60px;
     background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 56px;
     border-bottom: 1px solid #e8e5df;
     z-index: 999999;
-    box-shadow: 0 2px 15px rgba(15, 34, 64, 0.04);
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
 }
 
-.logo {
-    font-family: 'Sora', sans-serif;
-    font-size: 24px;
-    font-weight: 800;
-    color: #0f2240;
-    letter-spacing: -1px;
-    user-select: none;
+/* ── Estilo especial para el Botón Logo ── */
+div[data-testid="stHorizontalBlock"] div:first-child .stButton button {
+    font-family: 'Sora', sans-serif !important;
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    color: #0f2240 !important;
+    letter-spacing: -1px !important;
+    background: transparent !important;
+    padding: 0 !important;
 }
 
-.logo em { 
-    font-style: normal; 
-    color: #1a56a0; 
-}
-
-/* ── 3. Estilo de Botones de Navegación (Hack de Streamlit) ───────────────── */
-/* Hacemos que los botones de Streamlit en el header parezcan links elegantes */
+/* ── Estilo de Botones del Menú ── */
 div[data-testid="stHorizontalBlock"] .stButton button {
     background: transparent !important;
     border: none !important;
     color: #6b7280 !important;
     font-family: 'DM Sans', sans-serif !important;
-    font-size: 14px !important;
+    font-size: 13px !important;
     font-weight: 600 !important;
-    padding: 8px 14px !important;
-    transition: all 0.2s ease-out !important;
-    box-shadow: none !important;
+    width: auto !important; /* Evita que ocupen todo el ancho */
+    min-width: 80px !important;
+    padding: 6px 10px !important;
+    transition: all 0.2s ease !important;
 }
 
 div[data-testid="stHorizontalBlock"] .stButton button:hover {
     color: #1a56a0 !important;
     background: #f3f4f6 !important;
-    border-radius: 12px !important;
+    border-radius: 8px !important;
 }
 
-/* El botón activo recibe un estilo destacado */
-div[data-testid="stHorizontalBlock"] .stButton button:active,
-div[data-testid="stHorizontalBlock"] .stButton button:focus {
-    color: #1a56a0 !important;
-    background: #e9eef8 !important;
-    border-radius: 12px !important;
-}
+/* Espaciador para el contenido */
+.nav-spacer { height: 60px; }
 
-/* ── 4. Componentes Visuales "ConVivir" ──────────────────────────────────── */
-
-/* Tarjetas (Cards) Blancas */
-.cv-card {
-    background: #ffffff;
-    border: 1px solid #e8e5df;
-    border-radius: 20px;
-    padding: 28px;
-    box-shadow: 0 10px 30px rgba(15, 34, 64, 0.05);
-    transition: transform 0.2s ease;
-    margin-bottom: 16px;
-}
-
-.cv-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px rgba(15, 34, 64, 0.08);
-}
-
-/* Etiquetas (Pills) de Roles */
-.cv-pill {
-    display: inline-block;
-    padding: 5px 14px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 12px;
-}
-
-.pill-blue   { background: #e8f0fb; color: #1a56a0; }
-.pill-green  { background: #eaf6f0; color: #1d7a55; }
-.pill-orange { background: #fff1e8; color: #d4580a; }
-
-/* ── 5. Tipografía y Espaciado ───────────────────────────────────────────── */
-h1, h2, h3, h4 {
-    font-family: 'Sora', sans-serif;
-    color: #0f2240;
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
-}
-
-p {
-    line-height: 1.6;
-    color: #374151;
-}
-
-/* Separadores sutiles */
-hr {
-    border: 0;
-    border-top: 1px solid #e8e5df;
-    margin: 2rem 0;
-}
-
-/* ── 6. Contenedor de Contenido ─────────────────────────────────────────── */
-.main-content {
-    padding: 48px 56px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.nav-spacer {
-    height: 80px; /* Espacio para que el contenido no quede debajo del header */
-}
-
-/* ── 7. Landing Page (Dark Mode Override) ────────────────────────────────── */
-/* Si estamos en la landing, aplicamos el estilo oscuro del archivo original */
-.landing-bg {
-    background: #03091a !important;
-    color: #dde8f8;
-    margin-top: -80px;
-    min-height: 100vh;
-}
+/* Fondo base */
+body { background-color: #f9f6f0; }
