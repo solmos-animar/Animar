@@ -30,8 +30,8 @@ div[data-testid="stHorizontalBlock"]:first-of-type {
     top: 0; left: 0; right: 0;
     z-index: 9999;
     background: #ffffff;
-    border-bottom: 1px solid #e8e8e8;
-    height: 56px;
+    border-bottom: 1px solid #f0f0f0;
+    height: 52px;
     display: flex;
     align-items: center;
 }
@@ -44,7 +44,7 @@ div[data-testid="stHorizontalBlock"]:first-of-type {
 }
 .topnav-logo {
     font-family: 'Sora', sans-serif;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 800;
     color: #111;
     letter-spacing: -0.5px;
@@ -57,50 +57,51 @@ div[data-testid="stHorizontalBlock"]:first-of-type {
 .topnav-links {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     justify-content: center;
     flex: 1;
 }
 .nav-item {
     font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    color: #444;
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
     cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: all .15s;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: all .2s ease;
     white-space: nowrap;
     user-select: none;
 }
 .nav-item:hover {
     color: #111;
-    background: #f4f4f4;
+    background: #f8f8f8;
 }
 .nav-item.active {
     color: #111;
-    background: #f0f0f0;
-    box-shadow: inset 0 -2px 0 #111;
+    background: transparent;
+    box-shadow: inset 0 -1.5px 0 #111;
+    border-radius: 0;
 }
 .nav-sep {
-    color: #ddd;
-    font-size: 14px;
-    padding: 0 4px;
+    color: #eee;
+    font-size: 12px;
+    padding: 0 8px;
     user-select: none;
 }
 .nav-group {
     font-family: 'DM Sans', sans-serif;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #aaa;
-    padding: 0 6px;
+    color: #ccc;
+    padding: 0 8px;
     user-select: none;
 }
 
 /* ── Empujar contenido debajo de la navbar ───────────────────────────────── */
-.cv { margin-top: 56px; }
+.cv { margin-top: 52px; }
 
 /* ── Ocultar navbar original de la landing ───────────────────────────────── */
 .cv-nav { display: none !important; }
@@ -221,5 +222,4 @@ div[data-testid="stHorizontalBlock"]:first-of-type {
 .cv-cta { padding: 84px 52px; text-align: center; background: radial-gradient(ellipse 50% 65% at 50% 50%, rgba(26,111,255,0.09) 0%, transparent 65%); }
 .cv-cta h2 { font-family: 'Sora', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: -2px; color: #fff; margin-bottom: 14px; }
 .cv-cta p { font-size: 16px; color: rgba(221,232,248,0.42); }
-.cv-ft { padding: 22px 52px; border-top: 1px solid rgba(74,158,255,0.07); display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: rgba(221,232,248,0.2); }
-.cv-ft-logo { display: flex; align-items: center; gap: 7px; }
+.cv-ft { padding:
