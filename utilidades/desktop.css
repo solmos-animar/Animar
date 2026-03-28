@@ -1,29 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap');
 
-/* ── Streamlit UI Reset ──────────────────────────────────────────────────── */
-[data-testid="stHeader"], 
-[data-testid="stToolbar"], 
-[data-testid="stDecoration"], 
-[data-testid="stSidebarNav"], 
-[data-testid="stSidebar"] { 
-    display: none !important; 
-}
+/* Reset de Streamlit */
+[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stSidebar"] { display: none !important; }
+.block-container { padding: 0 !important; max-width: 100% !important; }
 
-.block-container {
-    padding: 0 !important;
-    max-width: 100% !important;
-}
-
-/* ── Ocultar la zona de navegación técnica ────────────────────────────────── */
-.hidden-nav {
-    position: fixed;
-    bottom: -100px; /* Fuera de la pantalla */
-    left: 0;
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* ── Navbar ─────────────────────────────────────────────────────────────── */
+/* Navbar */
 .topnav {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -48,34 +29,40 @@
     color: #111;
 }
 .topnav-logo em { font-style: normal; color: #4a9eff; }
-.topnav-links { display: flex; align-items: center; gap: 4px; }
+.topnav-links { display: flex; align-items: center; gap: 5px; }
 
+/* Estilo para los enlaces del menú */
 .nav-item {
     font-family: 'DM Sans', sans-serif;
     font-size: 12px;
     font-weight: 500;
     color: #666;
-    cursor: pointer;
-    padding: 6px 12px;
+    text-decoration: none;
+    padding: 8px 12px;
     transition: all .2s;
+    border-radius: 4px;
 }
-.nav-item:hover { color: #111; }
+.nav-item:hover {
+    color: #111;
+    background: #f8f8f8;
+}
 .nav-item.active {
     color: #111;
-    box-shadow: inset 0 -2px 0 #111;
+    background: #f0f0f0;
+    font-weight: 700;
 }
-.nav-sep { color: #eee; padding: 0 8px; }
+
+.nav-sep { color: #eee; padding: 0 5px; }
 .nav-group {
     font-size: 9px;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #ccc;
+    letter-spacing: 1.2px;
+    color: #bbb;
     font-weight: 700;
-    padding: 0 8px;
+    padding: 0 10px;
 }
 
 .nav-spacer { height: 52px; }
 
-/* ── Landing Style (Solo para Inicio) ────────────────────────────────────── */
-.cv { background: #03091a; color: #dde8f8; min-height: 100vh; }
-/* ... (puedes mantener el resto de tus estilos de la landing aquí) ... */
+/* Estilos básicos para las secciones institucionales */
+h1, h2, h3 { font-family: 'Sora', sans-serif; }
