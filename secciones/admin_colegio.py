@@ -54,38 +54,44 @@ def render():
                 st.info("No hay colegios en la base de datos.")
         except Exception as e:
             st.error(f"Error al cargar la lista: {e}")
-    # --- TAB 2: DOCENTES (NUEVA LÓGICA) ---
+    # --- TAB 2: DOCENTES (CORREGIDA) ---
     with tab2:
         st.subheader("Gestión de Personal Docente")
         
         try:
             with conn.session as s:
-                res = s.execute(text("SELECT id, nombre FROM colegios"))
-                df_col = pd.DataFrame(res.fetchall(), columns=res.keys())
+                res_col = s.execute(text("SELECT id, nombre FROM colegios"))
+                df_col_list = pd.DataFrame(res_col.fetchall(), columns=res_col.keys())
 
-            if not df_col.empty:
+            if not df_col_list.empty:
                 col_destino = st.selectbox("Seleccionar Colegio para Docentes", 
-                                          options=df_col['id'].tolist(), 
-                                          format_func=lambda x: df_col[df_col['id']==x]['nombre'].iloc[0],
-                                          key="sel_col_doc")
-                nombre_colegio = df_col[df_col['id']==col_destino]['nombre'].iloc[0]
+                                          options=df_col_list['id'].tolist(), 
+                                          format_func=lambda x: df_col_list[df_col_list['id']==x]['nombre'].iloc[0])
+                
+                nombre_institucion = df_col_list[df_col_list['id']==col_destino]['nombre'].iloc[0]
 
-                # --- CARGA MASIVA ---
-                archivo_doc = st.file_uploader("Subir Excel de Docentes (DNI, Apellido, Nombre, Grado, División)", type=["xlsx"])
+                # Subida de archivo
+                archivo_doc = st.file_uploader("Subir Excel de Docentes", type=["xlsx"])
                 
                 if archivo_doc:
                     df_doc_raw = pd.read_excel(archivo_doc)
-                    # Unificamos Grado y División en una sola columna para la base de datos
-                    if all(c in df_doc_raw.columns for c in ['DNI', 'Apellido', 'Nombre', 'Grado', 'División']):
-                        df_doc_raw['Grados_y_Div'] = df_doc_raw['Grado'].astype(str) + " " + df_doc_raw['División'].astype(str)
-                        st.write("📋 Vista previa de carga:")
-                        st.dataframe(df_doc_raw[['DNI', 'Apellido', 'Nombre', 'Grados_y_Div']], use_container_width=True)
-
-                        # RECUADRO DE CONFIRMACIÓN
-                        st.warning(f"⚠️ **CONFIRMACIÓN**: Estás por cargar {len(df_doc_raw)} docentes al **{nombre_colegio}**. ¿Confirmas la operación?")
-                        col_conf1, col_conf2 = st.columns(2)
+                    
+                    # Normalizamos nombres de columnas para evitar errores de mayúsculas/espacios
+                    df_doc_raw.columns = [c.strip().capitalize() for c in df_doc_raw.columns]
+                    columnas_esperadas = ['Dni', 'Apellido', 'Nombre', 'Grado', 'División']
+                    
+                    # Verificamos si están todas
+                    if all(c in df_doc_raw.columns for c in columnas_esperadas):
+                        # Creamos la columna combinada
+                        df_doc_raw['Grados_y_div'] = df_doc_raw['Grado'].astype(str) + " " + df_doc_raw['División'].astype(str)
                         
-                        if col_conf1.button("✅ Sí, proceder con la carga", use_container_width=True):
+                        st.write("📋 **Vista previa de los datos a importar:**")
+                        st.dataframe(df_doc_raw[['Dni', 'Apellido', 'Nombre', 'Grados_y_div']].head(), use_container_width=True)
+
+                        # EL BOTÓN DE GUARDADO DENTRO DE UN WARNING DE CONFIRMACIÓN
+                        st.warning(f"⚠️ Estás por cargar estos docentes al colegio: **{nombre_institucion}**")
+                        
+                        if st.button("🚀 Confirmar y Guardar en Base de Datos", type="primary", use_container_width=True):
                             exitos = 0
                             with conn.session as s:
                                 for _, row in df_doc_raw.iterrows():
@@ -93,52 +99,56 @@ def render():
                                         s.execute(text("""
                                             INSERT INTO docentes (colegio_id, dni, apellido, nombre, grados_divisiones)
                                             VALUES (:cid, :dni, :ape, :nom, :gd)
-                                            ON CONFLICT (dni) DO UPDATE SET grados_divisiones = EXCLUDED.grados_divisiones
-                                        """), {"cid": col_destino, "dni": str(row['DNI']), "ape": row['Apellido'], "nom": row['Nombre'], "gd": row['Grados_y_Div']})
+                                            ON CONFLICT (dni) DO UPDATE SET 
+                                            grados_divisiones = EXCLUDED.grados_divisiones,
+                                            apellido = EXCLUDED.apellido,
+                                            nombre = EXCLUDED.nombre
+                                        """), {
+                                            "cid": col_destino, 
+                                            "dni": str(row['Dni']), 
+                                            "ape": str(row['Apellido']), 
+                                            "nom": str(row['Nombre']), 
+                                            "gd": str(row['Grados_y_div'])
+                                        })
                                         exitos += 1
-                                    except: pass
+                                    except Exception as e:
+                                        st.error(f"Error en DNI {row['Dni']}: {e}")
                                 s.commit()
-                            st.success(f"Se cargaron/actualizaron {exitos} docentes.")
+                            st.success(f"✅ ¡Hecho! Se procesaron {exitos} docentes en {nombre_institucion}.")
                             st.rerun()
+                    else:
+                        st.error(f"El Excel no tiene el formato correcto. Columnas detectadas: {list(df_doc_raw.columns)}")
+                        st.info(f"Se esperan exactamente: {columnas_esperadas}")
 
-                # --- EDICIÓN Y LISTADO ---
+                # --- TABLA DE EDICIÓN ---
                 st.markdown("---")
-                st.subheader(f"Docentes de {nombre_colegio}")
                 with conn.session as s:
                     res_d = s.execute(text("SELECT id, dni, apellido, nombre, grados_divisiones, activo FROM docentes WHERE colegio_id = :cid"), {"cid": col_destino})
                     df_docentes = pd.DataFrame(res_d.fetchall(), columns=res_d.keys())
 
                 if not df_docentes.empty:
-                    st.write("💡 Puedes editar nombres, grados o el estado directamente en la tabla.")
-                    # TABLA EDITABLE
-                    edited_df = st.data_editor(
-                        df_docentes, 
-                        column_config={
-                            "activo": st.column_config.CheckboxColumn("Habilitado"),
-                            "grados_divisiones": "Grados/Div (ej: 1A, 2B)",
-                            "id": None # Ocultamos el ID
-                        },
-                        disabled=["dni"], # El DNI no se debería editar por seguridad
+                    st.subheader(f"Listado de Docentes: {nombre_institucion}")
+                    # Editor dinámico
+                    df_editado = st.data_editor(
+                        df_docentes,
+                        column_config={"activo": st.column_config.CheckboxColumn("Activo"), "id": None},
+                        disabled=["dni"],
                         use_container_width=True,
-                        key="editor_docentes"
+                        key="edit_doc_table"
                     )
-
-                    if st.button("💾 Guardar cambios en la tabla"):
-                        # Aquí detectamos cambios y actualizamos en lote
+                    
+                    if st.button("💾 Guardar cambios realizados en la tabla"):
                         with conn.session as s:
-                            for _, row in edited_df.iterrows():
+                            for _, r in df_editado.iterrows():
                                 s.execute(text("""
-                                    UPDATE docentes SET 
-                                    apellido = :ape, nombre = :nom, grados_divisiones = :gd, activo = :act
-                                    WHERE id = :id
-                                """), {"ape": row['apellido'], "nom": row['nombre'], "gd": row['grados_divisiones'], "act": row['activo'], "id": row['id']})
+                                    UPDATE docentes SET apellido=:a, nombre=:n, grados_divisiones=:g, activo=:ac WHERE id=:id
+                                """), {"a": r['apellido'], "n": r['nombre'], "g": r['grados_divisiones'], "ac": r['activo'], "id": r['id']})
                             s.commit()
-                        st.success("Cambios guardados correctamente.")
-                else:
-                    st.info("No hay docentes cargados para este colegio.")
-
-        except Exception as e:
-            st.error(f"Error en módulo docentes: {e}")
+                        st.success("Cambios actualizados.")
+                        st.rerun()
+            else:
+                st.warning("No hay colegios creados.")
+        except Exception as e: st.error(f"Error: {e}")
 
     # --- TAB 4: ALUMNOS (Tu código anterior...) ---
     with tab4:
