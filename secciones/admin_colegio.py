@@ -248,6 +248,303 @@ def render():
                 st.warning("No hay colegios creados.")
         except Exception as e: st.error(f"Error: {e}")
 
-    # --- TAB 4: ALUMNOS (Tu código anterior...) ---
+    # --- TAB 4: ALUMNOS ---
     with tab4:
-        st.info("Módulo de alumnos operativo.")
+        st.markdown('<h3 style="color:#0f2240;">🎒 Gestión de Alumnos</h3>', unsafe_allow_html=True)
+
+        try:
+            with conn.session as s:
+                res_col_al = s.execute(text("SELECT id, nombre FROM colegios"))
+                df_col_al = pd.DataFrame(res_col_al.fetchall(), columns=res_col_al.keys())
+
+            if df_col_al.empty:
+                st.warning("No hay colegios creados. Primero registrá una institución.")
+                st.stop()
+
+            colegio_al = st.selectbox(
+                "Seleccionar Colegio",
+                options=df_col_al['id'].tolist(),
+                format_func=lambda x: df_col_al[df_col_al['id'] == x]['nombre'].iloc[0],
+                key="sel_colegio_alumnos"
+            )
+            nombre_colegio_al = df_col_al[df_col_al['id'] == colegio_al]['nombre'].iloc[0]
+
+            st.markdown("---")
+
+            # ================================================================
+            # BLOQUE 1 — CARGA MASIVA POR EXCEL
+            # ================================================================
+            st.subheader("📤 Carga masiva por Excel")
+
+            with st.expander("Ver formato esperado del archivo", expanded=False):
+                st.markdown("""
+                    <div style="background:#f0f4ff; border-radius:10px; padding:14px 18px; font-size:13px; color:#0f2240;">
+                        El archivo Excel debe tener <strong>exactamente estas columnas</strong> (los nombres no distinguen mayúsculas):
+                    </div>
+                """, unsafe_allow_html=True)
+                st.dataframe(
+                    pd.DataFrame([
+                        {"DNI": "28456789", "Apellido": "García", "Nombre": "Lucía",
+                         "Grado": "4°", "División": "B", "Fecha_nacimiento": "2012-05-14"},
+                        {"DNI": "31234567", "Apellido": "López", "Nombre": "Mateo",
+                         "Grado": "4°", "División": "B", "Fecha_nacimiento": "2011-11-03"},
+                    ]),
+                    use_container_width=True, hide_index=True
+                )
+                st.caption("La columna Fecha_nacimiento puede ir en formato YYYY-MM-DD o DD/MM/YYYY.")
+
+            archivo_al = st.file_uploader(
+                "Subir archivo Excel de alumnos",
+                type=["xlsx"],
+                key="uploader_alumnos"
+            )
+
+            if archivo_al:
+                df_al_raw = pd.read_excel(archivo_al)
+                df_al_raw.columns = [c.strip().capitalize() for c in df_al_raw.columns]
+                columnas_esp = ['Dni', 'Apellido', 'Nombre', 'Grado', 'División', 'Fecha_nacimiento']
+                # Permitir también "Fecha nacimiento" con espacio
+                df_al_raw.columns = [c.replace(" ", "_") for c in df_al_raw.columns]
+
+                if all(c in df_al_raw.columns for c in columnas_esp):
+                    df_al_raw['Grados_y_div'] = (
+                        df_al_raw['Grado'].astype(str) + " " + df_al_raw['División'].astype(str)
+                    )
+                    # Normalizar fecha
+                    df_al_raw['Fecha_nacimiento'] = pd.to_datetime(
+                        df_al_raw['Fecha_nacimiento'], dayfirst=True, errors='coerce'
+                    ).dt.date
+
+                    fechas_invalidas = df_al_raw['Fecha_nacimiento'].isna().sum()
+
+                    st.markdown("**📋 Vista previa:**")
+                    st.dataframe(
+                        df_al_raw[['Dni', 'Apellido', 'Nombre', 'Grados_y_div', 'Fecha_nacimiento']].head(10),
+                        use_container_width=True, hide_index=True
+                    )
+
+                    col_info1, col_info2, col_info3 = st.columns(3)
+                    col_info1.metric("Total de filas", len(df_al_raw))
+                    col_info2.metric("Colegio destino", nombre_colegio_al)
+                    col_info3.metric(
+                        "Fechas con error",
+                        fechas_invalidas,
+                        delta=None if fechas_invalidas == 0 else f"{fechas_invalidas} se guardarán como nulas",
+                        delta_color="off" if fechas_invalidas == 0 else "inverse"
+                    )
+
+                    st.warning(
+                        f"⚠️ Estás por cargar **{len(df_al_raw)} alumnos** al colegio: **{nombre_colegio_al}**. "
+                        "Si un DNI ya existe, se actualizarán sus datos."
+                    )
+
+                    if st.button("🚀 Confirmar y Guardar alumnos", type="primary", use_container_width=True):
+                        exitos, errores = 0, 0
+                        with conn.session as s:
+                            for _, row in df_al_raw.iterrows():
+                                try:
+                                    s.execute(text("""
+                                        INSERT INTO alumnos
+                                            (colegio_id, dni, apellido, nombre, grados_divisiones, fecha_nacimiento)
+                                        VALUES
+                                            (:cid, :dni, :ape, :nom, :gd, :fn)
+                                        ON CONFLICT (dni) DO UPDATE SET
+                                            apellido          = EXCLUDED.apellido,
+                                            nombre            = EXCLUDED.nombre,
+                                            grados_divisiones = EXCLUDED.grados_divisiones,
+                                            fecha_nacimiento  = EXCLUDED.fecha_nacimiento
+                                    """), {
+                                        "cid": colegio_al,
+                                        "dni": str(row['Dni']).strip(),
+                                        "ape": str(row['Apellido']).strip().capitalize(),
+                                        "nom": str(row['Nombre']).strip().capitalize(),
+                                        "gd":  str(row['Grados_y_div']),
+                                        "fn":  row['Fecha_nacimiento'] if pd.notna(row['Fecha_nacimiento']) else None,
+                                    })
+                                    exitos += 1
+                                except Exception as e:
+                                    errores += 1
+                                    st.error(f"Error en DNI {row['Dni']}: {e}")
+                            s.commit()
+
+                        if exitos:
+                            st.success(f"✅ Se procesaron **{exitos} alumnos** correctamente en {nombre_colegio_al}.")
+                        if errores:
+                            st.error(f"❌ {errores} filas tuvieron errores y no fueron guardadas.")
+                        st.rerun()
+
+                else:
+                    faltantes = [c for c in columnas_esp if c not in df_al_raw.columns]
+                    st.error(f"El Excel no tiene el formato correcto.")
+                    st.info(f"Columnas detectadas: `{list(df_al_raw.columns)}`")
+                    st.warning(f"Columnas faltantes: `{faltantes}`")
+
+            # ================================================================
+            # BLOQUE 2 — FORMULARIO INDIVIDUAL
+            # ================================================================
+            st.markdown("---")
+
+            with st.expander("➕ Agregar alumno manualmente", expanded=False):
+                st.markdown("""
+                    <div style="
+                        background: linear-gradient(135deg, #f0f4ff 0%, #fef9f0 100%);
+                        border-left: 4px solid #d4580a;
+                        border-radius: 0 12px 12px 0;
+                        padding: 14px 18px 6px;
+                        margin-bottom: 18px;
+                    ">
+                        <span style="font-size:13px; color:#0f2240; font-weight:600;">
+                            📋 Carga individual de alumno
+                        </span><br>
+                        <span style="font-size:12px; color:#5c5852;">
+                            Completá todos los campos para agregar un alumno a <strong>{}</strong>.
+                        </span>
+                    </div>
+                """.format(nombre_colegio_al), unsafe_allow_html=True)
+
+                with st.form("form_alumno_individual", clear_on_submit=True):
+
+                    # Fila 1: DNI (ancho reducido) + espacio
+                    col_dni, col_esp = st.columns([1, 2])
+                    dni_al = col_dni.text_input(
+                        "DNI *",
+                        placeholder="Ej: 45123456",
+                        help="Sin puntos ni espacios."
+                    )
+
+                    # Fila 2: Apellido + Nombre
+                    col_ape, col_nom = st.columns(2)
+                    apellido_al = col_ape.text_input("Apellido *", placeholder="Ej: Ramírez")
+                    nombre_al   = col_nom.text_input("Nombre *",   placeholder="Ej: Valentina")
+
+                    # Fila 3: Grado + División + Fecha de nacimiento
+                    col_gr, col_div, col_fn = st.columns([1, 1, 2])
+                    grado_al   = col_gr.selectbox(
+                        "Grado *",
+                        ["1°", "2°", "3°", "4°", "5°", "6°", "7°"]
+                    )
+                    division_al = col_div.selectbox(
+                        "División *",
+                        ["A", "B", "C", "D", "E"]
+                    )
+                    fecha_al = col_fn.date_input(
+                        "Fecha de nacimiento *",
+                        value=None,
+                        min_value=pd.Timestamp("2000-01-01").date(),
+                        max_value=pd.Timestamp("today").date(),
+                        format="DD/MM/YYYY",
+                        help="Seleccioná la fecha de nacimiento del alumno."
+                    )
+
+                    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+
+                    submitted_al = st.form_submit_button(
+                        "✅ Agregar Alumno",
+                        type="primary",
+                        use_container_width=True
+                    )
+
+                    if submitted_al:
+                        if dni_al and apellido_al and nombre_al and fecha_al:
+                            gd_al = f"{grado_al} {division_al}"
+                            try:
+                                with conn.session as s:
+                                    s.execute(text("""
+                                        INSERT INTO alumnos
+                                            (colegio_id, dni, apellido, nombre, grados_divisiones, fecha_nacimiento)
+                                        VALUES
+                                            (:cid, :dni, :ape, :nom, :gd, :fn)
+                                        ON CONFLICT (dni) DO UPDATE SET
+                                            apellido          = EXCLUDED.apellido,
+                                            nombre            = EXCLUDED.nombre,
+                                            grados_divisiones = EXCLUDED.grados_divisiones,
+                                            fecha_nacimiento  = EXCLUDED.fecha_nacimiento
+                                    """), {
+                                        "cid": colegio_al,
+                                        "dni": dni_al.strip(),
+                                        "ape": apellido_al.strip().capitalize(),
+                                        "nom": nombre_al.strip().capitalize(),
+                                        "gd":  gd_al,
+                                        "fn":  fecha_al,
+                                    })
+                                    s.commit()
+                                st.success(
+                                    f"✅ **{apellido_al.capitalize()}, {nombre_al.capitalize()}** "
+                                    f"agregado/a a **{nombre_colegio_al}** — {gd_al}."
+                                )
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Error al guardar: {e}")
+                        else:
+                            st.warning("⚠️ Completá todos los campos obligatorios antes de guardar.")
+
+            # ================================================================
+            # BLOQUE 3 — TABLA DE VISUALIZACIÓN Y EDICIÓN
+            # ================================================================
+            st.markdown("---")
+            st.subheader(f"📊 Padrón: {nombre_colegio_al}")
+
+            # Filtros rápidos por grado/división
+            with conn.session as s:
+                res_al = s.execute(text("""
+                    SELECT id, dni, apellido, nombre, grados_divisiones, fecha_nacimiento, activo
+                    FROM alumnos
+                    WHERE colegio_id = :cid
+                    ORDER BY grados_divisiones, apellido
+                """), {"cid": colegio_al})
+                df_alumnos = pd.DataFrame(res_al.fetchall(), columns=res_al.keys())
+
+            if not df_alumnos.empty:
+                # Filtro por grado/división
+                opciones_grado = ["Todos"] + sorted(df_alumnos['grados_divisiones'].dropna().unique().tolist())
+                col_f1, col_f2 = st.columns([2, 4])
+                filtro_grado = col_f1.selectbox("Filtrar por grado/división", opciones_grado, key="filtro_grado_al")
+                col_f2.markdown(
+                    f"<div style='padding-top:28px; font-size:13px; color:#5c5852;'>"
+                    f"Total: <strong>{len(df_alumnos)}</strong> alumnos registrados</div>",
+                    unsafe_allow_html=True
+                )
+
+                df_vista = df_alumnos if filtro_grado == "Todos" else df_alumnos[df_alumnos['grados_divisiones'] == filtro_grado]
+
+                df_editado_al = st.data_editor(
+                    df_vista,
+                    column_config={
+                        "id":                None,
+                        "activo":            st.column_config.CheckboxColumn("Activo"),
+                        "fecha_nacimiento":  st.column_config.DateColumn("Fecha Nac.", format="DD/MM/YYYY"),
+                        "dni":               st.column_config.TextColumn("DNI", disabled=True),
+                        "apellido":          st.column_config.TextColumn("Apellido"),
+                        "nombre":            st.column_config.TextColumn("Nombre"),
+                        "grados_divisiones": st.column_config.TextColumn("Grado / Div."),
+                    },
+                    use_container_width=True,
+                    hide_index=True,
+                    key="edit_al_table"
+                )
+
+                if st.button("💾 Guardar cambios en el padrón", use_container_width=True):
+                    with conn.session as s:
+                        for _, r in df_editado_al.iterrows():
+                            s.execute(text("""
+                                UPDATE alumnos
+                                SET apellido=:a, nombre=:n, grados_divisiones=:g,
+                                    fecha_nacimiento=:fn, activo=:ac
+                                WHERE id=:id
+                            """), {
+                                "a":  r['apellido'],
+                                "n":  r['nombre'],
+                                "g":  r['grados_divisiones'],
+                                "fn": r['fecha_nacimiento'],
+                                "ac": r['activo'],
+                                "id": r['id']
+                            })
+                        s.commit()
+                    st.success("✅ Padrón actualizado correctamente.")
+                    st.rerun()
+
+            else:
+                st.info(f"No hay alumnos cargados para {nombre_colegio_al} todavía.")
+
+        except Exception as e:
+            st.error(f"Error en módulo de alumnos: {e}")
