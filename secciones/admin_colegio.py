@@ -328,10 +328,7 @@ def render():
             if archivo_al:
                 df_raw = pd.read_excel(archivo_al)
                 # Normalizar columnas: strip, reemplazar espacios, capitalizar cada segmento
-                df_raw.columns = [
-                    "_".join(p.capitalize() for p in c.strip().replace(" ", "_").split("_"))
-                    for c in df_raw.columns
-                ]
+                df_raw.columns = [c.strip().replace(" ", "_").lower() for c in df_raw.columns]
 
                 cols_alumno = ['Dni', 'Apellido', 'Nombre', 'Grado', 'Division', 'Fecha_nacimiento']
                 cols_tutor1 = ['Tutor1_relacion', 'Tutor1_apellido', 'Tutor1_nombre',
