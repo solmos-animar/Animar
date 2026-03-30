@@ -248,7 +248,7 @@ def render():
                 st.warning("No hay colegios creados.")
         except Exception as e: st.error(f"Error: {e}")
 
-   # --- TAB 4: ALUMNOS + TUTORES ---
+# --- TAB 4: ALUMNOS + TUTORES ---
     with tab4:
         st.markdown('<h3 style="color:#0f2240;">🎒 Gestión de Alumnos y Tutores</h3>', unsafe_allow_html=True)
 
@@ -278,108 +278,101 @@ def render():
 
             with st.expander("Ver formato esperado del archivo", expanded=False):
                 st.markdown("""
-                    <div style="background:#f0f4ff; border-radius:10px; padding:14px 18px; font-size:13px; color:#0f2240; margin-bottom:10px;">
-                        El archivo debe tener los datos del alumno primero, y luego los tutores con prefijo
+                    <div style="background:#f0f4ff; border-radius:10px; padding:14px 18px;
+                                font-size:13px; color:#0f2240; margin-bottom:10px;">
+                        Columnas del alumno primero, luego tutores con prefijo
                         <code>Tutor1_</code>, <code>Tutor2_</code>, <code>Tutor3_</code>.<br>
-                        <strong>Solo Tutor1 es obligatorio.</strong> Los campos de Tutor2 y Tutor3 pueden dejarse vacíos.
+                        <strong>Solo Tutor1 es obligatorio.</strong>
+                        Si un DNI de tutor ya existe en la base, se reutiliza el registro
+                        y solo se crea el vínculo — no se duplica el tutor.
                     </div>
                 """, unsafe_allow_html=True)
-
-                ejemplo = pd.DataFrame([{
+                st.dataframe(pd.DataFrame([{
                     "Dni": "45123456", "Apellido": "García", "Nombre": "Lucía",
-                    "Grado": "4°", "División": "B", "Fecha_nacimiento": "2012-05-14",
-                    "Tutor1_relacion": "Madre", "Tutor1_apellido": "García",
+                    "Grado": "4°", "Division": "B", "Fecha_nacimiento": "2012-05-14",
+                    "Tutor1_relacion": "Madre", "Tutor1_apellido": "Pérez",
                     "Tutor1_nombre": "Ana", "Tutor1_dni": "28456789",
-                    "Tutor1_telefono": "1156781234", "Tutor1_email": "ana@email.com",
+                    "Tutor1_telefono": "1156781234", "Tutor1_email": "ana@mail.com",
                     "Tutor1_principal": "SI",
-                    "Tutor2_relacion": "Padre", "Tutor2_apellido": "López",
+                    "Tutor2_relacion": "Padre", "Tutor2_apellido": "García",
                     "Tutor2_nombre": "Carlos", "Tutor2_dni": "27123456",
-                    "Tutor2_telefono": "1143219876", "Tutor2_email": "carlos@email.com",
+                    "Tutor2_telefono": "1143219876", "Tutor2_email": "carlos@mail.com",
                     "Tutor2_principal": "NO",
-                }])
-                st.dataframe(ejemplo, use_container_width=True, hide_index=True)
-                st.caption("Tutor1_principal y Tutor2_principal: escribir SI o NO. Los campos de Tutor3 siguen el mismo patrón.")
+                }]), use_container_width=True, hide_index=True)
+                st.caption("Tutor1_principal: SI o NO. Tutor3 sigue el mismo patrón. Columna Division sin tilde.")
 
             archivo_al = st.file_uploader(
                 "Subir archivo Excel de alumnos con tutores",
-                type=["xlsx"],
-                key="uploader_alumnos"
+                type=["xlsx"], key="uploader_alumnos"
             )
 
             if archivo_al:
-                df_al_raw = pd.read_excel(archivo_al)
-                # Normalizar columnas
-                df_al_raw.columns = [c.strip().replace(" ", "_") for c in df_al_raw.columns]
-                # Capitalizar solo la primera letra de cada segmento para manejar Tutor1_apellido, etc.
-                def normalizar_col(c):
-                    partes = c.split("_")
-                    return "_".join([p.capitalize() for p in partes])
-                df_al_raw.columns = [normalizar_col(c) for c in df_al_raw.columns]
+                df_raw = pd.read_excel(archivo_al)
+                # Normalizar columnas: strip, reemplazar espacios, capitalizar cada segmento
+                df_raw.columns = [
+                    "_".join(p.capitalize() for p in c.strip().replace(" ", "_").split("_"))
+                    for c in df_raw.columns
+                ]
 
-                cols_alumno = ['Dni', 'Apellido', 'Nombre', 'Grado', 'División', 'Fecha_nacimiento']
+                cols_alumno = ['Dni', 'Apellido', 'Nombre', 'Grado', 'Division', 'Fecha_nacimiento']
                 cols_tutor1 = ['Tutor1_relacion', 'Tutor1_apellido', 'Tutor1_nombre',
                                'Tutor1_dni', 'Tutor1_telefono', 'Tutor1_email', 'Tutor1_principal']
 
-                faltantes_al = [c for c in cols_alumno if c not in df_al_raw.columns]
-                faltantes_t1 = [c for c in cols_tutor1 if c not in df_al_raw.columns]
+                falt_al = [c for c in cols_alumno if c not in df_raw.columns]
+                falt_t1 = [c for c in cols_tutor1 if c not in df_raw.columns]
 
-                if faltantes_al or faltantes_t1:
+                if falt_al or falt_t1:
                     st.error("El Excel no tiene el formato correcto.")
-                    if faltantes_al:
-                        st.warning(f"Columnas de alumno faltantes: `{faltantes_al}`")
-                    if faltantes_t1:
-                        st.warning(f"Columnas de Tutor1 faltantes: `{faltantes_t1}`")
+                    if falt_al: st.warning(f"Columnas de alumno faltantes: `{falt_al}`")
+                    if falt_t1: st.warning(f"Columnas de Tutor1 faltantes: `{falt_t1}`")
                 else:
-                    df_al_raw['Grados_y_div'] = (
-                        df_al_raw['Grado'].astype(str) + " " + df_al_raw['División'].astype(str)
-                    )
-                    df_al_raw['Fecha_nacimiento'] = pd.to_datetime(
-                        df_al_raw['Fecha_nacimiento'], dayfirst=True, errors='coerce'
+                    df_raw['Grados_y_div'] = df_raw['Grado'].astype(str) + " " + df_raw['Division'].astype(str)
+                    df_raw['Fecha_nacimiento'] = pd.to_datetime(
+                        df_raw['Fecha_nacimiento'], dayfirst=True, errors='coerce'
                     ).dt.date
 
-                    fechas_invalidas = df_al_raw['Fecha_nacimiento'].isna().sum()
-                    sin_tutor = df_al_raw['Tutor1_dni'].isna().sum()
+                    fechas_mal = df_raw['Fecha_nacimiento'].isna().sum()
+                    sin_tutor1 = df_raw['Tutor1_dni'].isna().sum()
 
-                    st.markdown("**📋 Vista previa (primeras 5 filas):**")
+                    st.markdown("**📋 Vista previa:**")
                     st.dataframe(
-                        df_al_raw[['Dni', 'Apellido', 'Nombre', 'Grados_y_div',
-                                   'Fecha_nacimiento', 'Tutor1_nombre', 'Tutor1_apellido']].head(5),
+                        df_raw[['Dni','Apellido','Nombre','Grados_y_div',
+                                'Fecha_nacimiento','Tutor1_nombre','Tutor1_apellido']].head(5),
                         use_container_width=True, hide_index=True
                     )
 
                     c1, c2, c3, c4 = st.columns(4)
-                    c1.metric("Total alumnos", len(df_al_raw))
+                    c1.metric("Total alumnos", len(df_raw))
                     c2.metric("Colegio destino", nombre_colegio_al)
-                    c3.metric("Fechas con error", fechas_invalidas,
-                              delta=None if fechas_invalidas == 0 else "se guardan como nulas",
-                              delta_color="off" if fechas_invalidas == 0 else "inverse")
-                    c4.metric("Sin Tutor1", sin_tutor,
-                              delta=None if sin_tutor == 0 else "filas serán rechazadas",
-                              delta_color="off" if sin_tutor == 0 else "inverse")
+                    c3.metric("Fechas con error", fechas_mal,
+                              delta=None if fechas_mal == 0 else "se guardan como nulas",
+                              delta_color="off" if fechas_mal == 0 else "inverse")
+                    c4.metric("Sin Tutor1", sin_tutor1,
+                              delta=None if sin_tutor1 == 0 else "filas serán rechazadas",
+                              delta_color="off" if sin_tutor1 == 0 else "inverse")
 
-                    if sin_tutor > 0:
-                        st.error(f"❌ {sin_tutor} filas no tienen Tutor1 y serán omitidas. Corregí el Excel antes de continuar.")
+                    if sin_tutor1 > 0:
+                        st.error(f"❌ {sin_tutor1} filas no tienen Tutor1. Corregí el Excel antes de continuar.")
                     else:
                         st.warning(
-                            f"⚠️ Estás por cargar **{len(df_al_raw)} alumnos** con sus tutores "
-                            f"al colegio **{nombre_colegio_al}**. Si un DNI ya existe se actualizarán sus datos."
+                            f"⚠️ Estás por cargar **{len(df_raw)} alumnos** con sus tutores "
+                            f"a **{nombre_colegio_al}**. Si un DNI ya existe se actualizan sus datos."
                         )
-
                         if st.button("🚀 Confirmar y Guardar", type="primary", use_container_width=True):
                             exitos, errores = 0, 0
-                            PREFIJOS_TUTOR = ["Tutor1", "Tutor2", "Tutor3"]
+                            PREFIJOS = ["Tutor1", "Tutor2", "Tutor3"]
 
                             with conn.session as s:
-                                for _, row in df_al_raw.iterrows():
+                                for _, row in df_raw.iterrows():
                                     try:
-                                        # Insertar alumno
-                                        res_ins = s.execute(text("""
+                                        # 1. Upsert alumno
+                                        res_al = s.execute(text("""
                                             INSERT INTO alumnos
-                                                (colegio_id, dni, apellido, nombre, grados_divisiones, fecha_nacimiento)
+                                                (colegio_id, dni, apellido, nombre, grado, fecha_nacimiento)
                                             VALUES (:cid, :dni, :ape, :nom, :gd, :fn)
                                             ON CONFLICT (dni) DO UPDATE SET
                                                 apellido=EXCLUDED.apellido, nombre=EXCLUDED.nombre,
-                                                grados_divisiones=EXCLUDED.grados_divisiones,
+                                                grado=EXCLUDED.grado,
                                                 fecha_nacimiento=EXCLUDED.fecha_nacimiento
                                             RETURNING id
                                         """), {
@@ -390,49 +383,62 @@ def render():
                                             "gd":  str(row['Grados_y_div']),
                                             "fn":  row['Fecha_nacimiento'] if pd.notna(row.get('Fecha_nacimiento')) else None,
                                         })
-                                        alumno_id = res_ins.fetchone()[0]
+                                        alumno_id = res_al.fetchone()[0]
 
-                                        # Borrar tutores previos del alumno para re-insertar limpios
-                                        s.execute(text("DELETE FROM tutores WHERE alumno_id = :aid"), {"aid": alumno_id})
-
-                                        # Insertar tutores
-                                        for pref in PREFIJOS_TUTOR:
+                                        for pref in PREFIJOS:
                                             col_dni_t = f"{pref}_dni"
-                                            if col_dni_t not in df_al_raw.columns:
+                                            if col_dni_t not in df_raw.columns:
                                                 continue
                                             dni_t = row.get(col_dni_t)
                                             if pd.isna(dni_t) or str(dni_t).strip() == "":
                                                 continue
+
+                                            # 2. Upsert tutor (por DNI)
+                                            res_t = s.execute(text("""
+                                                INSERT INTO tutores (nombre, apellido, dni, email, telefono)
+                                                VALUES (:nom, :ape, :dni, :email, :tel)
+                                                ON CONFLICT (dni) DO UPDATE SET
+                                                    nombre=EXCLUDED.nombre, apellido=EXCLUDED.apellido,
+                                                    email=EXCLUDED.email, telefono=EXCLUDED.telefono
+                                                RETURNING id
+                                            """), {
+                                                "nom":   str(row.get(f"{pref}_nombre", "")).strip().capitalize(),
+                                                "ape":   str(row.get(f"{pref}_apellido", "")).strip().capitalize(),
+                                                "dni":   str(dni_t).strip(),
+                                                "email": str(row.get(f"{pref}_email", "")).strip().lower(),
+                                                "tel":   str(row.get(f"{pref}_telefono", "")).strip(),
+                                            })
+                                            tutor_id = res_t.fetchone()[0]
+
+                                            # 3. Upsert vínculo en pivot
                                             principal_raw = str(row.get(f"{pref}_principal", "NO")).strip().upper()
                                             s.execute(text("""
-                                                INSERT INTO tutores
-                                                    (alumno_id, relacion, apellido, nombre, dni, telefono, email, es_principal)
-                                                VALUES
-                                                    (:aid, :rel, :ape, :nom, :dni, :tel, :email, :esp)
+                                                INSERT INTO alumno_tutores
+                                                    (alumno_id, tutor_id, relacion, es_principal)
+                                                VALUES (:aid, :tid, :rel, :esp)
+                                                ON CONFLICT (alumno_id, tutor_id) DO UPDATE SET
+                                                    relacion=EXCLUDED.relacion,
+                                                    es_principal=EXCLUDED.es_principal
                                             """), {
-                                                "aid":   alumno_id,
-                                                "rel":   str(row.get(f"{pref}_relacion", "")).strip().capitalize(),
-                                                "ape":   str(row.get(f"{pref}_apellido", "")).strip().capitalize(),
-                                                "nom":   str(row.get(f"{pref}_nombre", "")).strip().capitalize(),
-                                                "dni":   str(dni_t).strip(),
-                                                "tel":   str(row.get(f"{pref}_telefono", "")).strip(),
-                                                "email": str(row.get(f"{pref}_email", "")).strip().lower(),
-                                                "esp":   principal_raw == "SI",
+                                                "aid": alumno_id,
+                                                "tid": tutor_id,
+                                                "rel": str(row.get(f"{pref}_relacion", "")).strip().capitalize(),
+                                                "esp": principal_raw == "SI",
                                             })
                                         exitos += 1
                                     except Exception as e:
                                         errores += 1
-                                        st.error(f"Error en DNI {row.get('Dni', '?')}: {e}")
+                                        st.error(f"Error en DNI {row.get('Dni','?')}: {e}")
                                 s.commit()
 
                             if exitos:
-                                st.success(f"✅ Se procesaron **{exitos} alumnos** con sus tutores en {nombre_colegio_al}.")
+                                st.success(f"✅ Se procesaron **{exitos} alumnos** en {nombre_colegio_al}.")
                             if errores:
                                 st.error(f"❌ {errores} filas tuvieron errores.")
                             st.rerun()
 
             # ================================================================
-            # BLOQUE 2 — FORMULARIO INDIVIDUAL CON TUTORES
+            # BLOQUE 2 — FORMULARIO INDIVIDUAL
             # ================================================================
             st.markdown("---")
 
@@ -451,16 +457,15 @@ def render():
                     </div>
                 """, unsafe_allow_html=True)
 
-                # Usamos session_state para manejar la cantidad de tutores dinámica
                 if "n_tutores" not in st.session_state:
                     st.session_state.n_tutores = 1
 
                 with st.form("form_alumno_completo", clear_on_submit=True):
 
-                    # ---- SECCIÓN ALUMNO ----
+                    # ---- ALUMNO ----
                     col_dni, _ = st.columns([1, 2])
-                    dni_al = col_dni.text_input("DNI del alumno *", placeholder="Ej: 45123456", help="Sin puntos ni espacios.")
-
+                    dni_al = col_dni.text_input("DNI del alumno *", placeholder="Ej: 45123456",
+                                                help="Sin puntos ni espacios.")
                     col_ape, col_nom = st.columns(2)
                     apellido_al = col_ape.text_input("Apellido *", placeholder="Ej: Ramírez")
                     nombre_al   = col_nom.text_input("Nombre *",   placeholder="Ej: Valentina")
@@ -475,110 +480,80 @@ def render():
                         format="DD/MM/YYYY"
                     )
 
-                    # ---- SECCIÓN TUTORES ----
+                    # ---- TUTORES ----
                     st.markdown("""
-                        <div style="
-                            margin: 24px 0 14px;
-                            padding: 12px 18px;
+                        <div style="margin: 24px 0 14px; padding: 12px 18px;
                             background: linear-gradient(135deg, #e8f4f0 0%, #f0f9f4 100%);
-                            border-left: 4px solid #1d7a55;
-                            border-radius: 0 10px 10px 0;">
+                            border-left: 4px solid #1d7a55; border-radius: 0 10px 10px 0;">
                             <span style="font-size:13px; color:#0f2240; font-weight:600;">
-                                👨‍👩‍👧 Tutores / Referentes del alumno
+                                👨‍👩‍👧 Tutores / Referentes
                             </span><br>
                             <span style="font-size:12px; color:#5c5852;">
                                 Al menos un tutor es obligatorio. Podés cargar hasta 3.
+                                Si el tutor ya existe en la base (mismo DNI), se reutiliza su registro.
                             </span>
                         </div>
                     """, unsafe_allow_html=True)
 
+                    RELACIONES  = ["Madre", "Padre", "Tutor/a legal", "Abuelo/a", "Otro"]
+                    COLORES     = ["#1d7a55", "#1a56a0", "#d4580a"]
+                    LABELS      = ["Tutor 1 (principal)", "Tutor 2", "Tutor 3"]
                     tutores_data = []
-                    RELACIONES = ["Madre", "Padre", "Tutor/a legal", "Abuelo/a", "Otro"]
 
                     for i in range(st.session_state.n_tutores):
-                        numero = i + 1
-                        color_borde = ["#1d7a55", "#1a56a0", "#d4580a"][i]
-                        label_default = ["Tutor 1 (principal)", "Tutor 2", "Tutor 3"][i]
-
+                        color = COLORES[i]
                         st.markdown(f"""
-                            <div style="
-                                border: 1.5px solid {color_borde}22;
-                                border-left: 4px solid {color_borde};
-                                border-radius: 0 10px 10px 0;
-                                padding: 14px 16px 6px;
-                                margin-bottom: 14px;
-                                background: white;">
+                            <div style="border:1.5px solid {color}22; border-left:4px solid {color};
+                                border-radius:0 10px 10px 0; padding:14px 16px 6px;
+                                margin-bottom:14px; background:white;">
                                 <span style="font-size:12px; font-weight:700;
-                                    text-transform:uppercase; letter-spacing:1px; color:{color_borde};">
-                                    {label_default}
+                                    text-transform:uppercase; letter-spacing:1px; color:{color};">
+                                    {LABELS[i]}
                                 </span>
                             </div>
                         """, unsafe_allow_html=True)
 
-                        t_col1, t_col2 = st.columns([1, 2])
-                        t_relacion = t_col1.selectbox(
-                            f"Relación {numero} *" if numero == 1 else f"Relación {numero}",
-                            RELACIONES, key=f"t{i}_rel"
-                        )
-                        t_principal = t_col2.checkbox(
-                            "Es el contacto principal",
-                            value=(i == 0),
-                            key=f"t{i}_principal"
-                        )
+                        tc1, tc2 = st.columns([1, 2])
+                        t_rel       = tc1.selectbox("Relación *" if i==0 else "Relación",
+                                                    RELACIONES, key=f"t{i}_rel")
+                        t_principal = tc2.checkbox("Es el contacto principal",
+                                                   value=(i == 0), key=f"t{i}_principal")
 
-                        t_c1, t_c2 = st.columns(2)
-                        t_apellido = t_c1.text_input(
-                            f"Apellido {'*' if numero==1 else ''}",
-                            placeholder="Ej: García", key=f"t{i}_ape"
-                        )
-                        t_nombre = t_c2.text_input(
-                            f"Nombre {'*' if numero==1 else ''}",
-                            placeholder="Ej: Ana", key=f"t{i}_nom"
-                        )
+                        ta1, ta2 = st.columns(2)
+                        t_apellido = ta1.text_input("Apellido *" if i==0 else "Apellido",
+                                                    placeholder="Ej: García", key=f"t{i}_ape")
+                        t_nombre   = ta2.text_input("Nombre *"   if i==0 else "Nombre",
+                                                    placeholder="Ej: Ana",    key=f"t{i}_nom")
 
-                        t_c3, t_c4 = st.columns(2)
-                        t_dni = t_c3.text_input(
-                            f"DNI {'*' if numero==1 else ''}",
-                            placeholder="Ej: 28456789", key=f"t{i}_dni"
-                        )
-                        t_tel = t_c4.text_input(
-                            "Teléfono", placeholder="Ej: 1156781234", key=f"t{i}_tel"
-                        )
-
-                        t_email = st.text_input(
-                            "Email", placeholder="Ej: contacto@email.com", key=f"t{i}_email"
-                        )
+                        tb1, tb2 = st.columns(2)
+                        t_dni = tb1.text_input("DNI *" if i==0 else "DNI",
+                                               placeholder="Ej: 28456789", key=f"t{i}_dni")
+                        t_tel = tb2.text_input("Teléfono", placeholder="Ej: 1156781234",
+                                               key=f"t{i}_tel")
+                        t_email = st.text_input("Email", placeholder="Ej: contacto@email.com",
+                                                key=f"t{i}_email")
 
                         tutores_data.append({
-                            "relacion":    t_relacion,
-                            "apellido":    t_apellido,
-                            "nombre":      t_nombre,
-                            "dni":         t_dni,
-                            "telefono":    t_tel,
-                            "email":       t_email,
+                            "relacion": t_rel, "apellido": t_apellido, "nombre": t_nombre,
+                            "dni": t_dni, "telefono": t_tel, "email": t_email,
                             "es_principal": t_principal,
                         })
 
-                    # Botones fuera del loop pero dentro del form
-                    col_btn1, col_btn2 = st.columns([1, 3])
-                    agregar = col_btn1.form_submit_button(
+                    col_add, col_save = st.columns([1, 3])
+                    agregar = col_add.form_submit_button(
                         f"＋ Tutor {st.session_state.n_tutores + 1}",
                         disabled=st.session_state.n_tutores >= 3
                     )
-                    guardar = col_btn2.form_submit_button(
+                    guardar = col_save.form_submit_button(
                         "✅ Guardar Alumno con Tutores",
-                        type="primary",
-                        use_container_width=True
+                        type="primary", use_container_width=True
                     )
 
-                    # Acción: agregar tutor
                     if agregar and st.session_state.n_tutores < 3:
                         st.session_state.n_tutores += 1
                         st.rerun()
 
-                    # Acción: guardar
                     if guardar:
-                        # Validaciones
                         t1 = tutores_data[0]
                         errores_val = []
                         if not dni_al.strip():         errores_val.append("DNI del alumno")
@@ -594,14 +569,14 @@ def render():
                         else:
                             try:
                                 with conn.session as s:
-                                    # Insertar alumno
+                                    # 1. Upsert alumno
                                     res_ins = s.execute(text("""
                                         INSERT INTO alumnos
-                                            (colegio_id, dni, apellido, nombre, grados_divisiones, fecha_nacimiento)
+                                            (colegio_id, dni, apellido, nombre, grado, fecha_nacimiento)
                                         VALUES (:cid, :dni, :ape, :nom, :gd, :fn)
                                         ON CONFLICT (dni) DO UPDATE SET
                                             apellido=EXCLUDED.apellido, nombre=EXCLUDED.nombre,
-                                            grados_divisiones=EXCLUDED.grados_divisiones,
+                                            grado=EXCLUDED.grado,
                                             fecha_nacimiento=EXCLUDED.fecha_nacimiento
                                         RETURNING id
                                     """), {
@@ -614,35 +589,47 @@ def render():
                                     })
                                     alumno_id = res_ins.fetchone()[0]
 
-                                    # Borrar tutores previos y reinsertar
-                                    s.execute(text("DELETE FROM tutores WHERE alumno_id = :aid"), {"aid": alumno_id})
-
                                     for t in tutores_data:
                                         if not t['dni'].strip():
                                             continue
-                                        s.execute(text("""
-                                            INSERT INTO tutores
-                                                (alumno_id, relacion, apellido, nombre, dni,
-                                                 telefono, email, es_principal)
-                                            VALUES
-                                                (:aid, :rel, :ape, :nom, :dni,
-                                                 :tel, :email, :esp)
+                                        # 2. Upsert tutor por DNI
+                                        res_t = s.execute(text("""
+                                            INSERT INTO tutores (nombre, apellido, dni, email, telefono)
+                                            VALUES (:nom, :ape, :dni, :email, :tel)
+                                            ON CONFLICT (dni) DO UPDATE SET
+                                                nombre=EXCLUDED.nombre, apellido=EXCLUDED.apellido,
+                                                email=EXCLUDED.email, telefono=EXCLUDED.telefono
+                                            RETURNING id
                                         """), {
-                                            "aid":   alumno_id,
-                                            "rel":   t['relacion'],
-                                            "ape":   t['apellido'].strip().capitalize(),
                                             "nom":   t['nombre'].strip().capitalize(),
+                                            "ape":   t['apellido'].strip().capitalize(),
                                             "dni":   t['dni'].strip(),
-                                            "tel":   t['telefono'].strip(),
                                             "email": t['email'].strip().lower(),
-                                            "esp":   t['es_principal'],
+                                            "tel":   t['telefono'].strip(),
+                                        })
+                                        tutor_id = res_t.fetchone()[0]
+
+                                        # 3. Upsert vínculo pivot
+                                        s.execute(text("""
+                                            INSERT INTO alumno_tutores
+                                                (alumno_id, tutor_id, relacion, es_principal)
+                                            VALUES (:aid, :tid, :rel, :esp)
+                                            ON CONFLICT (alumno_id, tutor_id) DO UPDATE SET
+                                                relacion=EXCLUDED.relacion,
+                                                es_principal=EXCLUDED.es_principal
+                                        """), {
+                                            "aid": alumno_id,
+                                            "tid": tutor_id,
+                                            "rel": t['relacion'],
+                                            "esp": t['es_principal'],
                                         })
                                     s.commit()
 
+                                cant_t = len([t for t in tutores_data if t['dni'].strip()])
                                 st.success(
                                     f"✅ **{apellido_al.capitalize()}, {nombre_al.capitalize()}** "
                                     f"guardado/a en **{nombre_colegio_al}** — {grado_al} {division_al} "
-                                    f"con {len([t for t in tutores_data if t['dni'].strip()])} tutor/es."
+                                    f"con {cant_t} tutor/es."
                                 )
                                 st.session_state.n_tutores = 1
                                 st.rerun()
@@ -651,74 +638,77 @@ def render():
                                 st.error(f"Error al guardar: {e}")
 
             # ================================================================
-            # BLOQUE 3 — PADRÓN CON DETALLE DE TUTORES
+            # BLOQUE 3 — PADRÓN
             # ================================================================
             st.markdown("---")
             st.subheader(f"📊 Padrón: {nombre_colegio_al}")
 
             with conn.session as s:
-                res_al = s.execute(text("""
+                res_padron = s.execute(text("""
                     SELECT
-                        a.id, a.dni, a.apellido, a.nombre,
-                        a.grados_divisiones, a.fecha_nacimiento, a.activo,
-                        COUNT(t.id) AS cant_tutores,
+                        a.id,
+                        a.dni,
+                        a.apellido,
+                        a.nombre,
+                        a.grado,
+                        a.fecha_nacimiento,
+                        a.activo,
+                        COUNT(at2.tutor_id)  AS cant_tutores,
                         STRING_AGG(
-                            t.relacion || ': ' || t.apellido || ' ' || t.nombre ||
-                            CASE WHEN t.es_principal THEN ' ★' ELSE '' END,
-                            ' | ' ORDER BY t.es_principal DESC
+                            at2.relacion || ': ' || t.apellido || ' ' || t.nombre ||
+                            CASE WHEN at2.es_principal THEN ' ★' ELSE '' END,
+                            ' | '
+                            ORDER BY at2.es_principal DESC
                         ) AS tutores_resumen
                     FROM alumnos a
-                    LEFT JOIN tutores t ON t.alumno_id = a.id
+                    LEFT JOIN alumno_tutores at2 ON at2.alumno_id = a.id
+                    LEFT JOIN tutores t          ON t.id = at2.tutor_id
                     WHERE a.colegio_id = :cid
                     GROUP BY a.id, a.dni, a.apellido, a.nombre,
-                             a.grados_divisiones, a.fecha_nacimiento, a.activo
-                    ORDER BY a.grados_divisiones, a.apellido
+                             a.grado, a.fecha_nacimiento, a.activo
+                    ORDER BY a.grado, a.apellido
                 """), {"cid": colegio_al})
-                df_alumnos = pd.DataFrame(res_al.fetchall(), columns=res_al.keys())
+                df_padron = pd.DataFrame(res_padron.fetchall(), columns=res_padron.keys())
 
-            if not df_alumnos.empty:
-                opciones_grado = ["Todos"] + sorted(df_alumnos['grados_divisiones'].dropna().unique().tolist())
+            if not df_padron.empty:
+                opciones_grado = ["Todos"] + sorted(df_padron['grado'].dropna().unique().tolist())
                 col_f1, col_f2, col_f3 = st.columns([2, 2, 3])
                 filtro_grado = col_f1.selectbox("Filtrar por grado", opciones_grado, key="filtro_grado_al")
 
-                # Alerta de alumnos sin tutores
-                sin_tutores = (df_alumnos['cant_tutores'] == 0).sum()
-                if sin_tutores > 0:
+                sin_tutor = (df_padron['cant_tutores'] == 0).sum()
+                if sin_tutor > 0:
                     col_f2.markdown(
                         f"<div style='padding-top:26px;'>"
-                        f"<span style='background:#fde8d0; color:#6b3000; padding:4px 10px; "
+                        f"<span style='background:#fde8d0; color:#6b3000; padding:4px 10px;"
                         f"border-radius:20px; font-size:12px; font-weight:600;'>"
-                        f"⚠️ {sin_tutores} sin tutor</span></div>",
+                        f"⚠️ {sin_tutor} sin tutor</span></div>",
                         unsafe_allow_html=True
                     )
                 col_f3.markdown(
                     f"<div style='padding-top:28px; font-size:13px; color:#5c5852;'>"
-                    f"Total: <strong>{len(df_alumnos)}</strong> alumnos registrados</div>",
+                    f"Total: <strong>{len(df_padron)}</strong> alumnos</div>",
                     unsafe_allow_html=True
                 )
 
-                df_vista = df_alumnos if filtro_grado == "Todos" \
-                    else df_alumnos[df_alumnos['grados_divisiones'] == filtro_grado]
+                df_vista = df_padron if filtro_grado == "Todos" \
+                    else df_padron[df_padron['grado'] == filtro_grado]
 
                 st.dataframe(
-                    df_vista[[
-                        'dni', 'apellido', 'nombre', 'grados_divisiones',
-                        'fecha_nacimiento', 'cant_tutores', 'tutores_resumen', 'activo'
-                    ]],
+                    df_vista[['dni','apellido','nombre','grado',
+                              'fecha_nacimiento','cant_tutores','tutores_resumen','activo']],
                     column_config={
-                        "dni":               st.column_config.TextColumn("DNI"),
-                        "apellido":          st.column_config.TextColumn("Apellido"),
-                        "nombre":            st.column_config.TextColumn("Nombre"),
-                        "grados_divisiones": st.column_config.TextColumn("Grado / Div."),
-                        "fecha_nacimiento":  st.column_config.DateColumn("Fecha Nac.", format="DD/MM/YYYY"),
-                        "cant_tutores":      st.column_config.NumberColumn("# Tutores", format="%d"),
-                        "tutores_resumen":   st.column_config.TextColumn("Tutores (★ = principal)", width="large"),
-                        "activo":            st.column_config.CheckboxColumn("Activo"),
+                        "dni":             st.column_config.TextColumn("DNI"),
+                        "apellido":        st.column_config.TextColumn("Apellido"),
+                        "nombre":          st.column_config.TextColumn("Nombre"),
+                        "grado":           st.column_config.TextColumn("Grado / Div."),
+                        "fecha_nacimiento":st.column_config.DateColumn("Fecha Nac.", format="DD/MM/YYYY"),
+                        "cant_tutores":    st.column_config.NumberColumn("# Tutores", format="%d"),
+                        "tutores_resumen": st.column_config.TextColumn("Tutores (★ = principal)", width="large"),
+                        "activo":          st.column_config.CheckboxColumn("Activo"),
                     },
                     use_container_width=True,
                     hide_index=True,
                 )
-
             else:
                 st.info(f"No hay alumnos cargados para {nombre_colegio_al} todavía.")
 
