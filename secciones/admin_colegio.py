@@ -1,3 +1,202 @@
+# Agregar esto dentro de admin_colegio.py, como una nueva tab "👤 Usuarios"
+# Importar al inicio del archivo:
+# from utilidades.auth import crear_usuario, hash_password, cambiar_password
+
+import streamlit as st
+import pandas as pd
+from sqlalchemy import text
+from utilidades.auth import crear_usuario, cambiar_password, require_login
+
+def render_tab_usuarios(conn):
+    """Tab de gestión de usuarios. Llamar desde admin_colegio.py"""
+
+    require_login("admin")
+
+    st.markdown('<h3 style="color:#0f2240;">👤 Gestión de Usuarios</h3>', unsafe_allow_html=True)
+
+    ROLES = ["animar_admin", "animar_moderador", "directivo", "docente", "alumno", "tutor"]
+    ROLES_LABELS = {
+        "animar_admin":     "⚙️ Admin Animar",
+        "animar_moderador": "🛡️ Moderador Animar",
+        "directivo":        "🏢 Directivo",
+        "docente":          "👨‍🏫 Docente",
+        "alumno":           "🎒 Alumno",
+        "tutor":            "👨‍👩‍👧 Tutor",
+    }
+
+    # ---- CREAR USUARIO ----
+    with st.expander("➕ Crear nuevo usuario", expanded=False):
+        st.markdown("""
+            <div style="background:linear-gradient(135deg,#f0f4ff 0%,#e8f4f0 100%);
+                border-left:4px solid #1a56a0; border-radius:0 12px 12px 0;
+                padding:14px 18px 8px; margin-bottom:18px;">
+                <span style="font-size:13px; color:#0f2240; font-weight:600;">
+                    📋 Nuevo acceso al sistema
+                </span><br>
+                <span style="font-size:12px; color:#5c5852;">
+                    La contraseña se hashea antes de guardarse. El usuario deberá cambiarla en su primer ingreso.
+                </span>
+            </div>
+        """, unsafe_allow_html=True)
+
+        with st.form("form_crear_usuario", clear_on_submit=True):
+            col1, col2 = st.columns(2)
+            nuevo_email = col1.text_input("Email *", placeholder="usuario@colegio.edu.ar")
+            nuevo_rol   = col2.selectbox("Rol *", options=ROLES,
+                                         format_func=lambda x: ROLES_LABELS[x])
+
+            col3, col4 = st.columns(2)
+            nueva_pass  = col3.text_input("Contraseña *", type="password",
+                                          placeholder="Mínimo 8 caracteres",
+                                          help="El usuario podrá cambiarla después.")
+            nueva_pass2 = col4.text_input("Confirmar contraseña *", type="password",
+                                          placeholder="Repetir contraseña")
+
+            # Colegio (opcional para roles Animar)
+            try:
+                with conn.session as s:
+                    res = s.execute(text("SELECT id, nombre FROM colegios ORDER BY nombre"))
+                    df_cols = pd.DataFrame(res.fetchall(), columns=res.keys())
+                opciones_col = [None] + df_cols['id'].tolist()
+                colegio_sel = st.selectbox(
+                    "Colegio asociado (obligatorio para directivo/docente/alumno/tutor)",
+                    options=opciones_col,
+                    format_func=lambda x: "— Sin colegio —" if x is None
+                                else df_cols[df_cols['id']==x]['nombre'].iloc[0]
+                )
+            except Exception:
+                colegio_sel = None
+                st.info("No se pudieron cargar los colegios.")
+
+            submitted = st.form_submit_button("✅ Crear Usuario", type="primary",
+                                              use_container_width=True)
+
+            if submitted:
+                errores = []
+                if not nuevo_email.strip():       errores.append("Email")
+                if not nueva_pass:                errores.append("Contraseña")
+                if nueva_pass != nueva_pass2:     errores.append("Las contraseñas no coinciden")
+                if len(nueva_pass or "") < 8:     errores.append("La contraseña debe tener al menos 8 caracteres")
+                if nuevo_rol not in ["animar_admin","animar_moderador"] and not colegio_sel:
+                    errores.append("Colegio obligatorio para ese rol")
+
+                if errores:
+                    st.warning(f"⚠️ {' · '.join(errores)}")
+                else:
+                    ok, msg = crear_usuario(
+                        conn,
+                        email=nuevo_email,
+                        password=nueva_pass,
+                        rol=nuevo_rol,
+                        colegio_id=colegio_sel,
+                    )
+                    if ok:
+                        st.success(f"✅ {msg} ({ROLES_LABELS[nuevo_rol]} — {nuevo_email})")
+                        st.rerun()
+                    else:
+                        st.error(f"❌ {msg}")
+
+    st.markdown("---")
+
+    # ---- LISTADO Y GESTIÓN ----
+    st.subheader("Usuarios del sistema")
+
+    col_f1, col_f2 = st.columns([2, 2])
+    filtro_rol    = col_f1.selectbox("Filtrar por rol", ["Todos"] + ROLES,
+                                     format_func=lambda x: "Todos" if x=="Todos" else ROLES_LABELS[x])
+    filtro_activo = col_f2.selectbox("Estado", ["Todos", "Activos", "Inactivos"])
+
+    try:
+        with conn.session as s:
+            res = s.execute(text("""
+                SELECT u.id, u.email, u.rol, u.activo, u.creado_en,
+                       c.nombre AS colegio
+                FROM usuarios u
+                LEFT JOIN colegios c ON c.id = u.colegio_id
+                ORDER BY u.creado_en DESC
+            """))
+            df_u = pd.DataFrame(res.fetchall(), columns=res.keys())
+
+        if not df_u.empty:
+            # Filtros
+            if filtro_rol != "Todos":
+                df_u = df_u[df_u['rol'] == filtro_rol]
+            if filtro_activo == "Activos":
+                df_u = df_u[df_u['activo'] == True]
+            elif filtro_activo == "Inactivos":
+                df_u = df_u[df_u['activo'] == False]
+
+            df_u['creado_en'] = pd.to_datetime(df_u['creado_en']).dt.date
+            df_u['rol_label'] = df_u['rol'].map(ROLES_LABELS)
+
+            st.markdown(f"<div style='font-size:13px; color:#5c5852; margin-bottom:8px;'>Total: <strong>{len(df_u)}</strong> usuarios</div>", unsafe_allow_html=True)
+
+            df_editado = st.data_editor(
+                df_u[['id','email','rol_label','colegio','activo','creado_en']],
+                column_config={
+                    "id":         None,
+                    "email":      st.column_config.TextColumn("Email", disabled=True),
+                    "rol_label":  st.column_config.TextColumn("Rol", disabled=True),
+                    "colegio":    st.column_config.TextColumn("Colegio", disabled=True),
+                    "activo":     st.column_config.CheckboxColumn("Activo"),
+                    "creado_en":  st.column_config.DateColumn("Alta", format="DD/MM/YYYY", disabled=True),
+                },
+                use_container_width=True,
+                hide_index=True,
+                key="edit_usuarios_table"
+            )
+
+            col_g1, col_g2 = st.columns([2, 3])
+
+            # Guardar cambios de estado activo
+            if col_g1.button("💾 Guardar cambios de estado", use_container_width=True):
+                with conn.session as s:
+                    for i, r in df_editado.iterrows():
+                        uid = df_u.iloc[i]['id']
+                        s.execute(text("UPDATE usuarios SET activo=:a WHERE id=:id"),
+                                  {"a": r['activo'], "id": uid})
+                    s.commit()
+                st.success("✅ Estados actualizados.")
+                st.rerun()
+
+        else:
+            st.info("No hay usuarios creados todavía.")
+
+    except Exception as e:
+        st.error(f"Error al cargar usuarios: {e}")
+
+    # ---- CAMBIAR CONTRASEÑA ----
+    st.markdown("---")
+    with st.expander("🔑 Cambiar contraseña de un usuario", expanded=False):
+        with st.form("form_cambiar_pass", clear_on_submit=True):
+            email_reset = st.text_input("Email del usuario", placeholder="usuario@colegio.edu.ar")
+            col_p1, col_p2 = st.columns(2)
+            nueva_p1 = col_p1.text_input("Nueva contraseña", type="password")
+            nueva_p2 = col_p2.text_input("Confirmar", type="password")
+
+            if st.form_submit_button("🔑 Cambiar contraseña", type="primary", use_container_width=True):
+                if nueva_p1 != nueva_p2:
+                    st.warning("Las contraseñas no coinciden.")
+                elif len(nueva_p1) < 8:
+                    st.warning("Mínimo 8 caracteres.")
+                else:
+                    try:
+                        with conn.session as s:
+                            res = s.execute(text("SELECT id FROM usuarios WHERE email=:e"),
+                                            {"e": email_reset.strip().lower()})
+                            row = res.fetchone()
+                        if not row:
+                            st.error("No se encontró ese email.")
+                        else:
+                            ok, msg = cambiar_password(conn, row[0], nueva_p1)
+                            if ok:
+                                st.success(f"✅ {msg}")
+                            else:
+                                st.error(msg)
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+
+
 import streamlit as st
 import pandas as pd
 from sqlalchemy import text
