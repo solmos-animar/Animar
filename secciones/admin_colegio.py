@@ -7,7 +7,7 @@ conn = st.connection("postgresql", type="sql")
 def render():
     st.markdown('<h2 style="color: #0f2240;">🛡️ Administración de Instituciones</h2>', unsafe_allow_html=True)
     
-    tab1, tab2, tab3, tab4 = st.tabs(["🏢 Nuevo Colegio", "👨‍🏫 Docentes", "👪 Tutores", "🎒 Alumnos"])
+    tab1, tab2, tab3 = st.tabs(["🏢 Nuevo Colegio", "👨‍🏫 Docentes", "🎒 Alumnos & Tutores"])
 
      # --- TAB 1: GESTIÓN DE COLEGIO ---
     with tab1:
@@ -268,7 +268,7 @@ def render():
         except Exception as e: st.error(f"Error: {e}")
 
 # --- TAB 4: ALUMNOS + TUTORES ---
-    with tab4:
+    with tab3:
         st.markdown('<h3 style="color:#0f2240;">🎒 Gestión de Alumnos y Tutores</h3>', unsafe_allow_html=True)
 
         try:
