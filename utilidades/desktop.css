@@ -1,33 +1,98 @@
-/* --- SIDEBAR COMPACTO --- */
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
 [data-testid="stSidebar"] {
     background-color: #0f2240 !important;
     width: 260px !important;
 }
 
-/* Reducimos el margen superior del logo */
-.sb-brand {
-    padding: 20px 16px 5px 16px !important;
+[data-testid="stSidebar"] > div:first-child {
+    padding-top: 24px;
 }
 
-/* Ajustamos los botones para que ocupen menos espacio vertical */
-[data-testid="stSidebar"] button {
+/* ---- Botones del sidebar ---- */
+[data-testid="stSidebar"] button[kind="secondary"] {
+    background-color: transparent !important;
+    border: none !important;
+    color: rgba(255, 255, 255, 0.7) !important;
     text-align: left !important;
-    padding: 6px 12px !important; /* Menos alto */
+    padding: 8px 14px !important;
     margin: 1px 0 !important;
-    font-size: 13px !important; /* Un punto más chico para ganar espacio */
-    min-height: 35px !important;
+    font-size: 13.5px !important;
+    font-weight: 400 !important;
+    min-height: 38px !important;
+    border-radius: 8px !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+    box-shadow: none !important;
 }
 
-/* Achicamos el espacio que ocupan los st.divider */
+[data-testid="stSidebar"] button[kind="secondary"]:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+    box-shadow: none !important;
+}
+
+[data-testid="stSidebar"] button[kind="secondary"]:active,
+[data-testid="stSidebar"] button[kind="secondary"]:focus {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    color: white !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Ícono y texto dentro del botón */
+[data-testid="stSidebar"] button[kind="secondary"] p {
+    color: inherit !important;
+    font-size: 13.5px !important;
+    margin: 0 !important;
+    opacity: 1 !important;
+}
+
+/* ---- Dividers ---- */
 [data-testid="stSidebar"] hr {
-    margin: 10px 0 !important;
-    opacity: 0.1;
+    margin: 10px 8px !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    opacity: 1 !important;
 }
 
-/* Ajustamos los títulos de categorías (Institución, Familia...) */
-[data-testid="stSidebar"] p {
-    margin-top: 10px !important;
-    margin-bottom: 5px !important;
+/* ---- Labels de sección (INSTITUCIÓN, FAMILIA, etc.) ---- */
+[data-testid="stSidebar"] .section-label p {
+    color: rgba(255, 255, 255, 0.35) !important;
     font-size: 10px !important;
-    opacity: 0.6;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1.5px !important;
+    margin: 12px 0 4px 6px !important;
+    opacity: 1 !important;
+}
+
+/* ---- Scrollbar del sidebar ---- */
+[data-testid="stSidebar"]::-webkit-scrollbar {
+    width: 4px;
+}
+[data-testid="stSidebar"]::-webkit-scrollbar-track {
+    background: transparent;
+}
+[data-testid="stSidebar"]::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}
+
+/* ============================================================
+   CONTENIDO PRINCIPAL
+   ============================================================ */
+
+.main-content {
+    padding: 24px 32px;
+}
+
+/* Ocultar el header de Streamlit */
+[data-testid="stHeader"] {
+    display: none !important;
+}
+
+/* Toolbar superior */
+[data-testid="stToolbar"] {
+    display: none !important;
 }
