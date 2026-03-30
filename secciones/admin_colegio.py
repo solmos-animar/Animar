@@ -72,6 +72,25 @@ def render():
 
                 # Subida de archivo
                 archivo_doc = st.file_uploader("Subir Excel de Docentes", type=["xlsx"])
+
+                with st.expander("Ver formato esperado del archivo", expanded=False):
+                    st.markdown("""
+                        <div style="background:#f0f4ff; border-radius:10px; padding:14px 18px;
+                                    font-size:13px; color:#0f2240; margin-bottom:10px;">
+                            El archivo Excel debe tener <strong>exactamente estas columnas</strong>.
+                            Los nombres no distinguen mayúsculas ni espacios extra.
+                        </div>
+                    """, unsafe_allow_html=True)
+                    st.dataframe(
+                        pd.DataFrame([
+                            {"Dni": "28456789", "Apellido": "García",  "Nombre": "Lucía",  "Grado": "4°", "División": "B"},
+                            {"Dni": "31234567", "Apellido": "López",   "Nombre": "Mateo",  "Grado": "3°", "División": "A"},
+                            {"Dni": "39876543", "Apellido": "Martínez","Nombre": "Sofía",  "Grado": "4°", "División": "B"},
+                        ]),
+                        use_container_width=True,
+                        hide_index=True
+                    )
+                    st.caption("La columna División lleva tilde. Guardá el archivo como .xlsx antes de subir.")
                 
                 if archivo_doc:
                     df_doc_raw = pd.read_excel(archivo_doc)
