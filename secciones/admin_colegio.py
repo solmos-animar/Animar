@@ -248,6 +248,7 @@ def render():
                 st.warning("No hay colegios creados.")
         except Exception as e: st.error(f"Error: {e}")
 
+    # --- TAB 4: ALUMNOS & TUTORES ---
     # --- TAB 4: ALUMNOS ---
     with tab4:
         st.markdown('<h3 style="color:#0f2240;">🎒 Gestión de Alumnos</h3>', unsafe_allow_html=True)
