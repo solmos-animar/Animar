@@ -120,6 +120,104 @@ def render():
                         st.error(f"El Excel no tiene el formato correcto. Columnas detectadas: {list(df_doc_raw.columns)}")
                         st.info(f"Se esperan exactamente: {columnas_esperadas}")
 
+
+                # --- FORMULARIO CARGA INDIVIDUAL ---
+                st.markdown("---")
+ 
+                with st.expander("➕ Agregar docente manualmente", expanded=False):
+                    st.markdown("""
+                        <div style="
+                            background: linear-gradient(135deg, #f0f4ff 0%, #e8f4f0 100%);
+                            border-left: 4px solid #1a56a0;
+                            border-radius: 0 12px 12px 0;
+                            padding: 14px 18px 6px;
+                            margin-bottom: 18px;
+                        ">
+                            <span style="font-size:13px; color:#0f2240; font-weight:600;">
+                                📋 Carga individual de docente
+                            </span><br>
+                            <span style="font-size:12px; color:#5c5852;">
+                                Completá todos los campos para agregar un docente al colegio seleccionado.
+                            </span>
+                        </div>
+                    """, unsafe_allow_html=True)
+ 
+                    with st.form("form_docente_individual", clear_on_submit=True):
+ 
+                        col_a, col_b = st.columns([1, 2])
+                        with col_a:
+                            dni_ind = st.text_input(
+                                "DNI *",
+                                placeholder="Ej: 28456789",
+                                help="Sin puntos ni espacios."
+                            )
+                        with col_b:
+                            st.empty()  # espacio visual intencional
+ 
+                        col_c, col_d = st.columns(2)
+                        with col_c:
+                            apellido_ind = st.text_input(
+                                "Apellido *",
+                                placeholder="Ej: García"
+                            )
+                        with col_d:
+                            nombre_ind = st.text_input(
+                                "Nombre *",
+                                placeholder="Ej: Lucía"
+                            )
+ 
+                        col_e, col_f = st.columns(2)
+                        with col_e:
+                            grado_ind = st.selectbox(
+                                "Grado *",
+                                options=["1°", "2°", "3°", "4°", "5°", "6°", "7°"],
+                                index=0
+                            )
+                        with col_f:
+                            division_ind = st.selectbox(
+                                "División *",
+                                options=["A", "B", "C", "D", "E"],
+                                index=0
+                            )
+ 
+                        st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+ 
+                        submitted_ind = st.form_submit_button(
+                            "✅ Agregar Docente",
+                            type="primary",
+                            use_container_width=True
+                        )
+ 
+                        if submitted_ind:
+                            if dni_ind and apellido_ind and nombre_ind:
+                                grados_y_div_ind = f"{grado_ind} {division_ind}"
+                                try:
+                                    with conn.session as s:
+                                        s.execute(text("""
+                                            INSERT INTO docentes (colegio_id, dni, apellido, nombre, grados_divisiones)
+                                            VALUES (:cid, :dni, :ape, :nom, :gd)
+                                            ON CONFLICT (dni) DO UPDATE SET
+                                                apellido = EXCLUDED.apellido,
+                                                nombre = EXCLUDED.nombre,
+                                                grados_divisiones = EXCLUDED.grados_divisiones
+                                        """), {
+                                            "cid": col_destino,
+                                            "dni": dni_ind.strip(),
+                                            "ape": apellido_ind.strip().capitalize(),
+                                            "nom": nombre_ind.strip().capitalize(),
+                                            "gd": grados_y_div_ind
+                                        })
+                                        s.commit()
+                                    st.success(
+                                        f"✅ Docente **{apellido_ind.capitalize()}, {nombre_ind.capitalize()}** "
+                                        f"agregado a **{nombre_institucion}** ({grados_y_div_ind})."
+                                    )
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"Error al guardar: {e}")
+                            else:
+                                st.warning("⚠️ Completá todos los campos obligatorios antes de guardar.")
+                
                 # --- TABLA DE EDICIÓN ---
                 st.markdown("---")
                 with conn.session as s:
