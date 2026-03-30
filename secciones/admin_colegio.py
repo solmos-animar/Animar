@@ -9,7 +9,7 @@ def render():
     
     tab1, tab2, tab3 = st.tabs(["🏢 Nuevo Colegio", "👨‍🏫 Docentes", "🎒 Alumnos & Tutores"])
 
-     # --- TAB 1: GESTIÓN DE COLEGIO ---
+    # --- TAB 1: GESTIÓN DE COLEGIO ---
     with tab1:
         st.subheader("Registrar Institución")
         with st.form("form_nuevo_colegio", clear_on_submit=True):
@@ -36,25 +36,22 @@ def render():
                 else:
                     st.warning("Completa los campos obligatorios.")
 
-        # --- VISUALIZACIÓN DE COLEGIOS (Usando Session para evitar error de Hash) ---
         st.markdown("---")
         st.subheader("Colegios Registrados")
         try:
             with conn.session as s:
-                # Ejecutamos la consulta directamente sobre la sesión
                 result = s.execute(text("SELECT nombre, cuit, plan, fecha_alta FROM colegios ORDER BY fecha_alta DESC"))
-                # Construimos el DataFrame con los resultados y las columnas
                 df_colegios = pd.DataFrame(result.fetchall(), columns=result.keys())
             
             if not df_colegios.empty:
-                # Limpiamos la visualización de la fecha
                 df_colegios['fecha_alta'] = pd.to_datetime(df_colegios['fecha_alta']).dt.date
                 st.dataframe(df_colegios, use_container_width=True)
             else:
                 st.info("No hay colegios en la base de datos.")
         except Exception as e:
             st.error(f"Error al cargar la lista: {e}")
-    # --- TAB 2: DOCENTES (CORREGIDA) ---
+
+    # --- TAB 2: DOCENTES ---
     with tab2:
         st.subheader("Gestión de Personal Docente")
         
@@ -70,7 +67,6 @@ def render():
                 
                 nombre_institucion = df_col_list[df_col_list['id']==col_destino]['nombre'].iloc[0]
 
-                # Subida de archivo
                 archivo_doc = st.file_uploader("Subir Excel de Docentes", type=["xlsx"])
 
                 with st.expander("Ver formato esperado del archivo", expanded=False):
@@ -94,20 +90,14 @@ def render():
                 
                 if archivo_doc:
                     df_doc_raw = pd.read_excel(archivo_doc)
-                    
-                    # Normalizamos nombres de columnas para evitar errores de mayúsculas/espacios
                     df_doc_raw.columns = [c.strip().capitalize() for c in df_doc_raw.columns]
                     columnas_esperadas = ['Dni', 'Apellido', 'Nombre', 'Grado', 'División']
                     
-                    # Verificamos si están todas
                     if all(c in df_doc_raw.columns for c in columnas_esperadas):
-                        # Creamos la columna combinada
                         df_doc_raw['Grados_y_div'] = df_doc_raw['Grado'].astype(str) + " " + df_doc_raw['División'].astype(str)
                         
                         st.write("📋 **Vista previa de los datos a importar:**")
                         st.dataframe(df_doc_raw[['Dni', 'Apellido', 'Nombre', 'Grados_y_div']].head(), use_container_width=True)
-
-                        # EL BOTÓN DE GUARDADO DENTRO DE UN WARNING DE CONFIRMACIÓN
                         st.warning(f"⚠️ Estás por cargar estos docentes al colegio: **{nombre_institucion}**")
                         
                         if st.button("🚀 Confirmar y Guardar en Base de Datos", type="primary", use_container_width=True):
@@ -139,10 +129,8 @@ def render():
                         st.error(f"El Excel no tiene el formato correcto. Columnas detectadas: {list(df_doc_raw.columns)}")
                         st.info(f"Se esperan exactamente: {columnas_esperadas}")
 
-
                 # --- FORMULARIO CARGA INDIVIDUAL ---
                 st.markdown("---")
- 
                 with st.expander("➕ Agregar docente manualmente", expanded=False):
                     st.markdown("""
                         <div style="
@@ -160,53 +148,30 @@ def render():
                             </span>
                         </div>
                     """, unsafe_allow_html=True)
- 
+
                     with st.form("form_docente_individual", clear_on_submit=True):
- 
                         col_a, col_b = st.columns([1, 2])
                         with col_a:
-                            dni_ind = st.text_input(
-                                "DNI *",
-                                placeholder="Ej: 28456789",
-                                help="Sin puntos ni espacios."
-                            )
+                            dni_ind = st.text_input("DNI *", placeholder="Ej: 28456789", help="Sin puntos ni espacios.")
                         with col_b:
-                            st.empty()  # espacio visual intencional
- 
+                            st.empty()
+
                         col_c, col_d = st.columns(2)
                         with col_c:
-                            apellido_ind = st.text_input(
-                                "Apellido *",
-                                placeholder="Ej: García"
-                            )
+                            apellido_ind = st.text_input("Apellido *", placeholder="Ej: García")
                         with col_d:
-                            nombre_ind = st.text_input(
-                                "Nombre *",
-                                placeholder="Ej: Lucía"
-                            )
- 
+                            nombre_ind = st.text_input("Nombre *", placeholder="Ej: Lucía")
+
                         col_e, col_f = st.columns(2)
                         with col_e:
-                            grado_ind = st.selectbox(
-                                "Grado *",
-                                options=["1°", "2°", "3°", "4°", "5°", "6°", "7°"],
-                                index=0
-                            )
+                            grado_ind = st.selectbox("Grado *", options=["1°", "2°", "3°", "4°", "5°", "6°", "7°"], index=0)
                         with col_f:
-                            division_ind = st.selectbox(
-                                "División *",
-                                options=["A", "B", "C", "D", "E"],
-                                index=0
-                            )
- 
+                            division_ind = st.selectbox("División *", options=["A", "B", "C", "D", "E"], index=0)
+
                         st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
- 
-                        submitted_ind = st.form_submit_button(
-                            "✅ Agregar Docente",
-                            type="primary",
-                            use_container_width=True
-                        )
- 
+
+                        submitted_ind = st.form_submit_button("✅ Agregar Docente", type="primary", use_container_width=True)
+
                         if submitted_ind:
                             if dni_ind and apellido_ind and nombre_ind:
                                 grados_y_div_ind = f"{grado_ind} {division_ind}"
@@ -236,7 +201,7 @@ def render():
                                     st.error(f"Error al guardar: {e}")
                             else:
                                 st.warning("⚠️ Completá todos los campos obligatorios antes de guardar.")
-                
+
                 # --- TABLA DE EDICIÓN ---
                 st.markdown("---")
                 with conn.session as s:
@@ -245,7 +210,6 @@ def render():
 
                 if not df_docentes.empty:
                     st.subheader(f"Listado de Docentes: {nombre_institucion}")
-                    # Editor dinámico
                     df_editado = st.data_editor(
                         df_docentes,
                         column_config={"activo": st.column_config.CheckboxColumn("Activo"), "id": None},
@@ -253,7 +217,6 @@ def render():
                         use_container_width=True,
                         key="edit_doc_table"
                     )
-                    
                     if st.button("💾 Guardar cambios realizados en la tabla"):
                         with conn.session as s:
                             for _, r in df_editado.iterrows():
@@ -265,9 +228,10 @@ def render():
                         st.rerun()
             else:
                 st.warning("No hay colegios creados.")
-        except Exception as e: st.error(f"Error: {e}")
+        except Exception as e:
+            st.error(f"Error: {e}")
 
-# --- TAB 4: ALUMNOS + TUTORES ---
+    # --- TAB 3: ALUMNOS + TUTORES ---
     with tab3:
         st.markdown('<h3 style="color:#0f2240;">🎒 Gestión de Alumnos y Tutores</h3>', unsafe_allow_html=True)
 
@@ -327,12 +291,13 @@ def render():
 
             if archivo_al:
                 df_raw = pd.read_excel(archivo_al)
-                # Normalizar columnas: strip, reemplazar espacios, capitalizar cada segmento
+
+                # Normalizar columnas: todo lowercase, sin espacios extra
                 df_raw.columns = [c.strip().replace(" ", "_").lower() for c in df_raw.columns]
 
-                cols_alumno = ['Dni', 'Apellido', 'Nombre', 'Grado', 'Division', 'Fecha_nacimiento']
-                cols_tutor1 = ['Tutor1_relacion', 'Tutor1_apellido', 'Tutor1_nombre',
-                               'Tutor1_dni', 'Tutor1_telefono', 'Tutor1_email', 'Tutor1_principal']
+                cols_alumno = ['dni', 'apellido', 'nombre', 'grado', 'division', 'fecha_nacimiento']
+                cols_tutor1 = ['tutor1_relacion', 'tutor1_apellido', 'tutor1_nombre',
+                               'tutor1_dni', 'tutor1_telefono', 'tutor1_email', 'tutor1_principal']
 
                 falt_al = [c for c in cols_alumno if c not in df_raw.columns]
                 falt_t1 = [c for c in cols_tutor1 if c not in df_raw.columns]
@@ -342,18 +307,18 @@ def render():
                     if falt_al: st.warning(f"Columnas de alumno faltantes: `{falt_al}`")
                     if falt_t1: st.warning(f"Columnas de Tutor1 faltantes: `{falt_t1}`")
                 else:
-                    df_raw['Grados_y_div'] = df_raw['Grado'].astype(str) + " " + df_raw['Division'].astype(str)
-                    df_raw['Fecha_nacimiento'] = pd.to_datetime(
-                        df_raw['Fecha_nacimiento'], dayfirst=True, errors='coerce'
+                    df_raw['grados_y_div'] = df_raw['grado'].astype(str) + " " + df_raw['division'].astype(str)
+                    df_raw['fecha_nacimiento'] = pd.to_datetime(
+                        df_raw['fecha_nacimiento'], dayfirst=True, errors='coerce'
                     ).dt.date
 
-                    fechas_mal = df_raw['Fecha_nacimiento'].isna().sum()
-                    sin_tutor1 = df_raw['Tutor1_dni'].isna().sum()
+                    fechas_mal  = df_raw['fecha_nacimiento'].isna().sum()
+                    sin_tutor1  = df_raw['tutor1_dni'].isna().sum()
 
                     st.markdown("**📋 Vista previa:**")
                     st.dataframe(
-                        df_raw[['Dni','Apellido','Nombre','Grados_y_div',
-                                'Fecha_nacimiento','Tutor1_nombre','Tutor1_apellido']].head(5),
+                        df_raw[['dni','apellido','nombre','grados_y_div',
+                                'fecha_nacimiento','tutor1_nombre','tutor1_apellido']].head(5),
                         use_container_width=True, hide_index=True
                     )
 
@@ -376,7 +341,7 @@ def render():
                         )
                         if st.button("🚀 Confirmar y Guardar", type="primary", use_container_width=True):
                             exitos, errores = 0, 0
-                            PREFIJOS = ["Tutor1", "Tutor2", "Tutor3"]
+                            PREFIJOS = ["tutor1", "tutor2", "tutor3"]
 
                             with conn.session as s:
                                 for _, row in df_raw.iterrows():
@@ -387,17 +352,18 @@ def render():
                                                 (colegio_id, dni, apellido, nombre, grado, fecha_nacimiento)
                                             VALUES (:cid, :dni, :ape, :nom, :gd, :fn)
                                             ON CONFLICT (dni) DO UPDATE SET
-                                                apellido=EXCLUDED.apellido, nombre=EXCLUDED.nombre,
+                                                apellido=EXCLUDED.apellido,
+                                                nombre=EXCLUDED.nombre,
                                                 grado=EXCLUDED.grado,
                                                 fecha_nacimiento=EXCLUDED.fecha_nacimiento
                                             RETURNING id
                                         """), {
                                             "cid": colegio_al,
-                                            "dni": str(row['Dni']).strip(),
-                                            "ape": str(row['Apellido']).strip().capitalize(),
-                                            "nom": str(row['Nombre']).strip().capitalize(),
-                                            "gd":  str(row['Grados_y_div']),
-                                            "fn":  row['Fecha_nacimiento'] if pd.notna(row.get('Fecha_nacimiento')) else None,
+                                            "dni": str(row['dni']).strip(),
+                                            "ape": str(row['apellido']).strip().capitalize(),
+                                            "nom": str(row['nombre']).strip().capitalize(),
+                                            "gd":  str(row['grados_y_div']),
+                                            "fn":  row['fecha_nacimiento'] if pd.notna(row.get('fecha_nacimiento')) else None,
                                         })
                                         alumno_id = res_al.fetchone()[0]
 
@@ -409,13 +375,15 @@ def render():
                                             if pd.isna(dni_t) or str(dni_t).strip() == "":
                                                 continue
 
-                                            # 2. Upsert tutor (por DNI)
+                                            # 2. Upsert tutor por DNI
                                             res_t = s.execute(text("""
                                                 INSERT INTO tutores (nombre, apellido, dni, email, telefono)
                                                 VALUES (:nom, :ape, :dni, :email, :tel)
                                                 ON CONFLICT (dni) DO UPDATE SET
-                                                    nombre=EXCLUDED.nombre, apellido=EXCLUDED.apellido,
-                                                    email=EXCLUDED.email, telefono=EXCLUDED.telefono
+                                                    nombre=EXCLUDED.nombre,
+                                                    apellido=EXCLUDED.apellido,
+                                                    email=EXCLUDED.email,
+                                                    telefono=EXCLUDED.telefono
                                                 RETURNING id
                                             """), {
                                                 "nom":   str(row.get(f"{pref}_nombre", "")).strip().capitalize(),
@@ -426,7 +394,7 @@ def render():
                                             })
                                             tutor_id = res_t.fetchone()[0]
 
-                                            # 3. Upsert vínculo en pivot
+                                            # 3. Upsert vínculo pivot
                                             principal_raw = str(row.get(f"{pref}_principal", "NO")).strip().upper()
                                             s.execute(text("""
                                                 INSERT INTO alumno_tutores
@@ -444,7 +412,7 @@ def render():
                                         exitos += 1
                                     except Exception as e:
                                         errores += 1
-                                        st.error(f"Error en DNI {row.get('Dni','?')}: {e}")
+                                        st.error(f"Error en DNI {row.get('dni','?')}: {e}")
                                 s.commit()
 
                             if exitos:
@@ -459,7 +427,6 @@ def render():
             st.markdown("---")
 
             with st.expander("➕ Agregar alumno manualmente", expanded=False):
-
                 st.markdown("""
                     <div style="
                         background: linear-gradient(135deg, #f0f4ff 0%, #fef9f0 100%);
@@ -478,10 +445,8 @@ def render():
 
                 with st.form("form_alumno_completo", clear_on_submit=True):
 
-                    # ---- ALUMNO ----
                     col_dni, _ = st.columns([1, 2])
-                    dni_al = col_dni.text_input("DNI del alumno *", placeholder="Ej: 45123456",
-                                                help="Sin puntos ni espacios.")
+                    dni_al = col_dni.text_input("DNI del alumno *", placeholder="Ej: 45123456", help="Sin puntos ni espacios.")
                     col_ape, col_nom = st.columns(2)
                     apellido_al = col_ape.text_input("Apellido *", placeholder="Ej: Ramírez")
                     nombre_al   = col_nom.text_input("Nombre *",   placeholder="Ej: Valentina")
@@ -496,7 +461,6 @@ def render():
                         format="DD/MM/YYYY"
                     )
 
-                    # ---- TUTORES ----
                     st.markdown("""
                         <div style="margin: 24px 0 14px; padding: 12px 18px;
                             background: linear-gradient(135deg, #e8f4f0 0%, #f0f9f4 100%);
@@ -511,9 +475,9 @@ def render():
                         </div>
                     """, unsafe_allow_html=True)
 
-                    RELACIONES  = ["Madre", "Padre", "Tutor/a legal", "Abuelo/a", "Otro"]
-                    COLORES     = ["#1d7a55", "#1a56a0", "#d4580a"]
-                    LABELS      = ["Tutor 1 (principal)", "Tutor 2", "Tutor 3"]
+                    RELACIONES = ["Madre", "Padre", "Tutor/a legal", "Abuelo/a", "Otro"]
+                    COLORES    = ["#1d7a55", "#1a56a0", "#d4580a"]
+                    LABELS     = ["Tutor 1 (principal)", "Tutor 2", "Tutor 3"]
                     tutores_data = []
 
                     for i in range(st.session_state.n_tutores):
@@ -530,24 +494,17 @@ def render():
                         """, unsafe_allow_html=True)
 
                         tc1, tc2 = st.columns([1, 2])
-                        t_rel       = tc1.selectbox("Relación *" if i==0 else "Relación",
-                                                    RELACIONES, key=f"t{i}_rel")
-                        t_principal = tc2.checkbox("Es el contacto principal",
-                                                   value=(i == 0), key=f"t{i}_principal")
+                        t_rel       = tc1.selectbox("Relación *" if i==0 else "Relación", RELACIONES, key=f"t{i}_rel")
+                        t_principal = tc2.checkbox("Es el contacto principal", value=(i == 0), key=f"t{i}_principal")
 
                         ta1, ta2 = st.columns(2)
-                        t_apellido = ta1.text_input("Apellido *" if i==0 else "Apellido",
-                                                    placeholder="Ej: García", key=f"t{i}_ape")
-                        t_nombre   = ta2.text_input("Nombre *"   if i==0 else "Nombre",
-                                                    placeholder="Ej: Ana",    key=f"t{i}_nom")
+                        t_apellido = ta1.text_input("Apellido *" if i==0 else "Apellido", placeholder="Ej: García", key=f"t{i}_ape")
+                        t_nombre   = ta2.text_input("Nombre *"   if i==0 else "Nombre",   placeholder="Ej: Ana",    key=f"t{i}_nom")
 
                         tb1, tb2 = st.columns(2)
-                        t_dni = tb1.text_input("DNI *" if i==0 else "DNI",
-                                               placeholder="Ej: 28456789", key=f"t{i}_dni")
-                        t_tel = tb2.text_input("Teléfono", placeholder="Ej: 1156781234",
-                                               key=f"t{i}_tel")
-                        t_email = st.text_input("Email", placeholder="Ej: contacto@email.com",
-                                                key=f"t{i}_email")
+                        t_dni = tb1.text_input("DNI *" if i==0 else "DNI", placeholder="Ej: 28456789", key=f"t{i}_dni")
+                        t_tel = tb2.text_input("Teléfono", placeholder="Ej: 1156781234", key=f"t{i}_tel")
+                        t_email = st.text_input("Email", placeholder="Ej: contacto@email.com", key=f"t{i}_email")
 
                         tutores_data.append({
                             "relacion": t_rel, "apellido": t_apellido, "nombre": t_nombre,
@@ -585,7 +542,6 @@ def render():
                         else:
                             try:
                                 with conn.session as s:
-                                    # 1. Upsert alumno
                                     res_ins = s.execute(text("""
                                         INSERT INTO alumnos
                                             (colegio_id, dni, apellido, nombre, grado, fecha_nacimiento)
@@ -608,7 +564,6 @@ def render():
                                     for t in tutores_data:
                                         if not t['dni'].strip():
                                             continue
-                                        # 2. Upsert tutor por DNI
                                         res_t = s.execute(text("""
                                             INSERT INTO tutores (nombre, apellido, dni, email, telefono)
                                             VALUES (:nom, :ape, :dni, :email, :tel)
@@ -625,7 +580,6 @@ def render():
                                         })
                                         tutor_id = res_t.fetchone()[0]
 
-                                        # 3. Upsert vínculo pivot
                                         s.execute(text("""
                                             INSERT INTO alumno_tutores
                                                 (alumno_id, tutor_id, relacion, es_principal)
@@ -669,7 +623,7 @@ def render():
                         a.grado,
                         a.fecha_nacimiento,
                         a.activo,
-                        COUNT(at2.tutor_id)  AS cant_tutores,
+                        COUNT(at2.tutor_id) AS cant_tutores,
                         STRING_AGG(
                             at2.relacion || ': ' || t.apellido || ' ' || t.nombre ||
                             CASE WHEN at2.es_principal THEN ' ★' ELSE '' END,
@@ -713,14 +667,14 @@ def render():
                     df_vista[['dni','apellido','nombre','grado',
                               'fecha_nacimiento','cant_tutores','tutores_resumen','activo']],
                     column_config={
-                        "dni":             st.column_config.TextColumn("DNI"),
-                        "apellido":        st.column_config.TextColumn("Apellido"),
-                        "nombre":          st.column_config.TextColumn("Nombre"),
-                        "grado":           st.column_config.TextColumn("Grado / Div."),
-                        "fecha_nacimiento":st.column_config.DateColumn("Fecha Nac.", format="DD/MM/YYYY"),
-                        "cant_tutores":    st.column_config.NumberColumn("# Tutores", format="%d"),
-                        "tutores_resumen": st.column_config.TextColumn("Tutores (★ = principal)", width="large"),
-                        "activo":          st.column_config.CheckboxColumn("Activo"),
+                        "dni":              st.column_config.TextColumn("DNI"),
+                        "apellido":         st.column_config.TextColumn("Apellido"),
+                        "nombre":           st.column_config.TextColumn("Nombre"),
+                        "grado":            st.column_config.TextColumn("Grado / Div."),
+                        "fecha_nacimiento": st.column_config.DateColumn("Fecha Nac.", format="DD/MM/YYYY"),
+                        "cant_tutores":     st.column_config.NumberColumn("# Tutores", format="%d"),
+                        "tutores_resumen":  st.column_config.TextColumn("Tutores (★ = principal)", width="large"),
+                        "activo":           st.column_config.CheckboxColumn("Activo"),
                     },
                     use_container_width=True,
                     hide_index=True,
