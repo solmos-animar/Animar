@@ -154,6 +154,14 @@ try:
         from secciones.admin_colegio import render
         render()
 
+    elif seccion == "encuesta_docente":
+        from secciones.encuesta_docente import render
+        render()
+
+    elif seccion == "encuesta_alumno":
+        from secciones.encuesta_alumno import render
+        render()
+
     else:
         st.title(f"Sección: {seccion.replace('_', ' ').capitalize()}")
         st.info("Esta pantalla está siendo preparada para el despliegue.")
