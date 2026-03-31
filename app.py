@@ -30,7 +30,6 @@ with st.sidebar:
     st.markdown('<h1 style="color:white; font-size:28px; margin-bottom:0;">ConVivir</h1>', unsafe_allow_html=True)
     st.markdown('<p style="color:rgba(255,255,255,0.4); margin-bottom:20px; font-size:12px;">v1.1 · 2026</p>', unsafe_allow_html=True)
 
-    # Landing siempre visible
     if st.button("📋 Landing", use_container_width=True):
         st.session_state.seccion = "inicio"
         st.rerun()
@@ -98,7 +97,6 @@ with st.sidebar:
             st.rerun()
 
     else:
-        # No logueado
         st.divider()
         if st.button("🔑 Iniciar sesión", use_container_width=True, type="primary"):
             st.session_state.seccion = "login"
@@ -107,7 +105,7 @@ with st.sidebar:
     st.markdown('<br><div style="color:rgba(255,255,255,0.2); font-size:10px; padding-left:6px;">Confidencial · 2026</div>', unsafe_allow_html=True)
 
 # ============================================================
-# GUARD — secciones protegidas
+# GUARD
 # ============================================================
 seccion = st.session_state.seccion
 
@@ -117,12 +115,10 @@ SECCIONES_PROTEGIDAS = [
     "moderador", "admin"
 ]
 
-# Sin login → redirigir a login
 if seccion in SECCIONES_PROTEGIDAS and not is_logged_in():
     st.session_state.seccion = "login"
     seccion = "login"
 
-# Logueado pero sin permiso → error
 if seccion in SECCIONES_PROTEGIDAS and is_logged_in() and not puede_ver(seccion):
     st.error("⛔ No tenés permisos para acceder a esta sección.")
     st.stop()
@@ -146,16 +142,16 @@ try:
         from secciones.direccion import render
         render()
 
-   elif seccion == "alumno":
+    elif seccion == "docente":
+        from secciones.docente import render
+        render()
+
+    elif seccion == "alumno":
         from secciones.alumno import render
         render()
 
     elif seccion == "admin":
         from secciones.admin_colegio import render
-        render()
-
-    elif seccion == "docente":
-        from secciones.docente import render
         render()
 
     else:
