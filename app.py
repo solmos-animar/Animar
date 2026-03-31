@@ -146,9 +146,9 @@ try:
         from secciones.direccion import render
         render()
 
-    elif seccion == "alumno":
-        from secciones.estudiantes import render
-        render()
+   elif seccion == "alumno":
+    from secciones.alumno import render
+    render()
 
     elif seccion == "admin":
         from secciones.admin_colegio import render
