@@ -169,6 +169,9 @@ def render():
         else:
             st.info(f"No hay alumnos en {grado_sel}.")
 
+    from utilidades.cambiar_pass_widget import render_cambiar_password
+    render_cambiar_password()  # ← mismo nivel, sin indentación extra
+
     # ================================================================
     # TAB 2 — ENCUESTA Y SOCIOGRAMA
     # ================================================================
