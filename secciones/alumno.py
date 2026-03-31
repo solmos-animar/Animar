@@ -461,8 +461,7 @@ def _mis_datos(alumno, edad):
     """, unsafe_allow_html=True)
 
     from utilidades.cambiar_pass_widget import render_cambiar_password
-    # Al final de cada tab de perfil o en la sección "Mis datos":
-        render_cambiar_password()
+    render_cambiar_password()  # ← mismo nivel, sin indentación extra
 
 
 
