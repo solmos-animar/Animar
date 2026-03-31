@@ -1,8 +1,7 @@
 # app.py
 import streamlit as st
 from utilidades.auth import (
-    is_logged_in, get_rol, get_session, logout,
-    puede_ver, SECCIONES_POR_ROL
+    is_logged_in, get_rol, get_session, logout, puede_ver
 )
 
 # 1. Configuración de página
@@ -36,16 +35,14 @@ with st.sidebar:
         st.session_state.seccion = "inicio"
         st.rerun()
 
-    # ---- Secciones según rol ----
     if is_logged_in():
         usuario = get_session()
-        rol = get_rol()
+        rol     = get_rol()
 
         st.divider()
 
         # --- INSTITUCIÓN ---
-        mostrar_inst = any(puede_ver(s) for s in ["direccion", "docente", "alumno"])
-        if mostrar_inst:
+        if any(puede_ver(s) for s in ["direccion", "docente", "alumno"]):
             st.markdown('<p style="color:rgba(255,255,255,0.4); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-left:6px; margin-bottom:4px;">Institución</p>', unsafe_allow_html=True)
             if puede_ver("direccion"):
                 if st.button("🏢 Dirección", use_container_width=True):
@@ -61,8 +58,7 @@ with st.sidebar:
                     st.rerun()
 
         # --- FAMILIA ---
-        mostrar_fam = any(puede_ver(s) for s in ["familia", "alumno_familia"])
-        if mostrar_fam:
+        if any(puede_ver(s) for s in ["familia", "alumno_familia"]):
             st.divider()
             st.markdown('<p style="color:rgba(255,255,255,0.4); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-left:6px; margin-bottom:4px;">Familia</p>', unsafe_allow_html=True)
             if puede_ver("familia"):
@@ -75,8 +71,7 @@ with st.sidebar:
                     st.rerun()
 
         # --- ANIMAR ---
-        mostrar_animar = any(puede_ver(s) for s in ["moderador", "admin"])
-        if mostrar_animar:
+        if any(puede_ver(s) for s in ["moderador", "admin"]):
             st.divider()
             st.markdown('<p style="color:rgba(255,255,255,0.4); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-left:6px; margin-bottom:4px;">Animar</p>', unsafe_allow_html=True)
             if puede_ver("moderador"):
@@ -88,11 +83,11 @@ with st.sidebar:
                     st.session_state.seccion = "admin"
                     st.rerun()
 
-        # ---- Usuario logueado + logout ----
+        # --- Usuario + logout ---
         st.divider()
         st.markdown(
-            f'<div style="padding: 0 6px; font-size:12px; color:rgba(255,255,255,0.5);">'
-            f'<span style="color:rgba(255,255,255,0.8); font-weight:600;">{usuario["email"]}</span><br>'
+            f'<div style="padding:0 6px; font-size:12px; color:rgba(255,255,255,0.5);">'
+            f'<span style="color:rgba(255,255,255,0.85); font-weight:600;">{usuario["email"]}</span><br>'
             f'<span style="font-size:11px; text-transform:capitalize;">{usuario["rol"].replace("_", " ")}</span>'
             f'</div>',
             unsafe_allow_html=True
@@ -103,31 +98,38 @@ with st.sidebar:
             st.rerun()
 
     else:
-        # No logueado: solo mostrar botón de login
+        # No logueado
         st.divider()
         if st.button("🔑 Iniciar sesión", use_container_width=True, type="primary"):
-            st.switch_page("pages/login.py")
+            st.session_state.seccion = "login"
+            st.rerun()
 
     st.markdown('<br><div style="color:rgba(255,255,255,0.2); font-size:10px; padding-left:6px;">Confidencial · 2026</div>', unsafe_allow_html=True)
 
 # ============================================================
-# RENDERIZADO DE CONTENIDO
+# GUARD — secciones protegidas
 # ============================================================
 seccion = st.session_state.seccion
 
-# Guard global: si la sección requiere login y no está logueado
-SECCIONES_PROTEGIDAS = ["direccion", "docente", "alumno", "familia",
-                         "alumno_familia", "moderador", "admin"]
+SECCIONES_PROTEGIDAS = [
+    "direccion", "docente", "alumno",
+    "familia", "alumno_familia",
+    "moderador", "admin"
+]
 
+# Sin login → redirigir a login
 if seccion in SECCIONES_PROTEGIDAS and not is_logged_in():
-    st.session_state.seccion = "inicio"
-    seccion = "inicio"
+    st.session_state.seccion = "login"
+    seccion = "login"
 
-# Guard de rol: si está logueado pero no tiene permiso
+# Logueado pero sin permiso → error
 if seccion in SECCIONES_PROTEGIDAS and is_logged_in() and not puede_ver(seccion):
     st.error("⛔ No tenés permisos para acceder a esta sección.")
     st.stop()
 
+# ============================================================
+# RENDERIZADO
+# ============================================================
 if seccion != "inicio":
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
@@ -135,6 +137,10 @@ try:
     if seccion == "inicio":
         from secciones.landing import show_landing
         show_landing()
+
+    elif seccion == "login":
+        from secciones.login import render
+        render()
 
     elif seccion == "direccion":
         from secciones.direccion import render
