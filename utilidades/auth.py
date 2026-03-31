@@ -52,23 +52,24 @@ def logout():
 # Secciones habilitadas por rol
 SECCIONES_POR_ROL = {
     "animar_admin": [
-        "inicio", "admin", "direccion", "docente", "alumno",
-        "familia", "alumno_familia", "moderador", "admin_institucion"
+        "inicio", "login", "admin", "direccion", "docente", "alumno",
+        "familia", "alumno_familia", "moderador"
     ],
     "animar_moderador": [
-        "inicio", "moderador", "admin_institucion"
+        "inicio", "login", "moderador", "familia", "alumno_familia",
+        "alumno", "docente", "direccion"
     ],
     "directivo": [
-        "inicio", "direccion", "docente", "alumno"
+        "inicio", "login", "direccion", "docente", "alumno"
     ],
     "docente": [
-        "inicio", "docente"
+        "inicio", "login", "docente", "alumno"
     ],
     "alumno": [
-        "inicio", "alumno"
+        "inicio", "login", "alumno"
     ],
     "tutor": [
-        "inicio", "familia", "alumno_familia"
+        "inicio", "login", "familia", "alumno_familia"
     ],
 }
 
