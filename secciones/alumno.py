@@ -13,19 +13,17 @@ conn = st.connection("postgresql", type="sql")
 def calcular_edad(fecha_nac):
     if not fecha_nac:
         return None
-    hoy = date.today()
-    try:
-        return hoy.year - fecha_nac.year - (
-            (hoy.month, hoy.day) < (fecha_nac.month, fecha_nac.day)
-        )
-    except Exception:
-        return None
+    corte = date(date.today().year, 6, 30)
+    edad = corte.year - fecha_nac.year - (
+        (corte.month, corte.day) < (fecha_nac.month, fecha_nac.day)
+    )
+    return edad
 
 def es_primaria(edad):
     if edad is None:
         return True
-    return edad <= 12
-
+    grado_escolar = edad - 5      # 6 años → 1°, 12 años → 7°
+    return grado_escolar <= 7     # 1° a 7° = primaria, 8° en adelante = secundaria
 # ============================================================
 # ESTILOS POR NIVEL
 # ============================================================
