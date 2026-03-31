@@ -122,6 +122,10 @@ def render():
         except Exception as e:
             st.error(f"Error: {e}")
 
+    from utilidades.cambiar_pass_widget import render_cambiar_password
+    # Al final de cada tab de perfil o en la sección "Mis datos":
+    render_cambiar_password()
+
     # ================================================================
     # TAB 2 — DOCENTES
     # ================================================================
