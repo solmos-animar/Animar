@@ -132,7 +132,6 @@ def _vista_encuesta(conn, enc, colegio_id, grado_sel):
                 <span style="background:{bg}; color:{color}; font-size:11px; font-weight:700;
                              padding:3px 10px; border-radius:20px; text-transform:uppercase;
                              letter-spacing:1px;">{icono} {label}</span>
-                {"<span style='background:#ede8fe;color:#5b3fa0;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-left:6px;'>Propuesta por Dirección</span>" if creada_por == "directivo" else ""}
             </div>
             <div style="font-size:17px; font-weight:700; color:#0f2240; margin-bottom:6px;">{titulo}</div>
             <div style="font-size:13px; color:#9a9690;">
