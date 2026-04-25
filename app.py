@@ -9,7 +9,7 @@ st.set_page_config(
     page_title="ConVivir — v1.1",
     page_icon="🕸️",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # 2. Cargar CSS
@@ -24,116 +24,85 @@ if "seccion" not in st.session_state:
     st.session_state.seccion = "inicio"
 
 # ============================================================
-# NAVBAR SUPERIOR
+# SIDEBAR
 # ============================================================
+with st.sidebar:
+    st.markdown('<h1 style="color:white; font-size:28px; margin-bottom:0;">ConVivir</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="color:rgba(255,255,255,0.4); margin-bottom:20px; font-size:12px;">v1.1 · 2026</p>', unsafe_allow_html=True)
 
-# Construir lista de ítems visibles
-# Cada ítem: (tipo, label, key)
-# tipos: "logo" | "sep" | "group" | "btn" | "user" | "logout"
-items = []
+    if st.button("📋 Landing", use_container_width=True):
+        st.session_state.seccion = "inicio"
+        st.rerun()
 
-items.append(("logo",  "🕸️ ConVivir", None))
-items.append(("btn",   "📋 Landing",  "inicio"))
+    if is_logged_in():
+        usuario = get_session()
+        rol     = get_rol()
 
-if is_logged_in():
-    usuario = get_session()
+        st.divider()
 
-    # Institución
-    secs_inst = [
-        ("direccion",  "🏢 Dirección"),
-        ("docente",    "👨‍🏫 Docentes"),
-        ("alumno",     "🎒 Alumnos"),
-    ]
-    vis_inst = [(k, l) for k, l in secs_inst if puede_ver(k)]
-    if vis_inst:
-        items.append(("sep",   "|",            None))
-        items.append(("group", "Institución",  None))
-        for k, l in vis_inst:
-            items.append(("btn", l, k))
+        # --- INSTITUCIÓN ---
+        if any(puede_ver(s) for s in ["direccion", "docente", "alumno"]):
+            st.markdown('<p style="color:rgba(255,255,255,0.4); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-left:6px; margin-bottom:4px;">Institución</p>', unsafe_allow_html=True)
+            if puede_ver("direccion"):
+                if st.button("🏢 Dirección", use_container_width=True):
+                    st.session_state.seccion = "direccion"
+                    st.rerun()
+            if puede_ver("docente"):
+                if st.button("👨‍🏫 Docentes", use_container_width=True):
+                    st.session_state.seccion = "docente"
+                    st.rerun()
+            if puede_ver("alumno"):
+                if st.button("🎒 Alumnos", use_container_width=True):
+                    st.session_state.seccion = "alumno"
+                    st.rerun()
 
-    # Familia
-    secs_fam = [
-        ("familia",        "👪 Tutores"),
-        ("alumno_familia", "👦 Alumnos Fam"),
-    ]
-    vis_fam = [(k, l) for k, l in secs_fam if puede_ver(k)]
-    if vis_fam:
-        items.append(("sep",   "|",       None))
-        items.append(("group", "Familia", None))
-        for k, l in vis_fam:
-            items.append(("btn", l, k))
+        # --- FAMILIA ---
+        if any(puede_ver(s) for s in ["familia", "alumno_familia"]):
+            st.divider()
+            st.markdown('<p style="color:rgba(255,255,255,0.4); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-left:6px; margin-bottom:4px;">Familia</p>', unsafe_allow_html=True)
+            if puede_ver("familia"):
+                if st.button("👦 Tutores", use_container_width=True):
+                    st.session_state.seccion = "familia"
+                    st.rerun()
+            if puede_ver("alumno_familia"):
+                if st.button("👦 Alumnos (Fam)", key="nav_fam_alu", use_container_width=True):
+                    st.session_state.seccion = "alumno_familia"
+                    st.rerun()
 
-    # Animar
-    secs_anim = [
-        ("moderador", "🛡️ Moderadores"),
-        ("admin",     "⚙️ Admin"),
-    ]
-    vis_anim = [(k, l) for k, l in secs_anim if puede_ver(k)]
-    if vis_anim:
-        items.append(("sep",   "|",      None))
-        items.append(("group", "Animar", None))
-        for k, l in vis_anim:
-            items.append(("btn", l, k))
+        # --- ANIMAR ---
+        if any(puede_ver(s) for s in ["moderador", "admin"]):
+            st.divider()
+            st.markdown('<p style="color:rgba(255,255,255,0.4); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-left:6px; margin-bottom:4px;">Animar</p>', unsafe_allow_html=True)
+            if puede_ver("moderador"):
+                if st.button("🛡️ Moderadores", use_container_width=True):
+                    st.session_state.seccion = "moderador"
+                    st.rerun()
+            if puede_ver("admin"):
+                if st.button("⚙️ Admin Institución", use_container_width=True):
+                    st.session_state.seccion = "admin"
+                    st.rerun()
 
-    # Usuario y logout
-    items.append(("sep",    "|",      None))
-    items.append(("user",   usuario,  None))
-    items.append(("logout", "🚪 Salir", None))
+        # --- Usuario + logout ---
+        st.divider()
+        st.markdown(
+            f'<div style="padding:0 6px; font-size:12px; color:rgba(255,255,255,0.5);">'
+            f'<span style="color:rgba(255,255,255,0.85); font-weight:600;">{usuario["email"]}</span><br>'
+            f'<span style="font-size:11px; text-transform:capitalize;">{usuario["rol"].replace("_", " ")}</span>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+        st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+        if st.button("🚪 Cerrar sesión", use_container_width=True):
+            logout()
+            st.rerun()
 
-else:
-    items.append(("sep", "|",               None))
-    items.append(("btn", "🔑 Iniciar sesión", "login"))
+    else:
+        st.divider()
+        if st.button("🔑 Iniciar sesión", use_container_width=True, type="primary"):
+            st.session_state.seccion = "login"
+            st.rerun()
 
-# Asignar anchos de columna por tipo
-ANCHOS = {
-    "logo":   2.0,
-    "sep":    0.1,
-    "group":  1.0,
-    "btn":    1.0,
-    "user":   2.2,
-    "logout": 0.9,
-}
-col_sizes = [ANCHOS.get(tipo, 1.0) for tipo, _, _ in items]
-cols = st.columns(col_sizes, gap="small")
-
-for col, (tipo, label, key) in zip(cols, items):
-    with col:
-        if tipo == "logo":
-            st.markdown(
-                f'<div style="color:white;font-size:16px;font-weight:700;'
-                f'padding-top:6px;white-space:nowrap;">{label}</div>',
-                unsafe_allow_html=True
-            )
-        elif tipo == "sep":
-            st.markdown(
-                '<div style="color:rgba(255,255,255,0.15);font-size:18px;'
-                'text-align:center;padding-top:4px;">|</div>',
-                unsafe_allow_html=True
-            )
-        elif tipo == "group":
-            st.markdown(
-                f'<div style="color:rgba(255,255,255,0.35);font-size:9px;'
-                f'font-weight:700;text-transform:uppercase;letter-spacing:1.2px;'
-                f'padding-top:10px;white-space:nowrap;">{label}</div>',
-                unsafe_allow_html=True
-            )
-        elif tipo == "btn":
-            if st.button(label, key=f"nav_{key}"):
-                st.session_state.seccion = key
-                st.rerun()
-        elif tipo == "user":
-            st.markdown(
-                f'<div style="color:rgba(255,255,255,0.55);font-size:11px;'
-                f'line-height:1.35;padding-top:4px;white-space:nowrap;">'
-                f'<b style="color:rgba(255,255,255,0.9);">{label["email"]}</b><br>'
-                f'{label["rol"].replace("_"," ").capitalize()}'
-                f'</div>',
-                unsafe_allow_html=True
-            )
-        elif tipo == "logout":
-            if st.button(label, key="nav_logout"):
-                logout()
-                st.rerun()
+    st.markdown('<br><div style="color:rgba(255,255,255,0.2); font-size:10px; padding-left:6px;">Confidencial · 2026</div>', unsafe_allow_html=True)
 
 # ============================================================
 # GUARD
