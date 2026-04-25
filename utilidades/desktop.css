@@ -35,7 +35,6 @@
     box-shadow: none !important;
     outline: none !important;
 }
-/* Ícono y texto dentro del botón */
 [data-testid="stSidebar"] button[kind="secondary"] p {
     color: inherit !important;
     font-size: 13.5px !important;
@@ -48,7 +47,7 @@
     border-color: rgba(255, 255, 255, 0.08) !important;
     opacity: 1 !important;
 }
-/* ---- Labels de sección (INSTITUCIÓN, FAMILIA, etc.) ---- */
+/* ---- Labels de sección ---- */
 [data-testid="stSidebar"] .section-label p {
     color: rgba(255, 255, 255, 0.35) !important;
     font-size: 10px !important;
@@ -58,28 +57,52 @@
     margin: 12px 0 4px 6px !important;
     opacity: 1 !important;
 }
-/* ---- Scrollbar del sidebar ---- */
-[data-testid="stSidebar"]::-webkit-scrollbar {
-    width: 4px;
-}
-[data-testid="stSidebar"]::-webkit-scrollbar-track {
-    background: transparent;
-}
+/* ---- Scrollbar ---- */
+[data-testid="stSidebar"]::-webkit-scrollbar { width: 4px; }
+[data-testid="stSidebar"]::-webkit-scrollbar-track { background: transparent; }
 [data-testid="stSidebar"]::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 2px;
 }
+
+/* ============================================================
+   HEADER — ocultar todo EXCEPTO el botón de la sidebar
+   ============================================================ */
+
+/* Ocultar toolbar y decoración del header */
+[data-testid="stToolbar"]      { display: none !important; }
+[data-testid="stDecoration"]   { display: none !important; }
+[data-testid="stStatusWidget"] { display: none !important; }
+
+/* Hacer el header transparente y sin altura */
+[data-testid="stHeader"] {
+    background: transparent !important;
+    height: 0 !important;
+    min-height: 0 !important;
+}
+
+/* El botón de colapsar sidebar: flotarlo sobre el contenido */
+[data-testid="collapsedControl"] {
+    display: flex !important;
+    position: fixed !important;
+    top: 10px !important;
+    left: 10px !important;
+    z-index: 9999 !important;
+    background: #0f2240 !important;
+    border-radius: 6px !important;
+    padding: 4px !important;
+}
+[data-testid="collapsedControl"] button {
+    color: rgba(255,255,255,0.7) !important;
+}
+[data-testid="collapsedControl"] button:hover {
+    color: white !important;
+    background: rgba(255,255,255,0.1) !important;
+}
+
 /* ============================================================
    CONTENIDO PRINCIPAL
    ============================================================ */
 .main-content {
     padding: 24px 32px;
-}
-/* Ocultar el header de Streamlit */
-[data-testid="stHeader"] {
-    display: none !important;
-}
-/* Toolbar superior */
-[data-testid="stToolbar"] {
-    display: none !important;
 }
