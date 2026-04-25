@@ -55,16 +55,13 @@ LOGO_MOD = (
 LANDING_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+.block-container { padding:0!important; max-width:100%!important; }
 
-/* ── FIX SIDEBAR: no tocar el block-container para que Streamlit
-      pueda reservar el espacio de la sidebar correctamente ── */
-.block-container { padding-top: 1rem !important; padding-bottom: 0 !important; max-width: 100% !important; }
-
-.cv { font-family:'DM Sans',sans-serif; background:#03091a; color:#dde8f8; min-height:100vh; width: 100%; }
+.cv { font-family:'DM Sans',sans-serif; background:#03091a; color:#dde8f8; min-height:100vh; width: 100%; margin-top: -80px; }
 
 .cv-hero {
     min-height:100vh; display:flex; flex-direction:column; justify-content:center;
-    padding:80px 52px 80px; position:relative; overflow:hidden;
+    padding:120px 52px 80px; position:relative; overflow:hidden;
     background:
         radial-gradient(ellipse 90% 65% at 50% -5%, rgba(26,111,255,0.2) 0%, transparent 65%),
         radial-gradient(ellipse 45% 45% at 87% 38%, rgba(59,130,246,0.08) 0%, transparent 55%),
